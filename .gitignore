@@ -14,11 +14,15 @@ BuildLog.htm
 *.sbr
 *.cache
 *.zip
+
+# ignore the following directories - they can occur
+# anywhere under the repo
 Unicode_Debug/
 Unicode_Release/
 Debug/
 Release/
 
+# exceptions to the above rules
 !Unicode_Debug/typelib/
 !Unicode_Release/typelib/
-!Unicode_Debug/typelib/*
+

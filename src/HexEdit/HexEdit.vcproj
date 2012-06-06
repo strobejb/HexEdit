@@ -123,9 +123,13 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Incrementing Build Number"
+				CommandLine="$(SolutionDir)build\incbuild.bat VERSION_BUILD_COUNT $(SolutionDir)src\HexEdit\version.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -169,6 +173,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCLinkerTool"
