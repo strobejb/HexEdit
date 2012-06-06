@@ -1,0 +1,66 @@
+//
+//  test.txt
+//
+//  www.catch22.net
+//
+//  Copyright (C) 2012 James Brown
+//  Please refer to the file LICENCE.TXT for copying permission
+//
+
+/* type definition language */
+
+//include "inc.txt";
+
+byte (* foobar)(dword a, byte b);
+
+enum oof
+{
+   FILETYPE_A = 0x2f,//2Af,
+   FILETYPE_B = 0370,
+   FILETYPE_C= 02.34e-500,
+FILETYPE_D= "\n\x4  "
+"blah",
+FILETYPE_E= 1.3e-2,
+};
+
+unsigned const dword A;
+typedef dword B;
+const B b;
+typedef dword a, *pa[((3*2))+5], *((*ppa)[4]);
+
+typedef ppa *pppa[5];
+
+typedef struct POINT
+{
+	dword x, y;
+	dword z;
+} P;
+
+typedef struct POINT *PP;
+
+typedef PP *PPP[3];
+
+PPP oof;
+
+
+struct POINT p;
+
+
+struct s
+{
+   enum oof e;
+
+   
+   struct POINT p[2][3];
+
+   union 
+   {
+	struct POINT p2;
+	struct { byte b; };
+
+	dword d;
+	word w;
+   };
+
+} s;
+

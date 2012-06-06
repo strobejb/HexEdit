@@ -1,0 +1,14 @@
+//
+//  highlight.txt
+//
+//  www.catch22.net
+//
+//  Copyright (C) 2012 James Brown
+//  Please refer to the file LICENCE.TXT for copying permission
+//
+
+0084 23 Resource Some annotations
+00D2 10 Header helloworld
+00136 67 Header2 smeghead!
+000234 25	Blah blah
+fff44f2 23ae Blah blah

@@ -1,0 +1,48 @@
+//
+//  basetypes.txt
+//
+//  www.catch22.net
+//
+//  Copyright (C) 2012 James Brown
+//  Please refer to the file LICENCE.TXT for copying permission
+//
+
+typedef unsigned byte 	uint8, 	BYTE,  UINT8;
+typedef unsigned word	uint16, WORD,  UINT16, USHORT;
+typedef unsigned dword 	uint32, DWORD, UINT32, ULONG, ULONG32;
+typedef unsigned qword 	uint64, QWORD, UINT64, ULONG64, ULONGLONG;
+typedef signed byte 	int8, 	INT8,  SINT8;
+typedef signed word 	int16, 	INT16, SINT16, SHORT, short;
+typedef signed dword 	int32, 	INT32, SINT32, LONG, LONG32, long, int;
+typedef signed qword 	int64,  INT64, SINT64, LONG64, LONGLONG;
+typedef char 		CHAR;
+typedef wchar_t 	WCHAR;
+typedef float 		FLOAT;
+typedef double		DOUBLE;
+
+/* head */
+struct ALL
+{
+  union {
+
+	char 	Char;			// Ascii character
+	wchar_t WideChar;		// UTF-16 Unicode Character
+
+	byte 	Byte;
+	word 	Word;
+	dword 	Dword;
+	qword 	Qword;
+
+	short 	Short;
+	long 	Long;
+
+	float 	Float;			// 32bit floating point
+	double 	Double;			// 64bit floating point
+
+	DOSTIME 	dosTime;	// 16bit DOSTIME structure
+	DOSDATE 	dosDate;	/* 16bit DOSDATE */
+	FILETIME 	ft;		// 64bit WindowsNT
+	time_t  	tt;		// Unix time_t
+
+  };
+} AllTypes;

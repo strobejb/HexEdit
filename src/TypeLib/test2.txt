@@ -1,0 +1,31 @@
+//
+//  test2.txt
+//
+//  www.catch22.net
+//
+//  Copyright (C) 2012 James Brown
+//  Please refer to the file LICENCE.TXT for copying permission
+//
+
+/* type definition language */
+
+//include "inc.txt";
+
+enum oof
+{
+   FILETYPE_A = 0x20,
+   FILETYPE_B = 0x30,
+   FILETYPE_C=2
+};
+
+struct s
+{
+  enum oof e;
+}
+
+
+/*
+unsigned const dword A;
+typedef dword B, *PB;
+const B b;
+*/
