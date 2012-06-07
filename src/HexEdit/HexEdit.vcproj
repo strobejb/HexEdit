@@ -3531,6 +3531,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ShellContextMenu.c"
+				>
+			</File>
+			<File
 				RelativePath="Statusbar.c"
 				>
 				<FileConfiguration

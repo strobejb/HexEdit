@@ -19,6 +19,9 @@
 
 #include "ComboUtil.h"
 
+BOOL SetExplorerContextMenu(BOOL fAddToMenu);
+BOOL IsContextMenuInstalled();
+
 void MakeFontCombo(HWND hwndDlg, HWND hwndCombo);
 BOOL MakeColourCombo(HWND hwndCombo, COLORREF crList[], TCHAR *szTextList[], int nCount);
 void InitSizeList(HWND hwndCombo, TCHAR *szFontName);
@@ -68,7 +71,6 @@ TEXT("Blue"),
 TEXT("Magenta"),
 TEXT("Cyan"),
 };
-
 
 
 
@@ -176,10 +178,27 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 INT_PTR CALLBACK MiscOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	BOOL g_fAddToExplorer;
+	PSHNOTIFY *pshn;
+
 	switch(msg)
 	{
 	case WM_INITDIALOG:
+		g_fAddToExplorer = IsContextMenuInstalled();
+		CheckDlgButton(hwnd, IDC_ADDCONTEXT, g_fAddToExplorer);
+
 		return TRUE;
+
+	case WM_NOTIFY:
+
+		pshn = (PSHNOTIFY *)lParam;
+
+		if(pshn->hdr.code == PSN_APPLY)
+		{
+			g_fAddToExplorer = IsDlgButtonChecked(hwnd, IDC_ADDCONTEXT);
+			SetExplorerContextMenu(g_fAddToExplorer);
+
+		}
 	}
 
 	return FALSE;
