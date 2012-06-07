@@ -105,7 +105,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		//AlignWindow(hwndPin, GetDlgItem(hwnd, IDCANCEL),  ALIGN_BOTTOM);
 
 		//AlignWindow(hwndPin, GetDlgItem(hwnd, IDC_GOTO_OFFSET), ALIGN_LEFT);
-		AlignWindow(hwndPin, GetDlgItem(hwnd, IDCANCEL),  ALIGN_RIGHT);
+		AlignWindow(hwndPin, GetDlgItem(hwnd, IDC_GOTO_OFFSET),  ALIGN_LEFT);
 
 
 		// setup the 'bookmark' combo

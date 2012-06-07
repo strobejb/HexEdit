@@ -33,7 +33,7 @@ extern BOOL g_fFileChanged;
 
 BOOL ShowFileOpenDlg(HWND hwnd, LPTSTR pszFileName, LPTSTR pszTitleName, DWORD *flags);
 BOOL ShowFileSaveDlg(HWND hwnd, LPTSTR pszFileName, LPTSTR pszTitleName);
-BOOL ShowFindDialog(HWND hwndOwner);
+BOOL ShowFindDialog(HWND hwndOwner, int idx);
 void ShowAboutDlg(HWND hwndParent);
 BOOL ShowExportDlg(HWND hwnd, LPTSTR pszFileName, LPTSTR pszTitleName);
 BOOL ShowImportDlg(HWND hwnd, LPTSTR pszFileName, LPTSTR pszTitleName);
@@ -308,7 +308,7 @@ LONG HexEdit_OnCommand(HWND hwnd, UINT nCommandId, UINT nNotify, HWND hwndContro
 		return 0;
 
 	case IDM_SEARCH_FIND:
-		ShowFindDialog(hwnd);
+		ShowFindDialog(hwnd, -1);
 		return 0;
 
 	case IDM_SEARCH_NEXT:
@@ -316,9 +316,7 @@ LONG HexEdit_OnCommand(HWND hwnd, UINT nCommandId, UINT nNotify, HWND hwndContro
 		return 0;
 
 	case IDM_SEARCH_REPLACE:
-		//h = GetDlgItem(g_hwndSearchBar, 666);
-		//val = (DWORD)SendMessage(h, TB_GETSTATE, IDM_SEARCH_REPLACE, 0);
-		//HexView_Highlight(hwndHV, val & TBSTATE_CHECKED ? TRUE : FALSE);
+		ShowFindDialog(hwnd, 3);
 		return 0;
 
 	case IDM_SEARCH_GOTO:

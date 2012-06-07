@@ -193,7 +193,7 @@ INT_PTR CALLBACK ModifyDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPara
 			SetDlgItemBaseInt(hwnd, IDC_MODIFY_OPERAND,  nLastOperand, fHexLength ? 16 : 10, FALSE);
 
 			SendDlgItemMessage(hwnd, IDC_MODIFY_OPERAND, EM_SETSEL, 0, -1);
-			SetFocus(GetDlgItem(hwnd, IDC_MODIFY_OPERAND));
+			SetDlgItemFocus(hwnd, IDC_MODIFY_OPERAND);
 			return TRUE;
 
 		case IDOK:

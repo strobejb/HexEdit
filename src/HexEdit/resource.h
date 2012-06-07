@@ -2,19 +2,24 @@
 // Microsoft Visual C++ generated include file.
 // Used by HexEdit.rc
 //
+#define VERSION_MINOR                   0
 #define IDC_PADDINGB                    1
 #define IDC_ADVANCED                    1
 #define IDC_FONTLIST                    1
 #define IDS_HEXTYPES                    1
 #define IDC_SIZELIST                    2
 #define IDS_STRING2                     2
+#define VERSION_MAJOR                   2
+#define IDOK2                           2
 #define IDCANCEL2                       3
 #define IDC_ITEMLIST                    3
 #define IDC_FGCOLCOMBO                  4
+#define VERSION_BUILD                   4
 #define IDC_BUTTON2                     5
 #define IDC_BGCOLCOMBO                  6
 #define IDC_BUTTON3                     7
 #define IDC_BOLD                        11
+#define VERSION_BUILD_COUNT             16
 #define IDI_APP                         100
 #define IDR_MENU1                       101
 #define IDB_BITMAP1                     103

@@ -175,7 +175,7 @@ INT_PTR CALLBACK InsertDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPara
 			SetDlgItemBaseInt(hwnd, IDC_INSERT_NUMBYTES, len, fHex ? 16 : 10, FALSE);
 
 			SendDlgItemMessage(hwnd, IDC_INSERT_NUMBYTES, EM_SETSEL, 0, -1);
-			SetFocus(GetDlgItem(hwnd, IDC_INSERT_NUMBYTES));
+			SetDlgItemFocus(hwnd, IDC_INSERT_NUMBYTES);
 
 			return 0;
 

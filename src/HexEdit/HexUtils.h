@@ -108,6 +108,7 @@ UINT ListBox_GetDlgSelData(HWND hwndDlg, UINT nListId);
 DWORD SaveFileData(const TCHAR *szPath, const TCHAR *szStreamName, PVOID data, DWORD len);
 DWORD LoadFileData(const TCHAR *szPath, const TCHAR *szStreamName, PVOID data, DWORD len);
 
+HWND SetDlgItemFocus(HWND hwndDialog, UINT uDlgItemId);
 
 #ifdef __cplusplus
 }

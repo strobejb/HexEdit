@@ -30,7 +30,7 @@ BYTE  replaceData[100];
 DWORD replaceLen = 0;//sizeof(searchData);
 BOOL  replaceValid = FALSE;
 
-BOOL ShowFindDialog(HWND hwndMain);
+BOOL ShowFindDialog(HWND hwndMain, int idx);
 BOOL UpdateProgress(MAINWND *mainWnd, BOOL fVisible, size_w pos, size_w len);
 
 /*struct SEARCH_PARAMS
@@ -571,7 +571,7 @@ BOOL FindNext()
 
 	if(searchLen == 0 || searchValid == FALSE)
 	{
-		ShowFindDialog(g_hwndMain);
+		ShowFindDialog(g_hwndMain, -2);
 		return FALSE;
 	}
 
@@ -632,6 +632,14 @@ BOOL Find(HWND hwnd, HWND hwndHV)
 			searchLen = sizeof(searchData);
 			//Update(hwnd, sps, searchData, &searchLen);
 			searchValid = UpdateSearchDataDlg(hwnd, IDC_COMBO1, g_fBigEndian, searchData, &searchLen);
+
+			if(searchValid == FALSE)
+			{
+				HexErrorBox(TEXT("%s"), TEXT("Invalid search data - select Data Type"));
+				SetDlgItemFocus(hwnd, IDC_COMBO1);
+				return FALSE;
+			}
+
 			HexView_FindInit(hwndHV, searchData, searchLen);
 			HexView_SetSearchPattern(hwndHV, searchData, searchLen);
 			
@@ -663,7 +671,7 @@ void Replace(HWND hwndDlg, HWND hwndHV)
 
 	if(selsize != replaceLen && HexView_GetEditMode(hwndHV) != HVMODE_INSERT)
 	{
-		MessageBox(hwndDlg, TEXT("Must be same size"), TEXT("error"), MB_OK|MB_ICONWARNING);
+		MessageBox(hwndDlg, TEXT("Replace data must be same length in Overwrite mode"), TEXT("error"), MB_OK|MB_ICONWARNING);
 	}
 	else
 	{
@@ -698,10 +706,10 @@ INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		UpdateFindGui(hwnd, sps);
 
-		hwndPin = CreatePinToolbar(hwnd, IDC_KEEPVISIBLE, TRUE);
+		hwndPin = CreatePinToolbar(hwnd, IDC_KEEPVISIBLE, FALSE);//TRUE);
 
 		AlignWindow(hwndPin, GetDlgItem(hwnd, IDC_GROUP), ALIGN_BOTTOM);
-		AlignWindow(hwndPin, GetDlgItem(hwnd, IDCANCEL),  ALIGN_RIGHT);
+		AlignWindow(hwndPin, GetDlgItem(hwnd, IDCANCEL),  ALIGN_LEFT);
 
 
 		// add the history!
@@ -735,9 +743,7 @@ INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 
 		case IDOK:
-			
 			Find(hwnd, hwndHV);
-
 			return TRUE;
 		}
 
@@ -856,7 +862,7 @@ void AddSearchTabs(HWND hwnd)
 	// adjust the find dialog size
 	AdjustWindowRectEx(&rect, GetWindowLong(hwnd, GWL_STYLE), FALSE, GetWindowLong(hwnd, GWL_EXSTYLE));
 	InflateRect(&rect, FINDBORDER, FINDBORDER);
-	SetWindowPos(hwnd, 0, 0, 0, rect.right-rect.left, rect.bottom-rect.top-2, SWP_SIZEONLY);
+	//SetWindowPos(hwnd, 0, 0, 0, rect.right-rect.left, rect.bottom-rect.top-2, SWP_SIZEONLY);
 
 	// now find out the tab control's client display area
 	GetWindowRect(hwndTab, &rect);
@@ -933,7 +939,7 @@ void SetFindTab(HWND hwndFindDlg, int idx, BOOL fMouseActivated)
 	// was the mouse used to activate this tab?
 	if(fMouseActivated)
 	{
-		SetFocus(GetDlgItem(hwndPanel, IDC_COMBO1));
+		SetDlgItemFocus(hwndPanel, IDC_COMBO1);
 		PostMessage(hwndPanel, WM_NEXTDLGCTL, IDC_COMBO1, TRUE);
 	}
 	
@@ -947,7 +953,11 @@ void SetFindTab(HWND hwndFindDlg, int idx, BOOL fMouseActivated)
 		}
 	}
 
-	SetFocus(GetDlgItem(g_hwndFindPane[idx], IDC_COMBO1));
+	// hide the replace/replaceall buttons if necessary
+	EnableDlgItem(hwndFindDlg, IDC_REPLACE, (BOOL)(idx == 3));
+	EnableDlgItem(hwndFindDlg, IDC_REPLACEALL, (BOOL)(idx == 3));
+
+	SetDlgItemFocus(g_hwndFindPane[idx], IDC_COMBO1);
 	PostMessage(g_hwndFindPane[idx], WM_NEXTDLGCTL, IDC_COMBO1, TRUE);
 
 	PostMessage(g_hwndFindPane[idx], WM_COMMAND, MAKEWPARAM(IDC_COMBO1, CBN_EDITUPDATE), 0);
@@ -963,6 +973,7 @@ INT_PTR CALLBACK SearchDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	static POINT ptLastPos;
 	static BOOL  fFirstTime = TRUE;
 	HWND hwndCombo;
+	HWND hwndHV = g_hwndHexView;
 
 	switch(msg)
 	{
@@ -1031,8 +1042,15 @@ INT_PTR CALLBACK SearchDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(hwnd);
 			return TRUE;
 
+		case IDC_REPLACE:
+			Replace(GetCurFindTab(hwnd), hwndHV);
+			return TRUE;
+
+		case IDC_REPLACEALL:
+			return TRUE;
+
 		case IDOK:
-			PostMessage(GetCurFindTab(hwnd), msg, wParam, lParam);
+			Find(GetCurFindTab(hwnd), hwndHV);
 			return TRUE;
 		}
 
@@ -1059,10 +1077,16 @@ INT_PTR CALLBACK SearchDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL ShowFindDialog(HWND hwndMain)
+BOOL ShowFindDialog(HWND hwndMain, int nCurrentFindTab)
 {
 	if(nCurrentFindTab == -1)
+	{
 		nCurrentFindTab = HexView_GetCurPane(g_hwndHexView);// == 0 ? 0 : 1;
+	}
+	else if(nCurrentFindTab == -2 && g_hwndSearch)
+	{
+		nCurrentFindTab = TabCtrl_GetCurSel(GetDlgItem(g_hwndSearch, IDC_TAB1));//GetCurFindTab(g_hwndSearch);
+	}
 
 	if(g_hwndSearch == 0)
 	{

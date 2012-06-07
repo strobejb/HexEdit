@@ -889,3 +889,7 @@ BOOL FontExists(HWND hWnd, LPCTSTR szFontName)
 } 
 
 
+HWND SetDlgItemFocus(HWND hwndDialog, UINT uDlgItemId)
+{
+	return SetFocus(GetDlgItem(hwndDialog, uDlgItemId));
+}
