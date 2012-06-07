@@ -63,7 +63,10 @@ void DrawDockPanelBackground(DOCKPANEL *dpp, HDC hdc)
 		rect.top += 18;
 	}
 
-	FillRect(hdc, &rect, GetSysColorBrush(COLOR_3DFACE));
+	if(!(dpp->dwStyle & DWS_THEMED_BACKGROUND))
+	{
+		FillRect(hdc, &rect, GetSysColorBrush(COLOR_3DFACE));
+	}
 
 	if(dpp->fDocked && (dpp->dwStyle & DWS_DOCKED_TITLEBAR))
 	{
@@ -160,7 +163,8 @@ void DrawDockPanelBackground(DOCKPANEL *dpp, HDC hdc)
 
 		if(hTheme)
 		{
-			rect.top -= 16;
+			rect.top -= 10;//16;
+			rect.right += 10;	// urrrghh.... fixes the non-repainting bug on the right-side 
 			DrawThemeBackground(hTheme, hdc, 0, 0, &rect, 0);
 
 			if(dpp->dwStyle & DWS_DRAWGRIPPER)
