@@ -50,7 +50,10 @@ def main()
   # get the fileversion from exe resource section
   ver = version(File.join($bindir, 'HexEdit.exe'))
 
-  Dir.mkdir('out')
+  begin
+    Dir.mkdir('out')
+  rescue
+  end
   zipname = "out/hexedit-#{ver}.zip"
 
   puts "Building: #{zipname}"
