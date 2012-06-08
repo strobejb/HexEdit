@@ -1275,6 +1275,9 @@ bool sequence::clear ()
 	buffer_list.clear();
 	sequence_length = 0;
 	can_quicksave   = false;
+
+	// make sure to setup all the filedescriptors again to 'empty'!
+	init();
 	return true;
 }
 
