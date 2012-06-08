@@ -1,7 +1,7 @@
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 0
-#define VERSION_BUILD 4
-#define VERSION_BUILD_COUNT 42
+#define VERSION_BUILD 5
+#define VERSION_BUILD_COUNT 44
 
 #define STR1(x) #x
 #define STR(x) STR1(x)
