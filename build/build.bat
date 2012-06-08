@@ -1,11 +1,17 @@
 @echo off
 
-cd ..
+SET vcvars="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
+SET version_h=".\version.h"
+SET resource_rc="..\src\HexEdit\HexEdit.rc"
 
-REM Win32
-msbuild HexEdit.sln /p:Configuration="Unicode Release" /p:Platform=Win32
+REM update the version build count, and 
+REM the resource-file prior to building the solution
+incbuild.rb %version_h% %resource_rc%
 
-REM Win64
-msbuild HexEdit.sln /p:Configuration="Unicode Release" /p:Platform=x64
+REM path to the visual-studio commandline environment variables
 
-cd build
+REM spawn another shell and run 'build0' with the VCVARS
+%comspec% /c "%vcvars% x86 && build0.bat"
+
+REM package everything together
+buildzip.rb

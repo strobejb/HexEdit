@@ -15,7 +15,7 @@ def zipfiles(zipfile, filespec, dest, ignore=[])
     
     d = dest
     d = File.join(dest, file.sub(filespec+'/','')) if File.directory?(filespec)
-    puts d
+    puts "Adding:    #{d}"
     zipfile.add(d, file)
 
   end
@@ -36,7 +36,10 @@ def version(file)
     Win32API.new('version.dll', 'GetFileVersionInfo', ['P', 'L', 'L', 'P'], 'L').call(file, 0, vsize, result)
 
     rstring = result.unpack('v*').map{ |s| s.chr if s < 256} * ''
-    #r = /ProductVersion\s+([\d\.]+)\000/.match(rstring)
+
+    r = /FileVersion\D+([\d\.]+)\000/.match(rstring)
+    puts "Packaging: #{file} - version #{r[1]}" if r
+
     r = /ProductVersion\D+([\d|\.]+)/.match(rstring)
     v = r[1] if r
 
@@ -56,7 +59,7 @@ def main()
   end
   zipname = "out/hexedit-#{ver}.zip"
 
-  puts "Building: #{zipname}"
+  puts "Building:  #{zipname}"
 
   # delete any existing zip
   FileUtils.rm zipname, :force=>true
@@ -70,6 +73,9 @@ def main()
     zipfiles(zipfile, File.join($bindir, 'typelib'),     'HexEdit/typelib',     $ignore)
 
   end
+
+  len = File.size(zipname)
+  puts "Done:      #{len} bytes"
 end
 
 main()
