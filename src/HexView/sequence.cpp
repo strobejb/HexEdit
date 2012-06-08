@@ -122,9 +122,7 @@ bool sequence::init ()
 
 bool sequence::init (const seqchar *buffer, size_t length)
 {
-	clear();
-
-	if(!init())
+	if(!clear())
 		return false;
 
 	buffer_control *bc = new buffer_control();
@@ -176,9 +174,7 @@ sequence::span * sequence::loadspan(const TCHAR *filename, bool readonly, bool q
 //
 bool sequence::open(const TCHAR *filename, bool readonly, bool quickload)
 {
-	clear();
-
-	if(!init())
+	if(!clear())
 		return false;
 
 	buffer_control *bc = new buffer_control();

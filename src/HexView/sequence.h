@@ -149,6 +149,7 @@ public:
 	ref			operator[] (size_w index);
 
 	HANDLE		_handle();
+	size_t		origfileid() { return origfile_id; }
 
 private:
 
