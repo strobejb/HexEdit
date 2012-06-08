@@ -445,6 +445,10 @@ INT_PTR CALLBACK PasteDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 				nLastTransform	= (int)SendDlgItemMessage(hwnd, IDC_IMPORTFORMAT,	  CB_GETCURSEL, 0, 0);
 				fLastMask		= IsDlgButtonChecked(hwnd, IDC_MASKSEL);
 
+				g_PasteOptions.format		= ComboBox_GetDlgSelData(hwnd, IDC_IMPORTFORMAT);
+				g_PasteOptions.fBigEndian	= IsDlgButtonChecked(hwnd, IDC_ENDIAN);
+				g_PasteOptions.fUseAddress	= IsDlgButtonChecked(hwnd, IDC_USEADDRESS);
+
 				PasteSpecial(hwndHV, fLastMask, nLastClipFormat, &g_PasteOptions);
 
 				EndDialog(hwnd, TRUE);
