@@ -544,7 +544,7 @@ BOOL DockWnd_CreateContent(DOCKPANEL *dpp, DOCKWND *dwp, HKEY hKey)
 	dwp->hwndContents = (HWND)DockWnd_NotifyParent(dpp, dwp, DWN_CREATE_CONTENT, (NMHDR *)&nmdw);
 
 	// don't set the dockpanel field yet!
-	//dpp->hwndContents = dwp->hwndContents;
+	dpp->hwndContents = dwp->hwndContents;
 
 	if(dwp->hwndContents == 0)
 		return FALSE;
@@ -694,7 +694,7 @@ DOCKPANEL * NewDockPanel(DOCKSERVER *dsp)
 BOOL WINAPI DockWnd_RegisterEx(HWND hwndMain, UINT uId, UINT uGroupWith, LPCTSTR szTitle)
 {
 	DOCKSERVER *dsp;
-	DOCKPANEL *dpp;
+	DOCKPANEL *dpp = 0;
 	DOCKWND *dwp;
 	
 	if((dsp = GetDockServer(hwndMain)) == 0)
@@ -708,17 +708,14 @@ BOOL WINAPI DockWnd_RegisterEx(HWND hwndMain, UINT uId, UINT uGroupWith, LPCTSTR
 	// be grouped in the same panel as the referenced uGroupId DOCKWND
 	if(uGroupWith != 0)
 	{
-		if((dwp = DOCKWNDFromId(hwndMain, uGroupWith)) == 0)
-			return FALSE;
+		if((dwp = DOCKWNDFromId(hwndMain, uGroupWith)) != 0)
+			dpp = dwp->pDockPanel;
+	}
 
-		dpp = dwp->pDockPanel;
-	}
-	// otherwise create a new panel!
-	else
-	{
-		if((dpp = NewDockPanel(dsp)) == 0)
-			return FALSE;
-	}
+
+	// create a new panel if nothing else worked
+	if(dpp == 0 && (dpp = NewDockPanel(dsp)) == 0)
+		return FALSE;
 
 	// insert into the PANEL's wndlist
     dwp = AllocDockObj(0, 0, 0, sizeof(DOCKWND));
@@ -851,6 +848,7 @@ BOOL WINAPI DockWnd_SetGroupId(HWND hwndMain, UINT uId, UINT uGroupId)
 BOOL DockWnd_ShowInternal2(DOCKWND *dwp)
 {
 	DOCKPANEL *dpp = dwp->pDockPanel;
+	HWND hwndOldContent = dpp->hwndContents;
 
 	//
 	// Create containing panel if necessary 
@@ -874,9 +872,10 @@ BOOL DockWnd_ShowInternal2(DOCKWND *dwp)
 	}
 
 	// if it's not already visible...
-	if(dwp->hwndContents != dpp->hwndContents)
+	if(hwndOldContent != dpp->hwndContents || dwp->hwndContents != dpp->hwndContents)
 	{
-		ShowWindow(dpp->hwndContents, SW_HIDE);
+		if(hwndOldContent == 0) hwndOldContent = dpp->hwndContents;
+		ShowWindow(hwndOldContent, SW_HIDE);//dpp->hwndContents, SW_HIDE);
 		dpp->hwndContents = dwp->hwndContents;
 		ShowWindow(dwp->hwndContents, SW_SHOW);
 
@@ -1026,7 +1025,7 @@ BOOL WINAPI DockWnd_Update(HWND hwndMain)
 		//if(dsp->PanelList[i]hwndPanel)
 		//	DockWnd_Show(hwndMain, dsp->PanelList[i].uId, TRUE);
 
-		if(dpp->fVisible)// && dsp->fDeferShowWindow == FALSE)
+		if(dpp->fVisible)// && dpp->fDocked == FALSE && dsp->fDeferShowWindow == FALSE)
 		{
 			// show the 'last' current tab, this will force the window visible
 			DockWnd_Show(hwndMain, dpp->uCurrentTabId, TRUE);

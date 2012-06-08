@@ -74,6 +74,7 @@ void UpdateToolbarState(HWND hwndTB, HWND hwndHV);
 BOOL SaveHighlights(HWND hwndHexView);
 void SaveSettings();
 void LoadSettings();
+void FirstTimeOptions(HWND hwndMain);
 BOOL UpdateHighlights(BOOL fAlways);
 int HexPasteSpecialDlg2(HWND hwnd);
 
@@ -300,7 +301,7 @@ void InitDockingBars(HWND hwnd)
 		DockWnd_SetStyle(hwnd, DWID_SEARCHBAR, dwStyle, dwStyle);
 
 		//DockWnd_Dock(hwnd, DWID_SEARCHBAR);
-		//DockWnd_Show(hwnd, DWID_SEARCHBAR, TRUE);
+		DockWnd_Show(hwnd, DWID_SEARCHBAR, TRUE);
 		//CenterWindow(DockWnd_GetWindow(hwnd, DWID_SEARCHBAR));
 	}
 	
@@ -308,8 +309,8 @@ void InitDockingBars(HWND hwnd)
 	{
 		DWORD dwStyle = DWS_SPLITTER |
 						DWS_TABSTRIP |
-						DWS_DOCKED_BOTTOM |
-						DWS_DOCKED_TITLEBAR
+						DWS_DOCKED_BOTTOM //|
+						//DWS_DOCKED_TITLEBAR
 						;// | DWS_DRAWGRIPPER;
 
 		DockWnd_Register(hwnd, DWID_TYPEVIEW, TEXT("TypeView"));
@@ -318,7 +319,7 @@ void InitDockingBars(HWND hwnd)
 		DockWnd_SetStyle(hwnd, DWID_TYPEVIEW, dwStyle, dwStyle);
 
 		DockWnd_Dock(hwnd, DWID_TYPEVIEW);
-		DockWnd_Show(hwnd, DWID_TYPEVIEW, TRUE);
+		//DockWnd_Show(hwnd, DWID_TYPEVIEW, TRUE);
 		CenterRelative(DockWnd_GetWindow(hwnd, DWID_TYPEVIEW), hwnd, hdwp);
 	}
 
@@ -332,7 +333,7 @@ void InitDockingBars(HWND hwnd)
 		DockWnd_SetStyle(hwnd, DWID_ALLTYPES, dwStyle, dwStyle);
 
 		DockWnd_Dock(hwnd, DWID_ALLTYPES);
-		DockWnd_Show(hwnd, DWID_ALLTYPES, TRUE);
+		//DockWnd_Show(hwnd, DWID_ALLTYPES, TRUE);
 		CenterRelative(DockWnd_GetWindow(hwnd, DWID_ALLTYPES), hwnd, hdwp);
 	}
 
@@ -924,8 +925,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		DragAcceptFiles(hwnd, TRUE);
 
 		UpdateRecentMenu(GetSubMenu(GetMenu(hwnd), 0));
+
+		SetTimer(hwnd, 0xdeadbeef, 1000, 0);
 		
 		return TRUE;
+
+	case WM_TIMER:
+		if(wParam == 0xdeadbeef)
+		{
+			KillTimer(hwnd, wParam);
+			//FirstTimeOptions(hwnd);
+		}
+		return 0;
 
 	case WM_DROPFILES:
 

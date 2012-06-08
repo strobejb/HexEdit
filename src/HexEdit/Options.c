@@ -310,6 +310,15 @@ void ShowOptions(HWND hwndParent)
 	CoUninitialize();
 }
 
+void FirstTimeOptions(HWND hwndMain)
+{
+	TCHAR szMsg[] = TEXT("Welcome to HexEdit!\n\n")
+		TEXT("Would you like integrate HexEdit into the Explorer shell menu?\n")
+		TEXT("This option is available through the main Options dialog");
+	MessageBox(hwndMain, szMsg, TEXT(""), MB_ICONQUESTION|MB_YESNO);
+
+}
+
 void LoadSettings()
 {
 	HKEY hKey;

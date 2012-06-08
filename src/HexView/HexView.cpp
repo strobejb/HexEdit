@@ -952,7 +952,9 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			((TCHAR *)lParam)[0] = '\0';
+			if(lParam && wParam > 0)
+				((TCHAR *)lParam)[0] = '\0';
+
 			return FALSE;
 		}
 

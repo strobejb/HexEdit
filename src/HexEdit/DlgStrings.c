@@ -25,24 +25,47 @@ static TCHAR *szStringTypes[] =
 };
 
 
-BOOL FindStringsBuf(BYTE *buf, int len)
+int FindStringsBuf(BYTE *buf, size_t len, int minlen, size_t *foundstart, size_t *foundend)
 {
-	int i;
+	size_t i;
+	BOOL fFound = FALSE;
+
+	*foundstart = -1;
+	*foundend   = -1;
 
 	for(i = 0; i < len; i++)
 	{
 		if(isascii(buf[i]))
 		{
+			if(i >= minlen && *foundstart == -1)
+			{
+				*foundstart = i;			
+			}
+		}
+		else 
+		{
+			break;
 		}
 	}
 
-	return TRUE;
+	if(*foundstart != -1)
+	{
+		*foundend = i;
+		return 1;
+	}
+
+	return 0;
 }
 
-BOOL FindStrings(HWND hwndHV, size_w offset, size_w length)
+BOOL FindStrings(HWND hwndHV, size_w offset, size_w length, int minLen)
 {
 	BYTE   buf[0x100];
 	ULONG  len;
+
+	size_t startmatch = -1;
+	size_t endmatch   = -1;
+
+	//size_t
 
 	while(length > 0)
 	{
@@ -50,7 +73,19 @@ BOOL FindStrings(HWND hwndHV, size_w offset, size_w length)
 
 		if(HexView_GetData(hwndHV, offset, buf, len))
 		{
-			
+			size_t i;
+			while(i < len)
+			{
+				size_t pos;
+				// did we find something?
+				pos = FindStringsBuf(buf + i, len - i, minLen, &startmatch, &endmatch);
+
+				//if(pos
+				{
+					//GVITEM gvitem;
+					// ADD ADD ADD
+				}
+			}
 			offset += len;
 			length -= len;
 		}
@@ -96,7 +131,7 @@ INT_PTR CALLBACK StringsDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPar
 				HexView_GetFileSize(hwndHV, &length);
 			}
 
-			FindStrings(hwndHV, start, length);
+			FindStrings(hwndHV, 0,start, length);
 
 			EndDialog(hwnd, TRUE);
 			return TRUE;

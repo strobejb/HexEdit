@@ -308,7 +308,9 @@ HANDLE sequence::_handle()
 	{
 		for(size_t i = 0; i < buffer_list.size(); i++)
 		{
+			buffer_control *bc = buffer_list[i];
 			HANDLE h = buffer_list[i]->hFile;
+			h = h;
 		}
 		return buffer_list[1]->hFile;
 	}
