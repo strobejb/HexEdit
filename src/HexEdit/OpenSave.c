@@ -467,7 +467,9 @@ BOOL HexCloseFile(MAINWND *mainWnd, int iItem)
 	SaveHighlights(hwndHV);
 	
 	HexView_GetFileName(hwndHV, szFilePath, MAX_PATH);
-	DestroyWindow(hwndHV);
+	
+	if(hwndHV == (HWND)tci.lParam)
+		DestroyWindow(hwndHV);
 
 	UpdateHighlight(szFilePath, 0, TRUE);
 	return TRUE;
@@ -515,15 +517,40 @@ HWND HexIsOpen(HWND hwndMain, LPCTSTR szFileName, int *idx)
 	return NULL;
 }
 
+void UpdateMainTabs(HWND hwndTabView)
+{
+	int i;
+	TCITEM tci = { TCIF_PARAM, 0, 0, NULL, 0, 0, 0 };
+
+	for(i = 0; TabCtrl_GetItem(hwndTabView, i, &tci); i++)
+	{
+		HWND hwndHV = (HWND)tci.lParam;
+		TCHAR szPath[MAX_PATH];
+
+		if(HexView_GetFileName(hwndHV, szPath, MAX_PATH))
+		{
+			TCITEM tci2 = {0};
+
+			tci.mask     = TCIF_PARAM | TCIF_TEXT | TCIF_STATE;
+			tci.dwState  = TCIS_FILENAME;
+			tci.lParam   = (LPARAM)hwndHV;
+			tci.pszText  = (WCHAR *)szPath;//g_szFileTitle;
+			
+			TabCtrl_SetItem(hwndTabView, i, &tci);
+		}
+	}
+}
+
+
 //
 //	Open the specified file
 //
 BOOL HexOpenFile(HWND hwndMain, LPCTSTR szFileName, DWORD fHexViewFlags)
 {
 	HWND   hwndHV;
-	//int    count = TabCtrl_GetItemCount(g_hwndTabView);
 	TCITEM tci = { TCIF_PARAM, 0, 0, NULL, 0, 0, 0 };
-	int i;
+	BOOL fReuseTab = FALSE;
+	int  i;
 	
 	// is the file already open?!
 	if(HexIsOpen(hwndMain, szFileName, &i))
@@ -532,7 +559,19 @@ BOOL HexOpenFile(HWND hwndMain, LPCTSTR szFileName, DWORD fHexViewFlags)
 	}
 	
 	// shall we use the (untitled) document or create a new window?
-	hwndHV = CreateHexViewCtrl(hwndMain);
+	if(TabCtrl_GetItemCount(g_hwndTabView) == 1 && TabCtrl_GetItem(g_hwndTabView, 0, &tci))
+	{
+		hwndHV = (HWND)tci.lParam;
+
+		// is file (new) and unmodified?
+		if(HexView_GetFileName(hwndHV, 0,0) == 0 && HexView_CanUndo(hwndHV) == FALSE && HexView_CanRedo(hwndHV) == FALSE)
+		{
+			fReuseTab = TRUE;
+		}
+	}
+	
+	if(fReuseTab == FALSE)
+		hwndHV = CreateHexViewCtrl(hwndMain);
 
 	// 
 	if(HexView_OpenFile(hwndHV, szFileName, fHexViewFlags))
@@ -543,16 +582,18 @@ BOOL HexOpenFile(HWND hwndMain, LPCTSTR szFileName, DWORD fHexViewFlags)
 
 		UpdateCurFileName(hwndMain, hwndHV, szFileName, FALSE);
 
-		tci.mask     = TCIF_PARAM | TCIF_TEXT | TCIF_STATE;
-		tci.dwState  = TCIS_FILENAME;
-		tci.lParam   = (LPARAM)hwndHV;
-		tci.pszText  = (WCHAR *)szFileName;//g_szFileTitle;
-		// insert at the end
-		TabCtrl_InsertItem(g_hwndTabView, TabCtrl_GetItemCount(g_hwndTabView), &tci);			
+		if(fReuseTab == FALSE)
+		{
+			tci.mask     = TCIF_PARAM | TCIF_TEXT | TCIF_STATE;
+			tci.dwState  = TCIS_FILENAME;
+			tci.lParam   = (LPARAM)hwndHV;
+			tci.pszText  = (WCHAR *)szFileName;//g_szFileTitle;
+			
+			// insert at the end
+			TabCtrl_InsertItem(g_hwndTabView, TabCtrl_GetItemCount(g_hwndTabView), &tci);			
+		}
 
-		//TabCtrl_InsertItem(g_hwndTabView, TabCtrl_GetItemCount(g_hwndTabView), &tci);
-		//TabCtrl_SetCurSel(g_hwndTabView, TabCtrl_GetItemCount(g_hwndTabView)-1);
-
+		UpdateMainTabs(g_hwndTabView);
 		HexSetCurFile(hwndMain, TabCtrl_GetItemCount(g_hwndTabView)-1, TRUE);
 
 		if(e == ERROR_SHARING_VIOLATION)
@@ -580,12 +621,7 @@ BOOL HexeditOpenFile(HWND hwnd, LPCTSTR szFile, DWORD openFlags)
 	TCHAR *name;
 	TCHAR *fp;
 
-	// save current file's position!
-	//SaveFileData(g_szFileName, hwnd);
-
 	GetFullPathName(szFile, MAX_PATH, g_szFileName, &fp);
-
-//	_tcscpy(g_szFileName, szFile);
 
 	name = _tcsrchr(g_szFileName, '\\');
 	_tcscpy(g_szFileTitle, name ? name+1 : szFile);
