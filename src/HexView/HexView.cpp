@@ -726,7 +726,7 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		//return OnInitMenuPopup((HWND)wParam, (HMENU)wParam, LOWORD(lParam), HIWORD(lParam));;
 	case WM_CONTEXTMENU:
 		//return DefWindowProc(m_hWnd, msg, wParam, lParam);
-		return OnContextMenu((HWND)wParam, LOWORD(lParam), HIWORD(lParam));
+		return OnContextMenu((HWND)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
 
 	case WM_CTLCOLOREDIT:
 		SetBkColor((HDC)wParam, RGB(245,245,245));
