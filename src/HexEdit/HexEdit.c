@@ -46,6 +46,8 @@ extern HWND g_hwndSearch;
 extern BOOL g_fDisplayHex;
 extern BOOL g_fDisplayBigEndian;
 
+extern HFONT g_hHexViewFont;
+
 TCHAR		g_szFileName[MAX_PATH];
 TCHAR		g_szAppName[] = APPNAME;
 TCHAR		g_szFileTitle[MAX_PATH];
@@ -70,6 +72,7 @@ void SetStatusBarParts(HWND hwndSB);
 HWND CreateSearchBar(HWND hwndParent);
 HWND CreateTypeView(HWND hwndParent, HKEY hKey, BOOL fAllTypes);
 HWND CreateHighlightView(HWND hwndParent);
+HWND CreateStringsView(HWND hwndParent);
 void UpdateToolbarState(HWND hwndTB, HWND hwndHV);
 BOOL SaveHighlights(HWND hwndHexView);
 void SaveSettings();
@@ -350,6 +353,17 @@ void InitDockingBars(HWND hwnd)
 		CenterRelative(DockWnd_GetWindow(hwnd, DWID_HIGHLIGHT), hwnd, hdwp);
 	}
 
+	if(DockWnd_Undefined(hwnd, DWID_STRINGS))
+	{
+		DWORD dwStyle = DWS_SPLITTER| DWS_DOCKED_RIGHT;// | DWS_DRAWGRIPPER;
+
+		DockWnd_Register(hwnd, DWID_STRINGS, TEXT("Strings"));
+		DockWnd_SetStyle(hwnd, DWID_STRINGS, dwStyle, dwStyle);
+
+		//DockWnd_Dock(hwnd, DWID_HIGHLIGHT);
+		//DockWnd_Show(hwnd, DWID_STRINGS, TRUE);
+		CenterRelative(DockWnd_GetWindow(hwnd, DWID_STRINGS), hwnd, hdwp);
+	}
 	
 
 //	DockWnd_ShowGui(hwnd);
@@ -802,6 +816,9 @@ LRESULT HexEdit_OnNotify(MAINWND *mainWnd, HWND hwnd, UINT idCtrl, NMHDR *hdr)
 
 		case DWID_HIGHLIGHT:
 			return (LONG)CreateHighlightView(hdr->hwndFrom);
+
+		case DWID_STRINGS:
+			return (LONG)CreateStringsView(hdr->hwndFrom);
 		}
 	}
 	else if(hdr->code == DWN_DOCKCHANGE)
@@ -838,21 +855,13 @@ HWND CreateHexViewCtrl(HWND hwndParent)
 {
 	HWND hwndHV = CreateHexView(hwndParent);
 
-	HMENU hMenu = LoadMenu(GetModuleHandle(0), MAKEINTRESOURCE(IDR_HEXCONTEXT));
-	HFONT hFont;
-	TCHAR *szFont;
+	HMENU   hMenu = LoadMenu(GetModuleHandle(0), MAKEINTRESOURCE(IDR_HEXCONTEXT));
 
 	// set the right-click context menu
 	HexView_SetContextMenu(hwndHV, GetSubMenu(hMenu, 0));
 
-	szFont = TEXT("Consolas");
-	if(FontExists(hwndParent, szFont) == FALSE)
-		szFont = TEXT("Courier");
-
-	hFont = CreateFont(-14,0,0,0,0,0,0,0,0,0,0,0,0, szFont);
-
 	// set the font
-	SendMessage(hwndHV, WM_SETFONT, (WPARAM)hFont, 0);
+	SendMessage(hwndHV, WM_SETFONT, (WPARAM)g_hHexViewFont, 0);
 	return hwndHV;
 }
 

@@ -3531,6 +3531,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\Settings.c"
+				>
+			</File>
+			<File
 				RelativePath=".\ShellContextMenu.c"
 				>
 			</File>
@@ -4093,11 +4097,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\media\bitmap15.bmp"
+				RelativePath="bitmap15.bmp"
 				>
 			</File>
 			<File
-				RelativePath="bitmap15.bmp"
+				RelativePath=".\media\bitmap15.bmp"
 				>
 			</File>
 			<File
@@ -4113,11 +4117,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\media\bitmap7.bmp"
+				RelativePath="bitmap7.bmp"
 				>
 			</File>
 			<File
-				RelativePath="bitmap7.bmp"
+				RelativePath=".\media\bitmap7.bmp"
 				>
 			</File>
 			<File
@@ -4125,11 +4129,11 @@
 				>
 			</File>
 			<File
-				RelativePath="bitmap9.bmp"
+				RelativePath=".\media\bitmap9.bmp"
 				>
 			</File>
 			<File
-				RelativePath=".\media\bitmap9.bmp"
+				RelativePath="bitmap9.bmp"
 				>
 			</File>
 			<File

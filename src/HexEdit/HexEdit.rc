@@ -123,13 +123,13 @@ BEGIN
     POPUP "&Tools"
     BEGIN
         MENUITEM "&Checksum...",                IDM_TOOLS_CHECKSUM
+        MENUITEM "&Strings...",                 IDM_TOOLS_STRINGS
         MENUITEM "Com&pare...",                 IDM_TOOLS_COMPARE
+        MENUITEM SEPARATOR
         MENUITEM "&Fill...\tCtrl+I",            IDM_EDIT_FILL
         MENUITEM "&Reverse...",                 IDM_EDIT_REVERSE
-        MENUITEM "&Strings...",                 IDM_TOOLS_STRINGS
         MENUITEM "&Transform...",               IDM_TOOLS_TRANSFORM
         MENUITEM SEPARATOR
-        MENUITEM "&Customize...",               IDM_TOOLS_CUSTOMIZE
         MENUITEM "&Options...",                 IDM_TOOLS_OPTIONS
     END
     POPUP "&Help"
@@ -600,10 +600,10 @@ CAPTION "Find"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "Tab1",IDC_TAB1,"SysTabControl32",WS_TABSTOP,4,4,283,124
-    DEFPUSHBUTTON   "&Find",IDOK,164,134,60,14
-    PUSHBUTTON      "Cancel",IDCANCEL,227,134,60,14
-    PUSHBUTTON      "&Replace",IDC_REPLACE,93,134,60,14,WS_DISABLED
-    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,30,134,60,14,WS_DISABLED
+    DEFPUSHBUTTON   "&Find",IDOK,178,134,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,235,134,52,14
+    PUSHBUTTON      "&Replace",IDC_REPLACE,115,134,54,14,WS_DISABLED
+    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,58,134,54,14,WS_DISABLED
 END
 
 IDD_FINDHEX DIALOGEX 0, 0, 280, 112
@@ -700,7 +700,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 CAPTION "About"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,232,125,60,14
+    DEFPUSHBUTTON   "OK",IDOK,238,125,54,14
     CONTROL         "",IDC_STATIC,"Static",SS_WHITERECT,0,0,298,72
     ICON            IDI_ICON5,IDC_ABOUT_ICON,13,20,20,20,0,WS_EX_TRANSPARENT
     LTEXT           "HexEdit 1.4.0",IDC_ABOUT_APPNAME,70,20,164,14,0,WS_EX_TRANSPARENT

@@ -73,7 +73,6 @@ TEXT("Cyan"),
 };
 
 
-
 void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, TCHAR *szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
@@ -310,44 +309,3 @@ void ShowOptions(HWND hwndParent)
 	CoUninitialize();
 }
 
-void FirstTimeOptions(HWND hwndMain)
-{
-	TCHAR szMsg[] = TEXT("Welcome to HexEdit!\n\n")
-		TEXT("Would you like integrate HexEdit into the Explorer shell menu?\n")
-		TEXT("This option is available through the main Options dialog");
-	MessageBox(hwndMain, szMsg, TEXT(""), MB_ICONQUESTION|MB_YESNO);
-
-}
-
-void LoadSettings()
-{
-	HKEY hKey;
-	
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, REGBASE, 0, KEY_READ, &hKey) == S_OK)
-	{
-		LoadRecentFileList(hKey);
-
-		RegCloseKey(hKey);
-	}
-	else
-	{
-		// make some defaults!!
-	}
-}
-
-void SaveSettings()
-{
-	HKEY hKey;
-
-	if(RegCreateKeyEx(HKEY_CURRENT_USER, REGBASE, 0, 0, 0, KEY_READ|KEY_WRITE, 0, &hKey, 0) == S_OK)
-	{
-		SaveRecentFileList(hKey);
-
-		RegCloseKey(hKey);
-	}
-	else
-	{
-		// make some defaults!!
-	}
-
-}

@@ -55,13 +55,16 @@ HWND GetActiveHexView(HWND hwndMain);
 
 //
 //	Tool-window IDs
+//	Each one must be UNIQUE!
 //
 #define DWID_TOOLBAR	1
 #define DWID_SEARCHBAR	2
 #define DWID_TYPEVIEW	3
 #define DWID_HIGHLIGHT	4
-
 #define DWID_ALLTYPES	5
+#define DWID_STRINGS	6
+#define DWID_CHECKSUMS	7
+#define DWID_DIFF		8
 
 
 //
