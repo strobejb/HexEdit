@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="about.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColourCombo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboFont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboFontSize.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboUtil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgChecksum.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgCompare.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgCopyAs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgExport.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgfont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgGoto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgHighlight.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgImport.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgInsertFill.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgModify.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgPasteSpecial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgProperties.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgReverse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgSelectRange.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgStrings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="endian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileChange.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexCommands.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexEdit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexFileData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexFind.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HexUtils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="intel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="motorola.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenSave.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecentFile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegLib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizeWnd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Searchbar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Statusbar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TabView.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Toolbar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolPanel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Trace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HexEdit.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\rt_manif.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\hexedit.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\ico00001.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\icon2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\icon3.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\icon4.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\hex.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\icon6.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap3.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\toolbar1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\toolbar2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap7.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap4.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bmp00001.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap9.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap10.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap11.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap12.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap13.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bmp00002.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap14.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\bitmap15.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\selarrow.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\selbox.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\selarrow2.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="media\selbox2.png">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="HexEdit.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlgfont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileChange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexEdit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecentFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

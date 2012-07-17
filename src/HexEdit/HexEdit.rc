@@ -18,20 +18,18 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.K.) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_MENU1 MENU 
+IDR_MENU1 MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -139,7 +137,7 @@ BEGIN
     END
 END
 
-IDR_SEARCHBAR_FINDTYPE MENU 
+IDR_SEARCHBAR_FINDTYPE MENU
 BEGIN
     POPUP "SearchBar"
     BEGIN
@@ -152,7 +150,7 @@ BEGIN
     END
 END
 
-IDR_HEXCONTEXT MENU 
+IDR_HEXCONTEXT MENU
 BEGIN
     POPUP "HexContext"
     BEGIN
@@ -175,7 +173,7 @@ BEGIN
     END
 END
 
-IDR_TYPECONTEXT MENU 
+IDR_TYPECONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
@@ -214,7 +212,7 @@ BEGIN
     END
 END
 
-IDR_MENU2 MENU 
+IDR_MENU2 MENU
 BEGIN
     POPUP "ValuePopup"
     BEGIN
@@ -231,7 +229,7 @@ BEGIN
     END
 END
 
-IDR_MENU3 MENU 
+IDR_MENU3 MENU
 BEGIN
     POPUP "IDM_STATUS_HEX"
     BEGIN
@@ -240,7 +238,7 @@ BEGIN
     END
 END
 
-IDR_DUMMYCOMMANDS MENU 
+IDR_DUMMYCOMMANDS MENU
 BEGIN
     POPUP "dummy"
     BEGIN
@@ -251,7 +249,7 @@ BEGIN
     END
 END
 
-IDR_MENU4 MENU 
+IDR_MENU4 MENU
 BEGIN
     POPUP "dd"
     BEGIN
@@ -427,7 +425,7 @@ BEGIN
     PUSHBUTTON      "Setup",1025,224,42,50,14
 END
 
-IDD_PROGRESS DIALOG  0, 0, 160, 58
+IDD_PROGRESS DIALOG 0, 0, 160, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "HexEdit"
 FONT 8, "MS Shell Dlg"
@@ -687,7 +685,7 @@ BEGIN
     CONTROL         "&Match Case",IDC_MATCHCASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,92,54,10
 END
 
-IDD_DIALOG1 DIALOG  0, 0, 299, 116
+IDD_DIALOG1 DIALOG 0, 0, 299, 116
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg"
@@ -904,7 +902,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_COPYAS, DIALOG
     BEGIN
@@ -1199,7 +1197,7 @@ END
 // Accelerator
 //
 
-IDR_ACCELERATOR1 ACCELERATORS 
+IDR_ACCELERATOR1 ACCELERATORS
 BEGIN
     "C",            IDM_EDIT_COPY,          VIRTKEY, CONTROL, NOINVERT
     "X",            IDM_EDIT_CUT,           VIRTKEY, CONTROL, NOINVERT
@@ -1309,13 +1307,6 @@ IDB_BITMAP15            BITMAP                  "media/bitmap15.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// RT_MANIFEST
-//
-
-1                       RT_MANIFEST             "Hexedit.exe.manifest"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // PNG
 //
 
@@ -1326,16 +1317,22 @@ IDB_SELBOX2             PNG                     "media\\selbox2.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// RT_MANIFEST
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_HEXTYPES            "asda?sd"
     IDS_STRING2             "IDCsdfsfsdf"
 END
 
-#endif    // English (U.K.) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

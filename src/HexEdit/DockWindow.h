@@ -77,7 +77,7 @@ typedef struct
 HWND CreateDockWnd(DockWnd *dwp, HWND hwndParent, TCHAR szCaption[]);
 void DockWnd_ToggleDockingMode(HWND hwnd);
 
-HDWP DockWnd_Position	 (HWND hwndMain, HDWP hdwp, DockWnd dwnd[], int nNumDockWnds, RECT *rect);
+BOOL DockWnd_Position	 (HWND hwndMain, HDWP hdwp, DockWnd dwnd[], int nNumDockWnds, RECT *rect);
 UINT DockWnd_GetDockSide (HWND hwnd, NMDOCKWNDQUERY *nmdwq, RECT *prc1, RECT *prc2);
 
 

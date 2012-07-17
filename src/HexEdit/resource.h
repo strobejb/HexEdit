@@ -96,6 +96,7 @@
 #define IDD_PRINT                       170
 #define IDB_PNG2                        170
 #define IDB_SELBOX2                     170
+#define IDR_RT_MANIFEST1                171
 #define IDD_PASTEFROMEXTEND             172
 #define IDD_REVERSE                     173
 #define IDD_COPYAS                      174
@@ -395,7 +396,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        171
+#define _APS_NEXT_RESOURCE_VALUE        172
 #define _APS_NEXT_COMMAND_VALUE         40129
 #define _APS_NEXT_CONTROL_VALUE         1048
 #define _APS_NEXT_SYMED_VALUE           101

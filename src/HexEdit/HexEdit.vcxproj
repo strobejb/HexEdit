@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6BD408DB-3E6D-4649-9A92-4A4E52E70137}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>HexEdit</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);SEQUENCE64</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <DelayLoadDLLs>uxtheme.dll</DelayLoadDLLs>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);uxtheme.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);SEQUENCE64</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <DelayLoadDLLs>uxtheme.dll</DelayLoadDLLs>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);uxtheme.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\Trace.c" />
+    <ClCompile Include="about.c" />
+    <ClCompile Include="base64.c" />
+    <ClCompile Include="ColourCombo.c" />
+    <ClCompile Include="ComboFont.c" />
+    <ClCompile Include="ComboFontSize.c" />
+    <ClCompile Include="ComboUtil.c" />
+    <ClCompile Include="DlgChecksum.c" />
+    <ClCompile Include="DlgCompare.c" />
+    <ClCompile Include="DlgCopyAs.c" />
+    <ClCompile Include="DlgExport.c" />
+    <ClCompile Include="dlgfont.c" />
+    <ClCompile Include="DlgGoto.c" />
+    <ClCompile Include="DlgHighlight.c" />
+    <ClCompile Include="DlgImport.c" />
+    <ClCompile Include="DlgInsertFill.c" />
+    <ClCompile Include="DlgModify.c" />
+    <ClCompile Include="DlgPasteSpecial.c" />
+    <ClCompile Include="DlgProperties.c" />
+    <ClCompile Include="DlgReverse.c" />
+    <ClCompile Include="DlgSelectRange.c" />
+    <ClCompile Include="DlgStrings.c" />
+    <ClCompile Include="endian.c" />
+    <ClCompile Include="FileChange.c" />
+    <ClCompile Include="HexCommands.c" />
+    <ClCompile Include="HexEdit.c" />
+    <ClCompile Include="HexFileData.c" />
+    <ClCompile Include="HexFind.c" />
+    <ClCompile Include="HexUtils.c" />
+    <ClCompile Include="intel.c" />
+    <ClCompile Include="motorola.c" />
+    <ClCompile Include="OpenSave.c" />
+    <ClCompile Include="Options.c" />
+    <ClCompile Include="RecentFile.c" />
+    <ClCompile Include="RegLib.c" />
+    <ClCompile Include="ResizeWnd.c" />
+    <ClCompile Include="Searchbar.c" />
+    <ClCompile Include="Settings.c" />
+    <ClCompile Include="ShellContextMenu.c" />
+    <ClCompile Include="Statusbar.c" />
+    <ClCompile Include="TabView.c" />
+    <ClCompile Include="Toolbar.c" />
+    <ClCompile Include="ToolPanel.c" />
+    <ClCompile Include="transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HexEdit.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConfigLib\ConfigLib.vcxproj">
+      <Project>{d42516bb-4c96-4f56-bf73-b3b9e95ba5f4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\DockLib\DockLib.vcxproj">
+      <Project>{d5b645a0-ab6c-4c08-8a02-9ee1324a0bfd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\GridView\GridView.vcxproj">
+      <Project>{93b6f7bd-ddb7-4fea-8994-1927ad706dd6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\HexView\HexView.vcxproj">
+      <Project>{3fba3178-4ae6-4103-9eb2-542901d978b7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TypeLib\TypeLib.vcxproj">
+      <Project>{e101755f-a81a-4c12-9b4b-8485bf8e66da}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TypeView\TypeView.vcxproj">
+      <Project>{8724ec2d-4352-46b2-ab57-3c3430bd52db}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\bitmap1.bmp" />
+    <None Include="media\bitmap10.bmp" />
+    <None Include="media\bitmap11.bmp" />
+    <None Include="media\bitmap12.bmp" />
+    <None Include="media\bitmap13.bmp" />
+    <None Include="media\bitmap14.bmp" />
+    <None Include="media\bitmap15.bmp" />
+    <None Include="media\bitmap2.bmp" />
+    <None Include="media\bitmap3.bmp" />
+    <None Include="media\bitmap4.bmp" />
+    <None Include="media\bitmap7.bmp" />
+    <None Include="media\bitmap9.bmp" />
+    <None Include="media\bmp00001.bmp" />
+    <None Include="media\bmp00002.bmp" />
+    <None Include="media\hex.ico" />
+    <None Include="media\hexedit.ico" />
+    <None Include="media\ico00001.ico" />
+    <None Include="media\icon2.ico" />
+    <None Include="media\icon3.ico" />
+    <None Include="media\icon4.ico" />
+    <None Include="media\icon6.ico" />
+    <None Include="media\rt_manif.bin" />
+    <None Include="media\selarrow.png" />
+    <None Include="media\selarrow2.png" />
+    <None Include="media\selbox.png" />
+    <None Include="media\selbox2.png" />
+    <None Include="media\toolbar1.bmp" />
+    <None Include="media\toolbar2.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="HexEdit.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="ComboUtil.h" />
+    <ClInclude Include="dlgfont.h" />
+    <ClInclude Include="DockWindow.h" />
+    <ClInclude Include="endian.h" />
+    <ClInclude Include="FileChange.h" />
+    <ClInclude Include="HexEdit.h" />
+    <ClInclude Include="HexFile.h" />
+    <ClInclude Include="HexUtils.h" />
+    <ClInclude Include="RecentFile.h" />
+    <ClInclude Include="RegLib.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TabView.h" />
+    <ClInclude Include="ToolPanel.h" />
+    <ClInclude Include="version.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
