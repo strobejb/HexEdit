@@ -10,16 +10,19 @@ Please refer to LICENCE.TXT for licencing terms and conditions.
 
 Sourcecode is available on github:
 
-  github.com/strobejb/HexEdit
+  www.github.com/strobejb/HexEdit
 
 
 Building HexEdit
 ----------------
 
-HexEdit requires Visual C++ 2008 (or later). HexEdit can be built using the IDE, 
-or via the Visual Studio command-prompt by using the build\build.bat command.
+HexEdit requires Visual C++ 2010 (or later). HexEdit can be built using the IDE, 
+or via the Visual Studio command-prompt by using the /build/build.bat command.
 
-The resulting binaries will be located in the /bin directory
+The resulting binaries will be located in the /bin directory.
+
+When using the build.bat commandline tool, packaged zipfiles will be located
+in the build/out directory
 
 
 
