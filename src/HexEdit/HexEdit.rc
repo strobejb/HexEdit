@@ -1249,8 +1249,8 @@ IDI_ICON6               ICON                    "media/icon6.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,5,45
- PRODUCTVERSION 2,0,5,45
+ FILEVERSION 2,0,5,46
+ PRODUCTVERSION 2,0,5,46
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -1268,7 +1268,7 @@ BEGIN
             VALUE "Comments", "Hexadecimal File Editor for Windows"
             VALUE "CompanyName", "Catch22 Productions"
             VALUE "FileDescription", "HexEdit"
-            VALUE "FileVersion", "2.0.5.45"
+            VALUE "FileVersion", "2.0.5.46"
             VALUE "InternalName", "HexEdit"
             VALUE "LegalCopyright", "Copyright © 1999 - 2012 by Catch22 Productions."
             VALUE "OriginalFilename", "HexEdit.exe"

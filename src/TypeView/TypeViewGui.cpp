@@ -1028,7 +1028,15 @@ void InitTypeLibrary()
 	globalTypeDeclList.clear();
 
 	GetModuleDirectory(0, szPath, MAX_PATH);
-	lstrcat(szPath, TEXT("\\typelib\\pe.txt"));
+	lstrcat(szPath, TEXT("\\..\\..\\typelib"));
+
+	if(GetFileAttributes(szPath) == INVALID_FILE_ATTRIBUTES)
+	{
+		GetModuleDirectory(0, szPath, MAX_PATH);
+		lstrcat(szPath, TEXT("\\typelib"));
+	}
+
+	lstrcat(szPath, TEXT("\\pe.txt"));
 
 
 	size_t s = globalFileHistory.size();

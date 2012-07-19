@@ -4,7 +4,6 @@ require 'win32api'
 require 'pp'
 
 $ignore  = [ '.git' ]
-$bindir = '../bin/i386-pc-win32/Unicode_Release'
 
 def zipfile(zipfile, filespec, dest, ignore=[])
 
@@ -59,20 +58,24 @@ def version(file)
   return ver
 end
 
-def main()
+def build(platform)
+
+  $bindir = "../bin/#{platform}/Release"
 
   hexbin = File.join($bindir, 'HexEdit.exe')
 
   # get the fileversion from exe resource section
   ver = version(hexbin)
 
+  puts "-" * 80
   puts "Packaging: #{hexbin} - version #{ver[:filever]}" 
 
   begin
     Dir.mkdir('out')
   rescue
   end
-  zipname = "out/hexedit-#{ver[:prodver]}.zip"
+
+  zipname = "out/hexedit-#{platform}-#{ver[:filever]}.zip"
 
   # delete any existing zip
   FileUtils.rm zipname, :force=>true
@@ -80,13 +83,15 @@ def main()
   # build the zip!
   Zip::ZipFile.open(zipname, Zip::ZipFile::CREATE) do |zf|
 
-    zipfile(zf, '../README.TXT',                   'HexEdit/README.TXT',  $ignore)
-    zipfile(zf, '../LICENCE.TXT',                  'HexEdit/LICENCE.TXT', $ignore)
-    zipfile(zf, File.join($bindir, 'HexEdit.exe'), 'HexEdit/HexEdit.exe', $ignore)
-    zipfile(zf, File.join($bindir, 'typelib'),     'HexEdit/typelib',     $ignore)
+    zipfile(zf, '../README.md',                      'HexEdit/README.TXT',  $ignore)
+    zipfile(zf, '../LICENCE.TXT',                    'HexEdit/LICENCE.TXT', $ignore)
+    zipfile(zf, File.join($bindir, 'HexEdit.exe'),   'HexEdit/HexEdit.exe', $ignore)
+    zipfile(zf, File.join($bindir, '../../typelib'), 'HexEdit/typelib',     $ignore)
+
     ziptext(zf, 'HexEdit/VERSION.TXT') do |f| 
-      f.puts "HexEdit #{ver[:filever]}\r" 
-      f.puts "Built on: #{Time.now.strftime('%Y/%m/%d %H:%M:%S')}\r"
+      f.puts "HexEdit:  #{ver[:filever]}\r" 
+      f.puts "Platform: #{platform}\r"
+      f.puts "Built:    #{Time.now.strftime('%Y/%m/%d %H:%M:%S')}\r"
     end
   end
 
@@ -98,5 +103,13 @@ def main()
 
 end
 
-main()
+case ARGV[0]
+when 'x86'
+ build('x86')
+when 'amd64'
+ build('amd64')
+else
+ puts "Usage: build <x86|amd64>\n" 
+end
+
 
