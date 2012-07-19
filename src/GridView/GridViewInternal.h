@@ -64,7 +64,7 @@ private:
 	LRESULT OnVScroll(UINT uSBCode, UINT uPos);
 	LRESULT OnHScroll(UINT uSBCode, UINT uPos);
 	LRESULT	OnMouseWheel(int nDelta);
-	LRESULT	OnTimer(UINT nTimer);
+	LRESULT	OnTimer(UINT_PTR nTimer);
 	bool	PinToBottomCorner();
 	void	Scroll(int dx, int dy);
 	HRGN	ScrollRgn(int dx, int dy, bool fReturnUpdateRgn);

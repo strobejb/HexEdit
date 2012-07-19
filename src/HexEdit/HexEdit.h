@@ -132,8 +132,8 @@ void AddSearchTypes(HWND hwndCombo, int startType, int endType, int initial);
 
 void HexView_CursorChanged(HWND hwndMain, HWND hwndHV);
 
-#define REGBASE TEXT("Software\\Catch22\\HexEdit 2.0 beta4")
-#define REGLOC TEXT("Software\\Catch22\\HexEdit 2.0 beta4\\DockLib")
+#define REGBASE TEXT("Software\\Catch22\\HexEdit 2.0 beta5")
+#define REGLOC TEXT("Software\\Catch22\\HexEdit 2.0 beta5\\DockLib")
 
 
 typedef unsigned __int64 QWORD;

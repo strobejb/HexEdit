@@ -76,7 +76,7 @@ TEXT("Cyan"),
 void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, TCHAR *szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	int idx = (int)SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG)szName);
+	int idx = (int)SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
 
@@ -84,7 +84,7 @@ void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, TCHAR *szNam
 /*void AddColourComboItem(HWND hwnd, UINT uItem, COLORREF col, TCHAR *szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG)szName);
+	int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }*/
 
@@ -152,7 +152,7 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 	//	Subclass the PREVIEW static control so we can custom-draw it
 	//
 	hwndPreview = GetDlgItem(hwnd, IDC_PREVIEW);
-	oldPreviewProc = (WNDPROC)SetWindowLongPtr(hwndPreview, GWLP_WNDPROC, (LONG)PreviewWndProc);
+	oldPreviewProc = (WNDPROC)SetWindowLongPtr(hwndPreview, GWLP_WNDPROC, (LONG_PTR)PreviewWndProc);
 
 		AddColourListItem(hwnd, IDC_ITEMLIST, -1,				HVC_BACKGROUND,   TEXT("Background"));	
 		AddColourListItem(hwnd, IDC_ITEMLIST, HVC_ADDRESS,		HVC_BACKGROUND,   TEXT("Address Column"));

@@ -56,7 +56,7 @@ int CALLBACK EnumFontNames(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD
 		fTrueType	= (lpntme->ntmTm.ntmFlags & NTM_TT_OPENTYPE) ? 2 : fTrueType;
 			
 		// store this information in the list-item's userdata area
-		SendMessage(hwndCombo, CB_SETITEMDATA, idx, MAKEWPARAM(fFixed, fTrueType));
+		SendMessage(hwndCombo, CB_SETITEMDATA, idx, MAKELPARAM(fFixed, fTrueType));
 
 		/*{
 			COMBOBOXEXITEM cbxi = { CBEIF_TEXT, 0, pszName };
@@ -161,9 +161,9 @@ BOOL WINAPI FontCombo_DrawItem(CTRLITEM *cip, DRAWITEMSTRUCT *dis, BOOL fDrawBac
 	//	Get the item text
 	//
 	if(dis->itemID == -1)
-		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
 	else
-		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 	
 
 

@@ -162,11 +162,11 @@ HWND InitToolbar(HWND hwndParent)
 
 		//SendMessage(hwndTB, TB_ADDBUTTONS, 1, (LPARAM) &tbb);
 		SendMessage(hwndTB, TB_ADDBUTTONS, sizeof(tbb)/sizeof(tbb[0]), (LPARAM) &tbb);
-		SendMessage(hwndTB, TB_SETBUTTONINFO, IDM_TOOLS_TYPEVIEW, (LONG)&tbi);
+		SendMessage(hwndTB, TB_SETBUTTONINFO, IDM_TOOLS_TYPEVIEW, (LPARAM)&tbi);
 
 		tbi.pszText		= TEXT("BookMarks");
 		tbi.idCommand	= IDM_HIGHLIGHT_MANAGE;
-		SendMessage(hwndTB, TB_SETBUTTONINFO, IDM_HIGHLIGHT_MANAGE, (LONG)&tbi);
+		SendMessage(hwndTB, TB_SETBUTTONINFO, IDM_HIGHLIGHT_MANAGE, (LPARAM)&tbi);
 		//	break;
 		//}
 	}

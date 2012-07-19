@@ -704,7 +704,7 @@ BOOL Ooop4(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBookPath, COLORREF col)
 
 			hBookmarks = OpenConfigSection(hConf, TEXT("hexFileData\\bookmarks"));
 
-			for(i = 0; bookmark = EnumConfigSection(hBookmarks, TEXT("bookmark"), i); i++)
+			for(i = 0; bookmark = EnumConfigSection(hBookmarks, TEXT("bookmark"), (int)i); i++)
 			{
 				TCHAR name[100], desc[100];
 				BOOKMARK bm = { 0, 0, 0, 0, 0, name, 100, desc, 100 };

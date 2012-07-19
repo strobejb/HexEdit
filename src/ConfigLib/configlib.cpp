@@ -361,7 +361,7 @@ BOOL SetConfigStr(HCONFIG config, LPCTSTR szKeyName, LPCTSTR szValue)
 		char *ptr = new char[len];
 
 		// make a UTF8 version of the name
-		while(WideCharToMultiByte(CP_UTF8, 0, szValue, -1, ptr, len, 0, 0) == 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+		while(WideCharToMultiByte(CP_UTF8, 0, szValue, -1, ptr, (int)len, 0, 0) == 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 		{
 			delete[] ptr;
 			len *= 2;

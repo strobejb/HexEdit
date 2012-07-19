@@ -301,7 +301,7 @@ Type * bollocks(Type *bn, int &i, int &idx)
 			{
 				if(i == idx)
 				{
-					i = j+k;
+					i = (int)(j+k);
 					return bn;
 				}
 
@@ -572,9 +572,9 @@ LRESULT CALLBACK TypeViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 					}
 					
 					HWND hwndEdit = GetWindow(gti.hwndActive, GW_CHILD);
-					int line = SendMessage(hwndEdit, EM_LINEFROMCHAR, type->parent->fileRef.wspEnd, 0);
-					int s    = SendMessage(hwndEdit, EM_LINEINDEX, line, 0);
-					int len  = SendMessage(hwndEdit, EM_LINELENGTH, line, 0);
+					int line = (int)SendMessage(hwndEdit, EM_LINEFROMCHAR, type->parent->fileRef.wspEnd, 0);
+					int s    = (int)SendMessage(hwndEdit, EM_LINEINDEX, line, 0);
+					int len  = (int)SendMessage(hwndEdit, EM_LINELENGTH, line, 0);
 
 					SendMessage(hwndEdit, EM_SETSEL, s, s+len);
 					SendMessage(hwndEdit, EM_SCROLLCARET, 0, 0);
@@ -646,7 +646,7 @@ void SaveTypeView(HWND hwndPanel, HKEY hKey)
 	HWND hwndHeader		= GridView_GetHeader(hwndGridView);
 	HWND hwndTB			= GetDlgItem(hwndPanel, IDC_TYPEVIEW_TOOLBAR);
 	int  count = Header_GetItemCount(hwndHeader), i;
-	UINT state;
+	UINT_PTR state;
 
 	state = SendMessage(hwndTB, TB_GETSTATE, IDC_TYPEVIEW_PIN, 0);
 

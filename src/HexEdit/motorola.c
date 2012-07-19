@@ -61,7 +61,7 @@ size_t motorola_frame(char *srec, int type, size_t count, unsigned long addr, BY
 	*s++ = '0' + type;
 
 	// record size
-	s += fmtbyte(s, sizelook[type] + count + 1, &checksum);
+	s += fmtbyte(s, sizelook[type] + (unsigned)count + 1, &checksum);
 
 	// 2/3/4 byte address field (depends on type)
 	switch(type)

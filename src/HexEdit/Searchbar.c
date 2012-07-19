@@ -89,7 +89,7 @@ int GetToolbarRect(HWND hwndTB, RECT *rect)
 	
 	for(i = 0; i < count; i++)
 	{
-		SendMessage(hwndTB, TB_GETITEMRECT, i, (LONG)&tmp);
+		SendMessage(hwndTB, TB_GETITEMRECT, i, (LPARAM)&tmp);
 		UnionRect(rect, rect, &tmp);
 	}
 

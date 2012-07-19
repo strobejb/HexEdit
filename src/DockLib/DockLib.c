@@ -355,7 +355,7 @@ VOID DockWnd_ShowDeferredPopups(HWND hwndMain)
 {
 	DOCKSERVER *dsp = GetDockServer(hwndMain);
 
-	if(dsp->fDeferShowWindow)
+	if(dsp && dsp->fDeferShowWindow)
 	{
 		DOCKPANEL *dpp;
 

@@ -426,7 +426,7 @@ BOOL LoadTabbedString(UINT uId, TCHAR *dest, DWORD dwLength)
 UINT AddStyle(HWND hwnd, UINT style)
 {
 	UINT oldstyle = GetWindowLong(hwnd, GWL_STYLE);
-	SetWindowLong(hwnd, GWL_STYLE,  oldstyle | style);
+	SetWindowLongPtr(hwnd, GWL_STYLE,  oldstyle | style);
 	return oldstyle;
 }
 
@@ -438,7 +438,7 @@ UINT AddDlgItemStyle(HWND hwnd, UINT nCtrlId, UINT style)
 UINT DelStyle(HWND hwnd, UINT style)
 {
 	UINT oldstyle = GetWindowLong(hwnd, GWL_STYLE);
-	SetWindowLong(hwnd, GWL_STYLE, oldstyle & ~style);
+	SetWindowLongPtr(hwnd, GWL_STYLE, oldstyle & ~style);
 	return oldstyle;
 }
 

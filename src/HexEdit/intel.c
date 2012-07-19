@@ -62,7 +62,7 @@ size_t intel_frame(char *hrec, int type, size_t count, unsigned long addr, BYTE 
 	*h++ = ':';
 	
 	// record-length
-	h += fmtbyte(h, count, &checksum);
+	h += fmtbyte(h, (unsigned)count, &checksum);
 
 	// address
 	h += fmtbyte(h, addr >> 8, &checksum);

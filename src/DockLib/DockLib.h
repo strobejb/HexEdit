@@ -157,7 +157,7 @@ VOID DockWnd_ShowDeferredPopups(HWND hwndMain);
 
 HDWP DockWnd_DeferPanelPos(HDWP hdwp, HWND hwndMain, RECT *rect);
 
-LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam);
+LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam, WNDPROC oldProc OPTIONAL);
 
 BOOL WINAPI DockWnd_IsDialogMessage(HWND hwndMain, UINT uId, MSG *msg);
 

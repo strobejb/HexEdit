@@ -10,6 +10,7 @@
 #define STRICT
 #define _WIN32_WINNT 0x501
 #include <windows.h>
+#include <WindowsX.h>
 #include <tchar.h>
 #include <stdio.h>
 #include "HexView.h"
@@ -688,20 +689,20 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return OnMouseActivate((HWND)wParam, LOWORD(lParam), HIWORD(lParam));
 
 	case WM_LBUTTONDOWN:
-		return OnLButtonDown((UINT)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonDown((UINT)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_LBUTTONDBLCLK:
-		return OnLButtonDblClick((UINT)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonDblClick((UINT)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_RBUTTONDOWN:
-		OnRButtonDown((UINT)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		OnRButtonDown((UINT)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return DefWindowProc(m_hWnd, msg, wParam, lParam);
 
 	case WM_LBUTTONUP:
-		return OnLButtonUp((UINT)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonUp((UINT)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_MOUSEMOVE:
-		return OnMouseMove((UINT)wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnMouseMove((UINT)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_MOUSEWHEEL:
 		return OnMouseWheel((short)HIWORD(wParam));

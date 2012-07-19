@@ -25,20 +25,30 @@ DOCKSERVER *GetDockServer(HWND hwndMain)
 	return (DOCKSERVER *)GetWindowLongPtr(hwndMain, GWLP_USERDATA);
 }
 
+static LRESULT CHAIN_WNDPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, WNDPROC oldProc)
+{
+	if(oldProc)
+		return CallWindowProc(oldProc, hwnd, msg, wParam, lParam);
+	else
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
 //
 //	The main window of app should call this in response to WM_ENABLE
 //
 //	hwndMain - handle to top-level owner window
 //	hwnd     - handle to window which received message (can be same as hwndMain)
 //
-LRESULT HANDLE_ENABLE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam)
+LRESULT HANDLE_ENABLE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam, WNDPROC oldProc OPTIONAL)
 {
 	HWND hParam = (HWND)lParam;
 	DOCKSERVER *dsp;
 	DOCKPANEL  *dpp;
 	
 	if((dsp = GetDockServer(hwndMain)) == 0)
-		return DefWindowProc(hwnd, WM_ENABLE, wParam, lParam);
+	{
+		return CHAIN_WNDPROC(hwnd, WM_ENABLE, wParam, lParam, oldProc);
+	}
 
 	for(dpp = dsp->PanelListHead; dpp; dpp = dpp->flink)
 	{
@@ -58,7 +68,7 @@ LRESULT HANDLE_ENABLE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam)
 //	hwndMain - handle to top-level owner window
 //	hwnd     - handle to window which received message (can be same as hwndMain)
 //
-LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam)
+LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam, WNDPROC oldProc OPTIONAL)
 {
 	HWND	hParam		= (HWND)lParam;
 	BOOL	fKeepActive = (BOOL)wParam;
@@ -68,7 +78,9 @@ LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam
 	DOCKPANEL  *dpp;
 	
 	if((dsp = GetDockServer(hwndMain)) == 0)
-		return DefWindowProc(hwnd, WM_NCACTIVATE, wParam, lParam);
+	{
+		return CHAIN_WNDPROC(hwnd, WM_NCACTIVATE, wParam, lParam, oldProc);
+	}
 
 	//
 	// If this message was sent by the synchronise-loop (below)
@@ -76,7 +88,7 @@ LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam
 	//
 	if(hParam == (HWND)-1)
 	{
-		return DefWindowProc(hwnd, WM_NCACTIVATE, wParam, 0);
+		return CHAIN_WNDPROC(hwnd, WM_NCACTIVATE, wParam, 0, oldProc);
 	}
 
 	//
@@ -106,15 +118,15 @@ LRESULT HANDLE_NCACTIVATE(HWND hwndMain, HWND hwnd, WPARAM wParam, LPARAM lParam
 				dpp->hwndPanel != hParam 
 				)
 			{
-				SendMessage(dpp->hwndPanel, WM_NCACTIVATE, fKeepActive, (LONG)-1);
+				SendMessage(dpp->hwndPanel, WM_NCACTIVATE, fKeepActive, (LPARAM)-1);
 			}
 		}
 
 		if(hwndMain != hwnd && hwndMain != hParam)
-			SendMessage(hwndMain, WM_NCACTIVATE, fKeepActive, (LONG)-1);
+			SendMessage(hwndMain, WM_NCACTIVATE, fKeepActive, (LPARAM)-1);
 	}
 
-	return DefWindowProc(hwnd, WM_NCACTIVATE, fKeepActive, lParam);
+	return CHAIN_WNDPROC(hwnd, WM_NCACTIVATE, fKeepActive, lParam, oldProc);
 }
 
 static LRESULT CALLBACK ServerWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -124,18 +136,13 @@ static LRESULT CALLBACK ServerWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 	static BOOL fMoving;
 	RECT rect;
 
-	//return CallWindowProc(dsp->oldproc, hwnd, msg, wParam, lParam);
-
 	switch(msg)
 	{
 	case WM_NCACTIVATE:
-		return HANDLE_NCACTIVATE(hwnd, hwnd, wParam, lParam);
+		return HANDLE_NCACTIVATE(hwnd, hwnd, wParam, lParam, dsp->oldproc);
 
 	case WM_ENABLE:
-		HANDLE_ENABLE(hwnd, hwnd, wParam, lParam);
-
-		// fall through to CallWindowProc
-		break;
+		return HANDLE_ENABLE(hwnd, hwnd, wParam, lParam, dsp->oldproc);
 
 	case WM_ENTERSIZEMOVE:
 		GetWindowRect(hwnd, &rect);
@@ -292,8 +299,8 @@ BOOL WINAPI DockWnd_Initialize(HWND hwndMain, LPCTSTR szRegLoc)
 	ds->oldproc = (WNDPROC)GetWindowLongPtr(hwndMain, GWLP_WNDPROC);
 	ds->hwndMain = hwndMain;
 
-	SetWindowLongPtr(hwndMain, GWLP_USERDATA, (LONG)ds);
-	SetWindowLongPtr(hwndMain, GWLP_WNDPROC, (LONG)ServerWndProc);
+	SetWindowLongPtr(hwndMain, GWLP_USERDATA, (LONG_PTR)ds);
+	SetWindowLongPtr(hwndMain, GWLP_WNDPROC, (LONG_PTR)ServerWndProc);
 
 	return TRUE;
 }

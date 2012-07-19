@@ -70,9 +70,9 @@ BOOL WINAPI ColourCombo_DrawItem(CTRLITEM *cip, DRAWITEMSTRUCT *dis, BOOL fDrawB
 	//	Get the item text
 	//
 	if(dis->itemID == -1)
-		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
 	else
-		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 	
 	//
 	//	Draw the text (centered vertically)
@@ -105,7 +105,7 @@ BOOL WINAPI ColourCombo_DrawItem(CTRLITEM *cip, DRAWITEMSTRUCT *dis, BOOL fDrawB
 	if(dis->itemState & ODS_DISABLED)
 		PaintFrameRect(dis->hDC, &rect, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DFACE));
 	else
-		PaintFrameRect(dis->hDC, &rect, RGB(0,0,0), dis->itemData);//REALIZE_SYSCOL(dis->itemData));
+		PaintFrameRect(dis->hDC, &rect, RGB(0,0,0), (COLORREF)dis->itemData);//REALIZE_SYSCOL(dis->itemData));
 	
 	
 	return TRUE;
@@ -113,7 +113,7 @@ BOOL WINAPI ColourCombo_DrawItem(CTRLITEM *cip, DRAWITEMSTRUCT *dis, BOOL fDrawB
 
 void AddColourComboItem(HWND hwndCombo, COLORREF col, TCHAR *szName)
 {
-	int idx = (int)SendMessage(hwndCombo, CB_ADDSTRING, 0, (LONG)szName);
+	int idx = (int)SendMessage(hwndCombo, CB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCombo, CB_SETITEMDATA, idx, col);
 }
 

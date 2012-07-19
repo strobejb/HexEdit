@@ -505,7 +505,7 @@ BOOL ExportMotorola(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 		HexView_GetDataAdv(hwndHexView, buf, len);
 
 		// 'data' record (type=3)
-		alen = motorola_frame(ach, 3, len, (size_t)offset, buf);
+		alen = motorola_frame(ach, 3, (unsigned)len, (unsigned long)offset, buf);
 		fprintf(fp, "%.*s\n", alen, ach);
 
 		length -= len;

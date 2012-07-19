@@ -1170,12 +1170,39 @@ TCHAR * GetArg(TCHAR *ptr, TCHAR *buf, int len)
 	return ptr;
 }
 
+//
+//	http://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work/
+//
+void EnableCrashingOnCrashes() 
+{ 
+    typedef BOOL (WINAPI *tGetPolicy)(LPDWORD lpFlags); 
+    typedef BOOL (WINAPI *tSetPolicy)(DWORD dwFlags); 
+    const DWORD EXCEPTION_SWALLOWING = 0x1;
+
+    HMODULE kernel32 = LoadLibraryA("kernel32.dll"); 
+
+    tGetPolicy pGetPolicy = (tGetPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy"); 
+    tSetPolicy pSetPolicy = (tSetPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy"); 
+    
+	if (pGetPolicy && pSetPolicy) 
+    { 
+        DWORD dwFlags; 
+        if (pGetPolicy(&dwFlags)) 
+        { 
+            // Turn off the filter 
+            pSetPolicy(dwFlags & ~EXCEPTION_SWALLOWING); 
+        } 
+    } 
+}
+
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShowCmd)
 {
 	MSG		msg;
 	HACCEL	hAccel;
 	TCHAR	arg[MAX_PATH];
 	TCHAR *	pszCmdline;
+
+	EnableCrashingOnCrashes();
 
 	//INITCOMMONCONTROLSEX icx = { sizeof(icx), ICC_
 	g_hInstance = hInst;

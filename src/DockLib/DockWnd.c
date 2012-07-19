@@ -9,6 +9,7 @@
 
 #define _WIN32_WINNT 0x501
 #include <windows.h>
+#include <WindowsX.h>
 #include <tchar.h>
 #include <uxtheme.h>
 
@@ -40,7 +41,7 @@ BOOL	fOverTab;
 //	This is called whenever a dockwindow is being dragged, and we want to determine
 //  if the current dockwindow is being dragged on top of another
 //
-DOCKPANEL * DockPanelFromPt(DOCKSERVER *dsp, DOCKPANEL *dppDragging, POINT pt, OUT RECT *rect, OUT UINT *hit)
+DOCKPANEL * DockPanelFromPt(DOCKSERVER *dsp, DOCKPANEL *dppDragging, POINT pt, OUT RECT *rect, OUT UINT_PTR *hit)
 {
 	DOCKPANEL *dpp;
 
@@ -70,7 +71,7 @@ DOCKPANEL * DockPanelFromPt(DOCKSERVER *dsp, DOCKPANEL *dppDragging, POINT pt, O
             // if floating
             else
             {
-                UINT uHit = DefWindowProc(dpp->hwndPanel, WM_NCHITTEST, 0, MAKELONG(pt.x, pt.y));
+                UINT_PTR uHit = DefWindowProc(dpp->hwndPanel, WM_NCHITTEST, 0, MAKELONG(pt.x, pt.y));
                 RECT rcTab;
 
 				if(hit) *hit = uHit;
@@ -126,7 +127,7 @@ int GetClosestSide(IN RECT *rect, IN POINT pt, OUT int * distance)
 UINT GetDockTarget(DOCKSERVER *dsp, DOCKPANEL *dppDragging, POINT pt, RECT *rectDrag, DOCKPANEL **pdppUnder)
 {
 	DOCKPANEL *dppUnder;
-	UINT uHit;
+	UINT_PTR uHit;
 
 	if(GetKeyState(VK_CONTROL) & 0x80000000)
 	{
@@ -385,7 +386,7 @@ void DockPanel_RemoveKeyboardHook(DOCKPANEL *dpp)
 	g_hKeyboardHook = 0;
 }
 
-LRESULT DockPanel_OnNcLButtonDown(DOCKPANEL *dpp, UINT uHitTest)
+LRESULT DockPanel_OnNcLButtonDown(DOCKPANEL *dpp, UINT_PTR uHitTest)
 {
 	// the window will start moving, but keep track of
 	// the initial window-rectangles and drag status
@@ -674,13 +675,13 @@ LRESULT DockPanel_ExitSizeMove(DOCKPANEL *dpp)
 //
 //	timer - used to animate the fade in/out of the transparent window
 //
-LRESULT DockPanel_Timer(DOCKPANEL *dpp, UINT id)
+LRESULT DockPanel_Timer(DOCKPANEL *dpp, UINT_PTR id)
 {
 	extern HWND hwndAnimPanel;
 	HWND hwndParam = (HWND)id;
 
 	// get current alpha value
-	BYTE alpha = (BYTE)GetWindowLong(hwndParam, GWL_USERDATA);
+	BYTE alpha = (BYTE)GetWindowLongPtr(hwndParam, GWLP_USERDATA);
 	BLENDFUNCTION blendPixelFunction = { AC_SRC_OVER, 0, -1, AC_SRC_ALPHA };		
 
 	if(hwndAnimPanel != hwndParam || alpha == 0)
@@ -692,7 +693,7 @@ LRESULT DockPanel_Timer(DOCKPANEL *dpp, UINT id)
 
 	// adjust alpha value towards '0'
 	alpha = alpha < 24 ? 0 : alpha - 24;
-	SetWindowLong(hwndParam, GWL_USERDATA, alpha);
+	SetWindowLongPtr(hwndParam, GWLP_USERDATA, alpha);
 
 	// update the layered window transparency
 	blendPixelFunction.SourceConstantAlpha = alpha;
@@ -809,7 +810,7 @@ LRESULT DockPanel_OnMoving(DOCKPANEL *dppThis)
 			if(hwndTransPanel != 0)
 			{
 				hwndAnimPanel = hwndTransPanel;
-				SetWindowLong(hwndAnimPanel, GWL_USERDATA, 255);
+				SetWindowLongPtr(hwndAnimPanel, GWLP_USERDATA, 255);
 				SetTimer(dppThis->hwndPanel, (UINT)hwndAnimPanel, 10, 0);
 				hwndTransPanel = 0;
 			}
@@ -859,7 +860,7 @@ LRESULT CALLBACK DockPanelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		return TRUE;
 
 	case WM_NCACTIVATE:
-		return HANDLE_NCACTIVATE(dpp->hwndMain, hwnd, wParam, lParam);
+		return HANDLE_NCACTIVATE(dpp->hwndMain, hwnd, wParam, lParam, NULL);
 
 	case WM_CREATE:
 		dpp->fVisible = TRUE;
@@ -901,13 +902,13 @@ LRESULT CALLBACK DockPanelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		return DockPanel_SetCursor(dpp, wParam, lParam);
 
 	case WM_LBUTTONDOWN:
-		return DockPanel_OnLButtonDown(dpp, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return DockPanel_OnLButtonDown(dpp, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_MOUSEMOVE:
-		return DockPanel_OnMouseMove(dpp, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return DockPanel_OnMouseMove(dpp, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_LBUTTONUP:
-		return DockPanel_OnLButtonUp(dpp, (short)LOWORD(lParam), (short)HIWORD(lParam));
+		return DockPanel_OnLButtonUp(dpp, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_MOVING:
 		return DockPanel_OnMoving(dpp);

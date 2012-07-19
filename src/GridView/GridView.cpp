@@ -12,6 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <commctrl.h>
 #include <tchar.h>
 #include "GridViewInternal.h"
@@ -472,22 +473,22 @@ LRESULT GridView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return OnMouseWheel((short)HIWORD(wParam));
 
 	case WM_LBUTTONDBLCLK:
-		return OnLButtonDblClick((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonDblClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_LBUTTONDOWN:
-		return OnLButtonDown((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_RBUTTONDOWN:
-		return OnRButtonDown((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_LBUTTONUP:
-		return OnLButtonUp((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_MOUSEMOVE:
-		return OnMouseMove((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
 	case WM_TIMER:
-		return OnTimer((UINT)wParam);
+		return OnTimer((UINT_PTR)wParam);
 
 	case WM_THEMECHANGED:
 		if(m_hComboTheme)

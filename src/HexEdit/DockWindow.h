@@ -81,8 +81,8 @@ BOOL DockWnd_Position	 (HWND hwndMain, HDWP hdwp, DockWnd dwnd[], int nNumDockWn
 UINT DockWnd_GetDockSide (HWND hwnd, NMDOCKWNDQUERY *nmdwq, RECT *prc1, RECT *prc2);
 
 
-LRESULT HANDLE_NCACTIVATE (HWND hwndMain, HWND hwndMsg, WPARAM wParam, LPARAM lParam);
-LRESULT HANDLE_ENABLE     (HWND hwndMain, HWND hwndMsg, WPARAM wParam, LPARAM lParam);
+LRESULT HANDLE_NCACTIVATE (WNDPROC oldProc, HWND hwndMain, HWND hwndMsg, WPARAM wParam, LPARAM lParam);
+LRESULT HANDLE_ENABLE     (WNDPROC oldProc, HWND hwndMain, HWND hwndMsg, WPARAM wParam, LPARAM lParam);
 
 //
 //	DockWnd styles

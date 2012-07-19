@@ -351,7 +351,7 @@ LRESULT GridView::OnLButtonDblClick(int x, int y)
 //
 //	Used to handle mouse-scrolling 
 //
-LRESULT	GridView::OnTimer(UINT nTimer)
+LRESULT	GridView::OnTimer(UINT_PTR nTimer)
 {
 	RECT rect;
 	POINT pt;

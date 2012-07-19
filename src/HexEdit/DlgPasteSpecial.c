@@ -239,7 +239,7 @@ DWORD WINAPI PipeWriteProc(PIPE_PARAMS *param)
 
 	dwGlobalSize = (DWORD)GlobalSize(pGlobalMem);
 
-	len = strlen((char *)pGlobalMem);
+	len = (DWORD)strlen((char *)pGlobalMem);
 	dwGlobalSize = len + 1;
 
 	// write the entire memory block to the pipe

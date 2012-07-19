@@ -700,7 +700,7 @@ INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 
 		sps = (SEARCH_PANE_STATE *)lParam;
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG)sps);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)sps);
 
 		EnableDialogTheme(hwnd);
 
