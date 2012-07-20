@@ -14,4 +14,6 @@ REM spawn another shell and run 'build0' with the VCVARS
 %comspec% /c "%vcvars% x86_amd64 && build0.bat"
 
 REM package everything together
-buildzip.rb
+buildzip.rb x86
+buildzip.rb amd64
+
