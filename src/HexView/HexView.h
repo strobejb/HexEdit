@@ -191,6 +191,7 @@ typedef void * HBOOKMARK;
 #define HEX_SYS_COLOR		0x80000000
 	
 HWND CreateHexView(HWND hwndParent);
+ATOM InitHexView();
 
 //
 //	HexView user-messages
@@ -449,8 +450,8 @@ typedef struct _NMHVBOOKMARK
 #define HexView_FindNext(hwnd, pdwResult, options) \
 	(BOOL)SNDMSG((hwnd), HVM_FINDNEXT, (WPARAM)(UINT)(options), (LPARAM)(size_w *)(pdwResult))
 
-#define HexView_FindPrev(hwnd) \
-	(BOOL)SNDMSG((hwnd), HVM_FINDPREV, 0, 0)
+#define HexView_FindPrev(hwnd, pdwResult, options) \
+	(BOOL)SNDMSG((hwnd), HVM_FINDPREV, (WPARAM)(UINT)(options), (LPARAM)(size_w *)(pdwResult))
 
 #define HexView_FindCancel(hwnd) \
 	(BOOL)SNDMSG((hwnd), HVM_FINDCANCEL, 0, 0)
