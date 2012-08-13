@@ -413,6 +413,10 @@ LRESULT HexView::OnChar(UINT nChar)
 		{
 			b = m_pDataSeq->getlastmodref();
 		}
+		else if(m_nEditMode == HVMODE_INSERT)
+		{
+			b = 0;
+		}
 		else
 		{
 			GetData(m_nCursorOffset, &b, 1);
@@ -438,9 +442,6 @@ LRESULT HexView::OnChar(UINT nChar)
 		int base  = cb[cf];
 		for(int i = cl[cf] - 1; i > m_nSubItem; i--)
 			power *= base;
-
-		if(m_nEditMode == HVMODE_INSERT)
-			b = 0;
 
 		val = b;
 		val = (val / power) % base;
