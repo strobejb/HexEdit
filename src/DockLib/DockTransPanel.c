@@ -69,7 +69,7 @@ HBITMAP MakeDockPanelBitmap(RECT *rect, DWORD side, DWORD type)
 	int height = RectHeight(rect);
 	int i;
 	
-	DWORD *pdwBox, pdwArrow;
+	DWORD *pdwBox, *pdwArrow;
 
 	HBITMAP hbmBox, hbmArrow, hbm;
 	HDC		hdcBox, hdcArrow, hdcDIB, hdcSrc;
