@@ -868,7 +868,7 @@ HWND CreateWinListToolbar(HWND hwndDlg, UINT nCtrlId, BOOL fRightAligned)
 	
 	static TBBUTTON tbbWinList[] = 
 	{	
-		{	0,	0, TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, 0	},
+		{	0,	0, TBSTATE_ENABLED, TBSTYLE_BUTTON,  {0}	},
 	};	
 
 	tbbWinList[0].idCommand = nCtrlId;

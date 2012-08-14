@@ -401,7 +401,7 @@ HWND CreatePinToolbar(HWND hwndDlg, UINT nCtrlId, BOOL fRightAligned)
 	
 	static TBBUTTON tbbPin[] = 
 	{	
-		{	0,	0, TBSTATE_ENABLED, TBSTYLE_CHECK,  0, 0	},
+		{	0,	0, TBSTATE_ENABLED, TBSTYLE_CHECK,  {0}	},
 	};	
 
 	tbbPin[0].idCommand = nCtrlId;

@@ -58,7 +58,7 @@ static DWORD TOOLBAR_STYLE =WS_CHILD | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE
 
 void AddBlankSpace(HWND hwndTB, int width)
 {
-	TBBUTTON tbb = { width, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0,0, 0 };
+	TBBUTTON tbb = { width, 0, TBSTATE_ENABLED, TBSTYLE_SEP, {0},0, 0 };
 	SendMessage(hwndTB, TB_ADDBUTTONS,  1, (LPARAM) &tbb);
 }
 
@@ -71,7 +71,7 @@ void AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, TCHAR *szT
 		uCmdId, 
 		TBSTATE_ENABLED, 
 		uStyle| BTNS_SHOWTEXT, 
-		0, 0, 0, 
+		{0}, 0, 
 		(INT_PTR)szText 
 	};
 	
