@@ -249,12 +249,13 @@ public:
 	bool ForwardDelete();
 	bool BackDelete();
 
-	void ContentChanged();
+	void ContentChanged(size_w offset, size_w length, UINT method);
 	//size_w nStartOffset, size_w nLength
 
 	BOOL OpenFile(LPCTSTR szFileName, UINT uMethod);
 	BOOL SaveFile(LPCTSTR szFileName, UINT uMethod);
 	BOOL ImportFile(LPCTSTR szFileName, UINT uMethod);
+	BOOL InitBuf(const BYTE *pBuffer, size_t nLength, bool copybuf, bool readonly);
 	BOOL CloseFile();
 	BOOL ClearFile();
 	BOOL RevertFile();

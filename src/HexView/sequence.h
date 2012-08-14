@@ -88,7 +88,7 @@ public:
 	//
 	// initialize from an in-memory buffer
 	//
-	bool		init(const seqchar *buffer, size_t length);
+	bool		init(const seqchar *buffer, size_t length, bool duplicate_buf = false);
 
 	//
 	//	sequence statistics
@@ -132,6 +132,7 @@ public:
 	void		ungroup();
 	size_w		event_index() const  { return undoredo_index; }
 	size_w		event_length() const { return undoredo_length; }
+	size_w		event_datalength() const { return undoredo_datalength; }
 
 	// print out the sequence
 	void		debug1();
@@ -191,6 +192,7 @@ private:
 	size_t			group_refcount;
 	size_w			undoredo_index;
 	size_w			undoredo_length;
+	size_w			undoredo_datalength;
 
 	//
 	//	File and memory buffer management

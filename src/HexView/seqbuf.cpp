@@ -125,18 +125,22 @@ bool sequence::buffer_control::init(const seqchar * buf, size_w len, bool copybu
 	
 	try 
 	{
-		if((viewlist[0].buffer = new seqchar[(size_t)len]) == 0)
-			return false;
+		if(buf == false || copybuf)
+		{
+			if((viewlist[0].buffer = new seqchar[(size_t)len]) == 0)
+				return false;
+		}
+
+		// duplicate the source buffer
+		if(copybuf)
+		{
+			memcpy(viewlist[0].buffer, buf, (size_t)len * sizeof(seqchar));
+		}
 	}
 	catch(std::bad_alloc & ba) 
 	{
 		UNREFERENCED_PARAMETER(ba);
 		return false;
-	}
-
-	if(copybuf)
-	{
-		memcpy(viewlist[0].buffer, buf, (size_t)len * sizeof(seqchar));
 	}
 
 	viewlist[0].initialized = true;

@@ -258,7 +258,8 @@ ATOM InitHexView();
 #define HVM_IMPORTFILE		(HVM_FIRST + 53)
 #define HVM_DELBOOKMARK		(HVM_FIRST + 54)
 #define HVM_ENUMBOOKMARK	(HVM_FIRST + 55)
-
+#define HVM_INITBUF			(HVM_FIRST + 56)
+#define HVM_INITBUF_SHARED  (HVM_FIRST + 57)
 
 //
 //	HexView notifications
@@ -273,6 +274,21 @@ ATOM InitHexView();
 #define HVN_PROGRESS			(HVN_BASE + 5)
 #define HVN_BOOKCLOSE			(HVN_BASE + 6)
 #define HVN_CONTEXTMENU			(HVN_BASE + 7)
+
+
+
+typedef struct _NMHVCHANGED
+{
+#define HVMETHOD_OVERWRITE 1
+#define HVMETHOD_INSERT    2
+#define HVMETHOD_DELETE    3
+
+	NMHDR	hdr;
+	UINT	method;
+	size_w  offset;
+	size_w  length;
+
+} NMHVCHANGED;
 
 typedef struct _NMHVPROGRESS
 {
@@ -392,6 +408,12 @@ typedef struct _NMHVBOOKMARK
 //
 #define HexView_SaveFile(hwnd, szFileName, uMethod) \
 	(UINT)SNDMSG((hwnd), HVM_SAVEFILE, (WPARAM)(UINT)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
+
+#define HexView_InitBuf(hwnd, pBuffer, nLength) \
+	(UINT)SNDMSG((hwnd), HVM_INITBUF, (WPARAM)(const PBYTE)(pBuffer), (LPARAM)(UINT_PTR)(nLength))
+
+#define HexView_InitBufShared(hwnd, pBuffer, nLength) \
+	(UINT)SNDMSG((hwnd), HVM_INITBUF_SHARED, (WPARAM)(const PBYTE)(pBuffer), (LPARAM)(UINT_PTR)(nLength))
 
 #define HexView_CanUndo(hwnd) \
 	(BOOL)SNDMSG((hwnd), HVM_CANUNDO, 0, 0)

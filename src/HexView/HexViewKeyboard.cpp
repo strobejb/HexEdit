@@ -50,45 +50,55 @@ void HexView::ScrollToCaret()
 
 bool HexView::ForwardDelete()
 {
+	size_w length;
+
 	if(SelectionSize() > 0)
 	{
-		m_pDataSeq->erase(SelectionStart(), SelectionSize());
+		length = SelectionSize();
+		m_pDataSeq->erase(SelectionStart(), length);
 		m_nCursorOffset = SelectionStart();
 
 		m_pDataSeq->breakopt();
 	}
 	else
 	{
-		m_pDataSeq->erase(m_nCursorOffset, 1);
+		length = 1;
+		m_pDataSeq->erase(m_nCursorOffset, length);
 	}
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
-	ContentChanged();
+	ContentChanged(m_nCursorOffset, length, HVMETHOD_DELETE);
 
 	return true;
 }
 	
 bool HexView::BackDelete()
 {
+	size_w offset, length;
+
 	if(SelectionSize())
 	{
-		m_pDataSeq->erase(SelectionStart(), SelectionSize());
-		m_nCursorOffset = SelectionStart();
+		offset = SelectionStart();
+		length = SelectionSize();
+
+		m_pDataSeq->erase(offset, length);
+		m_nCursorOffset = offset;
 
 		m_pDataSeq->breakopt();
 	}
 	else if(m_nCursorOffset > 0)
 	{
-		m_nCursorOffset--;
-		m_pDataSeq->erase(m_nCursorOffset, 1);
+		offset = --m_nCursorOffset;
+		length = 1;
+		m_pDataSeq->erase(offset, length);
 	}
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
-	ContentChanged();
+	ContentChanged(offset, length, HVMETHOD_DELETE);
 
 	return true;
 }
@@ -159,7 +169,6 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 		// can only erase when in Insert mode
 		if(m_nEditMode == HVMODE_INSERT || 
 			CheckStyle(HVS_ALWAYSDELETE) && 
-			(m_nEditMode == HVMODE_INSERT || m_nEditMode == HVMODE_OVERWRITE) && 
 			SelectionSize() == 0)
 		{
 			ForwardDelete();
@@ -176,17 +185,10 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 		
 		// can only erase when in Insert mode
 		if(m_nEditMode == HVMODE_INSERT || 
-			CheckStyle(HVS_ALWAYSDELETE) && 
-			(m_nEditMode == HVMODE_INSERT || m_nEditMode == HVMODE_OVERWRITE))
+			CheckStyle(HVS_ALWAYSDELETE)
+			)
 		{
 			BackDelete();			
-		}
-		else
-		{
-			//PostMessage(m_hWnd, WM_KEYDOWN, 
-			INPUT inp = { INPUT_KEYBOARD };
-			inp.ki.wVk = VK_LEFT;
-			SendInput(1, &inp, sizeof(inp));
 		}
 
 		return 0;
@@ -471,7 +473,7 @@ LRESULT HexView::OnChar(UINT nChar)
 			// prevents us from introducing any more spans than necessary
 			// and keeps this as a single 'byte' edit
 			m_pDataSeq->getlastmodref() = val;
-			ContentChanged();
+			ContentChanged(m_nCursorOffset, 1, HVMETHOD_OVERWRITE);
 
 			if(m_nSubItem == cl[cf])
 			{
@@ -494,15 +496,37 @@ LRESULT HexView::OnChar(UINT nChar)
 	return 0;
 }
 
+UINT method(size_w newlen, size_w oldlen)
+{
+	if(newlen == oldlen)
+	{
+		return HVMETHOD_OVERWRITE;
+	}
+	else if(newlen < oldlen)
+	{
+		return HVMETHOD_DELETE;
+	}
+	else if(newlen > oldlen)
+	{
+		return HVMETHOD_INSERT;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 bool HexView::Undo()
 {
+	size_w oldlen = m_pDataSeq->size();
+
 	if(m_pDataSeq->undo())
 	{
 		m_nSelectionStart = m_pDataSeq->event_index();
 		m_nSelectionEnd   = m_pDataSeq->event_length() + m_nSelectionStart;
 		m_nCursorOffset   = m_nSelectionEnd;
 
-		ContentChanged();
+		ContentChanged(m_pDataSeq->event_index(), m_pDataSeq->event_datalength(), method(m_pDataSeq->size(), oldlen));
 		return true;
 	}
 	else
@@ -513,13 +537,15 @@ bool HexView::Undo()
 
 bool HexView::Redo()
 {
+	size_w oldlen = m_pDataSeq->size();
+
 	if(m_pDataSeq->redo())
 	{
 		m_nSelectionStart = m_pDataSeq->event_index();
 		m_nSelectionEnd   = m_pDataSeq->event_length() + m_nSelectionStart;
 		m_nCursorOffset   = m_nSelectionEnd;
 
-		ContentChanged();
+		ContentChanged(m_pDataSeq->event_index(), m_pDataSeq->event_datalength(), method(m_pDataSeq->size(), oldlen));
 		return true;
 	}
 	else

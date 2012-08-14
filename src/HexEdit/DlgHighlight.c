@@ -315,7 +315,7 @@ void FillGridView2(HWND hwndGV, HGRIDITEM hGridItem, HBOOKMARK hbm, BOOKMARK *bm
 
 BOOL GetBookmarkFileName(HWND hwndHexView, LPCTSTR szFileName, TCHAR *szBookPath)
 {
-	TCHAR szBase[MAX_PATH];
+	TCHAR szBase[MAX_PATH] = {0};
 	TCHAR szAppData[MAX_PATH];
 	TCHAR *pszName;
 	UINT64 bookid;
@@ -323,7 +323,9 @@ BOOL GetBookmarkFileName(HWND hwndHexView, LPCTSTR szFileName, TCHAR *szBookPath
 	if(szFileName == 0)
 	{
 		szFileName = szBase;
-		HexView_GetFileName(hwndHexView, szBase, MAX_PATH);
+
+		if(!HexView_GetFileName(hwndHexView, szBase, MAX_PATH))
+			return FALSE;
 	}
 
 	// has this file got a bookmark id already??

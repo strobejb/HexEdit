@@ -193,6 +193,16 @@ public:
 		return HexView_SaveFile(m_hWnd, szFileName, uMethod);
 	}
 
+  UINT InitBuf(const BYTE *buf, size_w len)
+  {
+    return HexView_InitBuf(m_hWnd, buf, len);
+  }
+
+  UINT InitBufShared(const BYTE *buf, size_w len)
+  {
+    return HexView_InitBufShared(m_hWnd, buf, len);
+  }
+
 	BOOL CanUndo()
 	{
 		return HexView_CanUndo(m_hWnd);

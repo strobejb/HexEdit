@@ -469,31 +469,46 @@ void HexView_CursorChanged(HWND hwndMain, HWND hwndHV)
 	UpdateToolbarState(mainWnd->hwndStatusBar, hwndHV);
 }
 
-LONG HexViewNotifyHandler(MAINWND *mainWnd, HWND hwnd, NMHDR *hdr)
+LONG HexView_Changed(MAINWND *mainWnd, NMHVCHANGED *hvc)
+{
+	HWND hwndHV = GetActiveHexView(mainWnd->hwndMain);//g_hwndHexView;
+
+	TCHAR *szMethod[] = {
+		TEXT("??"), TEXT("HVMETHOD_OVERWRITE"), TEXT("HVMETHOD_INSERT"), TEXT("HVMETHOD_DELETE"), 
+	};
+
+	TRACE(TEXT("Changed: %08I64x %I64x %s\n"), hvc->offset, hvc->length, szMethod[hvc->method]);
+
+	mainWnd->fChanged = TRUE;
+	UpdateToolbarState(mainWnd->hwndToolbar, hwndHV);
+
+	if(g_szFileTitle[0])
+	{
+		BOOL fModified = HexView_CanUndo(hwndHV);
+
+		if(fModified != g_fFileChanged)
+		{
+			SetWindowFileName(mainWnd->hwndMain, g_szFileTitle, fModified, FALSE);
+			g_fFileChanged = fModified;
+		}
+	}
+
+	UpdateTypeView();
+	return 0;
+}
+
+LONG_PTR HexViewNotifyHandler(MAINWND *mainWnd, HWND hwnd, NMHDR *hdr)
 {
 	HWND hwndHV = GetActiveHexView(hwnd);//g_hwndHexView;
 	NMHVPROGRESS *hvp;
+	NMHVCHANGED  *hvc;
 
 	switch(hdr->code)
 	{
 	case HVN_CHANGED:
 
-		mainWnd->fChanged = TRUE;
-		UpdateToolbarState(mainWnd->hwndToolbar, hwndHV);
-
-		if(g_szFileTitle[0])
-		{
-			BOOL fModified = HexView_CanUndo(hwndHV);
-
-			if(fModified != g_fFileChanged)
-			{
-				SetWindowFileName(hwnd, g_szFileTitle, fModified, FALSE);
-				g_fFileChanged = fModified;
-			}
-		}
-
-		UpdateTypeView();
-
+		hvc = (NMHVCHANGED *)hdr;
+		HexView_Changed(mainWnd, hvc);
 		return 0;
 
 	case HVN_EDITMODE_CHANGE:
@@ -1201,6 +1216,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShowC
 	HACCEL	hAccel;
 	TCHAR	arg[MAX_PATH];
 	TCHAR *	pszCmdline;
+	//char buf[] = "hello world";
 
 	EnableCrashingOnCrashes();
 
@@ -1258,7 +1274,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShowC
 	InitMainWnd();
 	CreateMainWnd();
 
-
 	// open file specified on commmand line?
 	if(pszCmdline && *pszCmdline)
 	{
@@ -1291,6 +1306,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShowC
 	// become visible at the same time
 	//ShowOwnedPopups(g_hwndMain, TRUE);
 	DockWnd_ShowDeferredPopups(g_hwndMain);
+
+	//HexView_InitBuf(g_hwndHexView, buf, sizeof(buf));
 
 	//
 	// load keyboard accelerator table

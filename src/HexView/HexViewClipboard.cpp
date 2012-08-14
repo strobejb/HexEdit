@@ -160,6 +160,8 @@ ULONG HexView::FillData(BYTE *buf, ULONG buflen, size_w len)
 //
 size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, bool fReplaceSelection, bool fSelectData, HexSnapShot *hss /*= 0*/)
 {
+	size_w offset = m_nCursorOffset;
+
 	if(m_nEditMode == HVMODE_READONLY)
 		return 0;
 
@@ -222,7 +224,7 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 		m_pDataSeq->ungroup();
 
 	if(m_fRedrawChanges)
-		ContentChanged();
+		ContentChanged(offset, nLength, m_nEditMode == HVMODE_INSERT ? HVMETHOD_INSERT : HVMETHOD_OVERWRITE);
 
 	return nLength;
 }
@@ -330,7 +332,7 @@ BOOL HexView::OnClear()
 		{
 			BYTE b[] = { 0 };
 			success = FillData(b, 1, SelectionSize());
-			ContentChanged();
+			ContentChanged(m_nCursorOffset, SelectionSize(), HVMETHOD_OVERWRITE);
 		}
 
 		break;

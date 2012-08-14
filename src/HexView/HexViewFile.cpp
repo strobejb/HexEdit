@@ -49,6 +49,25 @@ BOOL HexView::OpenFile(LPCTSTR szFileName, UINT uOpenFlags)
 
 	return FALSE;
 }
+BOOL HexView::InitBuf(const BYTE *buffer, size_t len, bool copybuf, bool readonly)
+{
+	if(m_pDataSeq->init(buffer, len, copybuf))
+	{
+		m_szFilePath[0] = '\0';
+		
+		m_nEditMode = readonly ? HVMODE_READONLY : HVMODE_OVERWRITE;
+
+		RecalcPositions();
+		SetCaretPos((m_nAddressWidth + m_nHexPaddingLeft) * m_nFontHeight, 0);
+		UpdateMetrics();
+
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
 
 BOOL HexView::CloseFile()
 {

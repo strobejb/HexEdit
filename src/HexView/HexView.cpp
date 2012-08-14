@@ -71,9 +71,7 @@ LRESULT HexView::NotifyParent(UINT nNotifyCode, NMHDR *optional /* = 0*/)
 		*nmptr = nmhdr;
 	}
 
-	//TRACEA("NotifyParent%x\n", 
-		SendMessage(GetParent(m_hWnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)nmptr);
-	//	);
+	SendMessage(GetParent(m_hWnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)nmptr);
 	return 0;
 }
 
@@ -159,7 +157,7 @@ HexView::HexView(HWND hwnd)	:
 
 	m_nControlStyles = //HVS_ADDR_MIDCOLON|//HVS_LOWERCASEHEX|HVS_ADDR_ENDCOLON;//|HVS_ADDR_DEC;
 		//HVS_INVERTSELECTION|
-		HVS_RESIZEBAR|HVS_ALWAYSVSCROLL|HVS_ALWAYSDELETE
+		HVS_RESIZEBAR|HVS_ALWAYSVSCROLL//|HVS_ALWAYSDELETE
 		;//|HVS_FITTOWINDOW;
 
 	//m_pDataSeq->open(_T("C:\\Users\\James\\Desktop\\DSCF0258.JPG"), false);
@@ -504,11 +502,12 @@ VOID HexView::UpdateMetrics()
 	RepositionCaret();
 }
 
-void HexView::ContentChanged()
+void HexView::ContentChanged(size_w offset, size_w length, UINT method)
 {
+	NMHVCHANGED nmchanged = { { 0,0,0 }, method, offset, length };
 	UpdateMetrics();
 	ScrollToCaret();
-	NotifyParent(HVN_CHANGED);
+	NotifyParent(HVN_CHANGED, (NMHDR *)&nmchanged);
 }
 
 BOOL HexView::SetCurSel(size_w selStart, size_w selEnd)
@@ -576,7 +575,7 @@ BOOL HexView::SetRedraw(BOOL fRedraw)
 	if(fRedraw)
 	{
 		m_fRedrawChanges = true;
-		ContentChanged();
+		ContentChanged(0, 0, 0);
 	}
 	else
 	{
@@ -792,6 +791,12 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case HVM_SAVEFILE:
 		return SaveFile((LPCTSTR)lParam, (UINT)wParam);
+
+	case HVM_INITBUF:
+		return InitBuf((const BYTE *)wParam, (size_t)lParam, true, false);
+
+	case HVM_INITBUF_SHARED:
+		return InitBuf((const BYTE *)wParam, (size_t)lParam, false, false);
 
 	case HVM_IMPORTFILE:
 		return ImportFile((LPCTSTR)lParam, (UINT)wParam);

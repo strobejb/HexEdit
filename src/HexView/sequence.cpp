@@ -115,18 +115,21 @@ bool sequence::init ()
 	group_refcount	= 0;
 	undoredo_index	= 0;
 	undoredo_length = 0;
-
+	undoredo_datalength = 0;
 
 	return true;
 }
 
-bool sequence::init (const seqchar *buffer, size_t length)
+//
+//	initialize with a buffer
+//
+bool sequence::init (const seqchar *buffer, size_t length, bool duplicate_buf /*=false*/)
 {
 	if(!clear())
 		return false;
 
 	buffer_control *bc = new buffer_control();
-	bc->init(buffer, length, true);
+	bc->init(buffer, length, duplicate_buf);
 
 	bc->id = (int)buffer_list.size();		// assign the id
 	buffer_list.push_back(bc);
@@ -635,10 +638,12 @@ void sequence::restore_spanrange (span_range *range, bool undo_or_redo)
 		range->act != action_erase && undo_or_redo == false)
 	{
 		undoredo_length = range->length;
+		undoredo_datalength = range->length;
 	}
 	else
 	{
 		undoredo_length = 0;
+		undoredo_datalength = range->length;
 	}
 }
 
