@@ -309,6 +309,7 @@ private:
 	int		m_nFontHeight;
 	int		m_nFontWidth;
 
+
 	// View dimensions
 	int		m_nWindowLines;
 	int		m_nWindowColumns;

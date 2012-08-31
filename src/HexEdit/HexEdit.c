@@ -875,8 +875,9 @@ HWND CreateHexViewCtrl(HWND hwndParent)
 	// set the right-click context menu
 	HexView_SetContextMenu(hwndHV, GetSubMenu(hMenu, 0));
 
-	// set the font
+	// set the font0
 	SendMessage(hwndHV, WM_SETFONT, (WPARAM)g_hHexViewFont, 0);
+	HexView_SetFontSpacing(hwndHV, 2, 0);
 	return hwndHV;
 }
 

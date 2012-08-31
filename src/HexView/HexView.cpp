@@ -243,7 +243,7 @@ HMENU HexView::SetContextMenu(HMENU hMenu)
 
 LRESULT HexView::OnSetFocus()
 {
-	TRACEA("setfocus %d\n", GetTickCount());
+	//TRACEA("setfocus %d\n", GetTickCount());
 	CreateCaret(m_hWnd, NULL, 2, m_nFontHeight);
 	RepositionCaret();
 	ShowCaret(m_hWnd);
@@ -253,7 +253,7 @@ LRESULT HexView::OnSetFocus()
 
 LRESULT HexView::OnKillFocus()
 {
-	TRACEA("killfocus\n");
+	//TRACEA("killfocus\n");
 	OnLButtonUp(0, 0, 0);
 
 	HideCaret(m_hWnd);
@@ -396,7 +396,7 @@ LRESULT HexView::OnSetFont(HFONT hFont)
 
 
 	m_nFontHeight = tm.tmHeight;
-	m_nFontWidth  = tm.tmAveCharWidth+2;//11;//tm.tmAveCharWidth;//9;//tm.tmAveCharWidth;;
+	m_nFontWidth  = tm.tmAveCharWidth;//+2;//11;//tm.tmAveCharWidth;//9;//tm.tmAveCharWidth;;
 
 	SelectObject(hdc, hOld);
 	ReleaseDC(m_hWnd, hdc);
@@ -980,6 +980,11 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 			((POINT *)lParam)->y = y * m_nFontHeight;
 		}
 		return TRUE;
+
+	case HVM_SETFONTSPACING:
+		m_nFontWidth  += (short)LOWORD(lParam);
+		m_nFontHeight += (short)HIWORD(lParam);
+		return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, msg, wParam, lParam);

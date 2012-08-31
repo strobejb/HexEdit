@@ -260,6 +260,7 @@ ATOM InitHexView();
 #define HVM_ENUMBOOKMARK	(HVM_FIRST + 55)
 #define HVM_INITBUF			(HVM_FIRST + 56)
 #define HVM_INITBUF_SHARED  (HVM_FIRST + 57)
+#define HVM_SETFONTSPACING  (HVM_FIRST + 58)
 
 //
 //	HexView notifications
@@ -501,6 +502,9 @@ typedef struct _NMHVBOOKMARK
 
 #define HexView_ImportFile(hwnd, szFileName, uMethod) \
 	(UINT)SNDMSG((hwnd), HVM_IMPORTFILE, (WPARAM)(UINT)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
+
+#define HexView_SetFontSpacing(hwnd, xspace, yspace) \
+	(UINT)SNDMSG((hwnd), HVM_SETFONTSPACING, 0, (LPARAM)MAKELONG((short)(xspace), (short)(yspace)))
 
 
 //
