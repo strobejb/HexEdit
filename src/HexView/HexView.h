@@ -189,6 +189,17 @@ typedef void * HBOOKMARK;
 
 #define HEX_GET_COLOR		0x00ffffff
 #define HEX_SYS_COLOR		0x80000000
+
+#define HEX_SYSCOLOR(code) (HEX_SYS_COLOR | (code))
+
+// Find the real colour
+// an RGB value will not have the top byte set to anything,
+// so we can tell if we have a specific colour or not.
+// we can set the top byte to a meaningful value to indicate
+// that we are using a system colour - just mask the low triple
+// bytes to get the COLOR_* value
+#define HexView_RealiseColour(cr) (((cr) & HEX_SYS_COLOR) ? GetSysColor((cr) & HEX_GET_COLOR) : (cr))
+
 	
 HWND CreateHexView(HWND hwndParent);
 ATOM InitHexView();

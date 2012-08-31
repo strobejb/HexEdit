@@ -26,6 +26,56 @@ void MakeFontCombo(HWND hwndDlg, HWND hwndCombo);
 BOOL MakeColourCombo(HWND hwndCombo, COLORREF crList[], TCHAR *szTextList[], int nCount);
 void InitSizeList(HWND hwndCombo, TCHAR *szFontName);
 
+typedef struct _GUIITEM {
+
+	TCHAR   szName[30];
+	TCHAR	szFont[LF_FACESIZE];
+	int		nFontSize;
+	BOOL	fFontBold;
+	
+} GUIITEM;
+
+GUIITEM g_guiItem[] = 
+{
+	TEXT("HexView"),
+	TEXT("Consolas"), 
+	10,
+};
+
+HFONT EasyCreateFont(TCHAR *szName, int pointSize)
+{
+	HDC hdc = GetDC(0);
+	HFONT hFont;
+
+	int lfHeight = -MulDiv(pointSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	hFont = CreateFont(lfHeight, 0, 0, 0, bold ? FW_BOLD : FW_NORMAL, 0, 0, 0, 0, 0, 0, 0, 0, szName);
+
+	ReleaseDC(0, hdc);
+	return hFont;
+}
+
+typedef struct _COLORITEM {
+
+	UINT	 fgIndex;
+	COLORREF fgColor;
+
+	UINT	 bgIndex;
+	COLORREF bgColor;
+
+	TCHAR *  name;
+
+} COLORITEM;
+
+COLORITEM g_colorItem[] = 
+{
+	{ HVC_ADDRESS,		HEX_SYSCOLOR(COLOR_WINDOWTEXT),		HVC_BACKGROUND,   HEX_SYSCOLOR(COLOR_WINDOW),		TEXT("Address Column") },
+	{ HVC_HEXEVEN,		RGB(0, 0, 128),						HVC_BACKGROUND,   HEX_SYSCOLOR(COLOR_WINDOW),		TEXT("Hex Odd Columns") },
+	{ HVC_HEXODD,		RGB(0, 0, 196),						HVC_BACKGROUND,   HEX_SYSCOLOR(COLOR_WINDOW),		TEXT("Hex Even Columns") },
+	{ HVC_ASCII,		HEX_SYSCOLOR(COLOR_WINDOWTEXT),		HVC_BACKGROUND,	  HEX_SYSCOLOR(COLOR_WINDOW),		TEXT("Ascii Column") },
+	{ HVC_SELECTION,	HEX_SYSCOLOR(COLOR_HIGHLIGHTTEXT),	HVC_SELECTION,	  HEX_SYSCOLOR(COLOR_HIGHLIGHT),	TEXT("Selected Data") },
+	//{ HVC_SELECTION,	HEX_SYSCOLOCOLOR_HIGHLIGHTTEXTHVC_SELECTION,					TEXT("Inactive Selection") },
+};
+
 COLORREF crDefault[] = 
 {
 	 RGB(255,255,255),	
@@ -79,6 +129,12 @@ void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, TCHAR *szNam
 	int idx = (int)SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
+
+/*void GetColourItemList(HWND hwnd, UINT uItem, COLORREF *fg, COLORREG *bg)
+{
+	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
+	SendMessage(hwndCtrl, LB_GETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
+}*/
 
 
 /*void AddColourComboItem(HWND hwnd, UINT uItem, COLORREF col, TCHAR *szName)
@@ -154,7 +210,7 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 	hwndPreview = GetDlgItem(hwnd, IDC_PREVIEW);
 	oldPreviewProc = (WNDPROC)SetWindowLongPtr(hwndPreview, GWLP_WNDPROC, (LONG_PTR)PreviewWndProc);
 
-		AddColourListItem(hwnd, IDC_ITEMLIST, -1,				HVC_BACKGROUND,   TEXT("Background"));	
+		//AddColourListItem(hwnd, IDC_ITEMLIST, -1,				HVC_BACKGROUND,   TEXT("Background"));	
 		AddColourListItem(hwnd, IDC_ITEMLIST, HVC_ADDRESS,		HVC_BACKGROUND,   TEXT("Address Column"));
 		AddColourListItem(hwnd, IDC_ITEMLIST, HVC_HEXEVEN,		HVC_BACKGROUND,   TEXT("Hex Odd Columns"));
 		AddColourListItem(hwnd, IDC_ITEMLIST, HVC_HEXODD,		HVC_BACKGROUND,   TEXT("Hex Even Columns"));
@@ -165,6 +221,25 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		//AddColourListItem(hwnd, IDC_ITEMLIST, HVC_CURRENTLINETEXT, HVC_CURRENTLINE,  TEXT("Current Line"));
 
 		return TRUE;
+
+	case WM_COMMAND:
+		
+		if(HIWORD(wParam) == LBN_SELCHANGE)
+		{
+			int idx;
+
+			switch(LOWORD(wParam))
+			{
+			case IDC_ITEMLIST:
+				idx = SendDlgItemMessage(hwnd, IDC_ITEMLIST, LB_GETCURSEL, 0, 0);
+				g_crPreviewFG = HexView_RealiseColour(g_colorItem[idx].fgColor);
+				g_crPreviewBG = HexView_RealiseColour(g_colorItem[idx].bgColor);
+				InvalidateRect(GetDlgItem(hwnd, IDC_PREVIEW), 0, 0);
+				break;
+			}
+		}
+
+		return 0;
 
 	case WM_MEASUREITEM:
 		// can't do anything here because we haven't created

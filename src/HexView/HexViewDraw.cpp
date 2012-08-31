@@ -139,16 +139,7 @@ COLORREF HexView::GetHexColour(UINT uIndex)
 
 COLORREF HexView::RealiseColour(COLORREF cr)
 {
-	// Find the real colour
-	// an RGB value will not have the top byte set to anything,
-	// so we can tell if we have a specific colour or not.
-	// we can set the top byte to a meaningful value to indicate
-	// that we are using a system colour - just mask the low triple
-	// bytes to get the COLOR_* value
-	if(cr & HEX_SYS_COLOR)
-		return GetSysColor(cr & HEX_GET_COLOR);
-	else
-		return cr;
+	return HexView_RealiseColour(cr);
 }
 
 size_t HexView::FormatHexUnit(BYTE *data, TCHAR *buf, size_t buflen)
