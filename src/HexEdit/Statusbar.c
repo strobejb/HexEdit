@@ -32,6 +32,7 @@ DWORD dwStatusBarStyles = WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | CCS_NOPARENTAL
 extern HINSTANCE hInstance;
 
 #define MaxStatusParts 5
+BOOL g_fStatusValueFromSelection = TRUE;
 
 TCHAR		*g_szEditMode[] = { TEXT("READ"), TEXT("INS"), TEXT("OVR") };
 
@@ -175,17 +176,31 @@ int StatusType(int nMenuId)
 
 void UpdateStatusBarText(HWND hwndStatusBar, HWND hwndHexView)
 {
-	UINT nMode = HexView_GetEditMode(hwndHexView);
+	UINT  nMode = HexView_GetEditMode(hwndHexView) & 0x3;
 
-	BYTE buf[8] = {0};
+	BYTE  buf[8]  = { 0 };
 	TCHAR val[20] = TEXT("0x");
+
 	TOKEN ty = StatusType(g_nStatusValueType);
 
 	UINT64 pos = 0;
-	
-	HexView_GetCurPos(hwndHexView, &pos);
+	UINT64 sellen = 8;
 
-	HexView_GetData(hwndHexView, pos, buf, 8);
+	HexView_GetSelSize(hwndHexView, &sellen);
+	
+	// take value from selection?
+	if(g_fStatusValueFromSelection && sellen > 0)
+	{
+		HexView_GetSelStart(hwndHexView, &pos);
+		sellen = min(sellen, 8);
+	}
+	else
+	{
+		HexView_GetCurPos(hwndHexView, &pos);
+		sellen = 8;
+	}
+
+	HexView_GetData(hwndHexView, pos, buf, (ULONG)sellen);
 	FmtData(val+ g_fStatusHexValue*2, buf, ty, g_fStatusSignedValue, g_fStatusHexValue, g_fStatusBigEndian);
 
 	SetStatusBarText(hwndStatusBar, 2, 0, TEXT(" Value: %s"), val);
@@ -215,16 +230,9 @@ void UpdateStatusBarText(HWND hwndStatusBar, HWND hwndHexView)
 		UINT64 end;  
 		UINT64 len;  
 
-		BYTE buf[8];
-		TCHAR val[20] = TEXT("0x");
-		TOKEN ty = StatusType(g_nStatusValueType);
-
 		HexView_GetSelStart(hwndHexView, &start);
-		HexView_GetSelEnd(hwndHexView, &end);
-		HexView_GetSelSize(hwndHexView, &len);
-		HexView_GetData(hwndHexView, start, buf, 8);
-
-		FmtData(val+ g_fStatusHexValue*2, buf, ty, g_fStatusSignedValue, g_fStatusHexValue, g_fStatusBigEndian);
+		HexView_GetSelEnd(hwndHexView,   &end);
+		HexView_GetSelSize(hwndHexView,  &len);
 
 		// show selection size
 		if(g_fStatusHexCursor)
