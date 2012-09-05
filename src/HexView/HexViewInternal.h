@@ -231,6 +231,8 @@ public:
 	UINT GetStyleMask(UINT uStyleFlag);
 	UINT SetGrouping(UINT nBytes);
 	UINT GetGrouping();
+	UINT GetLineLen();
+	UINT SetLineLen(UINT nLineLen);
 
 	size_w  NumFileLines(size_w length);
 	bool	IsOverResizeBar(int x);

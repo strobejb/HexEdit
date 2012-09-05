@@ -328,6 +328,19 @@ UINT HexView::SetGrouping(UINT nBytes)
 	return 0;
 }
 
+UINT HexView::GetLineLen()
+{
+	return m_nBytesPerLine;
+}
+
+UINT HexView::SetLineLen(UINT nLineLen)
+{
+	m_nBytesPerLine = nLineLen;
+	RecalcPositions();
+	FakeSize();
+	return m_nBytesPerLine;
+}
+
 VOID HexView::UpdateResizeBarPos()
 {
 	m_nResizeBarPos = (-m_nHScrollPos * m_nFontWidth+(m_nTotalWidth - 
@@ -752,6 +765,10 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLEAR:
 		return OnClear();
 
+	case WM_GETDLGCODE:
+		// allow hexview to operate in a dialogbox
+		return DLGC_WANTCHARS | DLGC_WANTARROWS; 
+
 	case WM_UNDO: case HVM_UNDO:
 		return Undo();
 
@@ -921,10 +938,10 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return FormatData((HEXFMT_PARAMS *)lParam);
 
 	case HVM_GETLINELEN:
-		return m_nBytesPerLine;
+		return GetLineLen();
 
 	case HVM_SETLINELEN:
-		return m_nBytesPerLine;
+		return SetLineLen(wParam);
 
 	case HVM_FINDINIT:
 		return FindInit((BYTE *)lParam, wParam, FALSE, FALSE);
