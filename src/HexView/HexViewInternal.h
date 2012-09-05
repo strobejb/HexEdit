@@ -225,14 +225,15 @@ public:
 	COLORREF GetHexColour(UINT uIndex);
 	COLORREF RealiseColour(COLORREF cr);
 
-	bool CheckStyle(UINT uStyleFlag);
-	UINT SetStyle(UINT uMask, UINT uStyles);
-	UINT GetStyle(UINT uMask);
-	UINT GetStyleMask(UINT uStyleFlag);
-	UINT SetGrouping(UINT nBytes);
-	UINT GetGrouping();
-	UINT GetLineLen();
-	UINT SetLineLen(UINT nLineLen);
+	bool	CheckStyle(UINT uStyleFlag);
+	UINT	SetStyle(UINT uMask, UINT uStyles);
+	UINT	GetStyle(UINT uMask);
+	UINT	GetStyleMask(UINT uStyleFlag);
+	UINT	SetGrouping(UINT nBytes);
+	UINT	GetGrouping();
+	UINT	GetLineLen();
+	UINT	SetLineLen(UINT nLineLen);
+	BOOL	SetPadding(int left, int right);
 
 	size_w  NumFileLines(size_w length);
 	bool	IsOverResizeBar(int x);

@@ -48,6 +48,28 @@ public:
 		return WC_HEXVIEW;
 	}
 
+  // uIndex - one of the HVC_* values
+  UINT SetColor(UINT uIndex, COLORREF color)
+  {
+    return HexView_SetColor(m_hWnd, uIndex, color);
+  }
+
+  COLORREF GetColor(UINT uIndex)
+  {
+    return HexView_GetColor(uIndex);
+  }
+
+  UINT SetFontSpacing(int xspace, int yspace)
+  {
+    return HexView_SetFontSpacing(m_hWnd, xspace, yspace);
+  }
+
+  VOID SetFont(HFONT hFont)
+  {
+    return HexView_SetFont(m_hWnd, hFont);
+  }
+
+  // uMask, uStyle - one or more of the HVS_* styles
 	UINT SetStyle(UINT uMask, UINT uStyle)
 	{
 		return HexView_SetStyle(m_hWnd, uMask, uStyle);
@@ -57,6 +79,11 @@ public:
 	{
 		return HexView_SetGrouping(m_hWnd, nBytes);
 	}
+
+  BOOL SetPadding(int nPaddingLeft, int nPaddingRight)
+  {
+    return HexView_SetPadding(m_hWnd, nPaddingLeft, nPaddingRight);
+  }
 
 	UINT GetStyle()
 	{

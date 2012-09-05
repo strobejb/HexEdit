@@ -291,6 +291,19 @@ UINT HexView::SetStyle(UINT uMask, UINT uStyles)
 	return uOldStyle;
 }
 
+BOOL HexView::SetPadding(int left, int right)
+{
+	left  = max(left, 0);
+	right = max(right, 0);
+	left  = min(left, 20);
+	right = min(right, 20);
+
+	m_nHexPaddingLeft  = left;
+	m_nHexPaddingRight = right;
+
+	return 0;
+}
+
 UINT HexView::GetStyle(UINT uMask)
 {
 	return m_nControlStyles;
@@ -915,6 +928,9 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case HVM_GETCOLOR:
 		return GetHexColour((UINT)wParam);
+
+	case HVM_SETPADDING:
+		return SetPadding(LOWORD(lParam), HIWORD(lParam));
 
 	//case HVM_HIGHLIGHT:
 	//	return Highlight(wParam);

@@ -305,6 +305,8 @@ typedef void * HBOOKMARK;
 #define HVM_SETFONTSPACING  (HVM_FIRST + 58)
 #define HVM_SETCOLOR		(HVM_FIRST + 59)
 #define HVM_GETCOLOR		(HVM_FIRST + 60)
+#define HVM_SETPADDING		(HVM_FIRST + 61)
+//#define HVM_GETPADDING		(HVM_FIRST + 62)
 
 //
 //	HexView notifications
@@ -842,7 +844,7 @@ typedef struct _NMHVBOOKMARK
  * @param COLORREF color - a RGB value, or a HEX_SYSCOLOR value
  */
 #define HexView_SetColor(hwnd, index, color) \
-	(VOID)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), (LPARAM)(COLORREF)(color))
+	(UINT)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), (LPARAM)(COLORREF)(color))
 
 /**
  * Get the color-value for the specified HexView display element
@@ -850,7 +852,18 @@ typedef struct _NMHVBOOKMARK
  * @param UINT index     - one of the HVC_* color indices
  */
 #define HexView_GetColor(hwnd, index) \
-	(VOID)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), 0)
+	(COLORREF)SNDMSG((hwnd), HVM_GETCOLOR, (WPARAM)(UINT)(index), 0)
+
+/**
+ * Specify the left & right padding (in character units) 
+ * either side of the main hex display. i.e. in-between the address&hex display,
+ * and the hex&ascii display, respectively
+ *
+ * @param int left - number of characters between the address column & hex display
+ * @param int right - number of characters between the hex display & ascii display
+ */
+#define HexView_SetPadding(hwnd, left, right) \
+	(VOID)SNDMSG((hwnd), HVM_SETPADDING, (WPARAM)MAKEWPARAM((USHORT)(int)(left), (USHORT)(int)(right)), 0)
 
 
 //
