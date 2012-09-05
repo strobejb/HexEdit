@@ -130,6 +130,7 @@ public:
 	bool		canredo() const;
 	void		group();
 	void		ungroup();
+	void		clear_undo();
 	size_w		event_index() const  { return undoredo_index; }
 	size_w		event_length() const { return undoredo_length; }
 	size_w		event_datalength() const { return undoredo_datalength; }

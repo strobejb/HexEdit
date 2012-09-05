@@ -69,6 +69,9 @@ bool HexView::ForwardDelete()
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
+	if(CheckStyle(HVS_DISABLE_UNDO))
+		m_pDataSeq->clear_undo();
+
 	ContentChanged(m_nCursorOffset, length, HVMETHOD_DELETE);
 
 	return true;
@@ -97,6 +100,9 @@ bool HexView::BackDelete()
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
+
+	if(CheckStyle(HVS_DISABLE_UNDO))
+		m_pDataSeq->clear_undo();
 
 	ContentChanged(offset, length, HVMETHOD_DELETE);
 
@@ -132,7 +138,7 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 		{
 			OnPaste();
 		}
-		else
+		else if(CheckStyle(HVS_FIXED_EDITMODE) == 0)
 		{
 			if(m_nEditMode == HVMODE_INSERT)
 				m_nEditMode = HVMODE_OVERWRITE;

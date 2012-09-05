@@ -683,6 +683,12 @@ bool sequence::undoredo (eventstack &source, eventstack &dest)
 	return true;
 }
 
+void sequence::clear_undo()
+{
+	clearstack(undostack);
+	clearstack(redostack);
+}
+
 // 
 //	UNDO the last action
 //

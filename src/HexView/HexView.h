@@ -130,6 +130,8 @@ typedef void * HBOOKMARK;
 #define HVS_ASCII_MASK		0x3800
 
 // Basic HexView control styles
+#define HVS_FIXED_EDITMODE  0x0100		// prevent user from using INSERT to change edit mode
+#define HVS_DISABLE_UNDO	0x0200		// prevent undo/redo functionality
 #define HVS_ALWAYSDELETE	0x4000		// backspace/delete work even in OVR mode
 #define HVS_HEX_INVISIBLE   0x8000		// hide the hex display
 #define HVS_UPPERCASEHEX	0x000000	// hex characters (A-F) are upper-case (default)
@@ -143,10 +145,11 @@ typedef void * HBOOKMARK;
 #define HVS_BRINGTOTOP		0x800000	// bring window to foreground during drag+drop
 
 // Editing styles
-#define HVS_OVERSTRIKE		0x0000000	// overstrike (default)
+/*#define HVS_OVERSTRIKE		0x0000000	// overstrike (default)
 #define HVS_INSERT			0x1000000	// insertion
 #define HVS_READONLY		0x2000000	// readonly (no editing)
 #define HVS_QUICKSAVE		0x4000000	// quicksave
+*/
 
 #define HVS_HEXPANE			0x0000000	// cursor in hex pane (default)
 #define HVS_ASCPANE			0x8000000	// cursor in ascii pane
