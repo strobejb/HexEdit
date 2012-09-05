@@ -301,6 +301,7 @@ private:
 	int		m_nCaretX;
 	int		m_nCaretY;
 	int		m_nWhichPane;
+	size_w  m_nAddressOffset;
 
 	//size_w  m_nFileLength;
 	size_w  m_nSelectionStart;

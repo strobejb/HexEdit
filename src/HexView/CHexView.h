@@ -85,6 +85,11 @@ public:
     return HexView_SetPadding(m_hWnd, nPaddingLeft, nPaddingRight);
   }
 
+  VOID SetAddressOffset(size_w offset)
+  {
+    HexView_SetAddressOffset(m_hWnd, offset);
+  }
+
 	UINT GetStyle()
 	{
 		return HexView_GetStyle(m_hWnd);

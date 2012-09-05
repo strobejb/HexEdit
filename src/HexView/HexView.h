@@ -311,6 +311,7 @@ typedef void * HBOOKMARK;
 #define HVM_GETCOLOR		(HVM_FIRST + 60)
 #define HVM_SETPADDING		(HVM_FIRST + 61)
 //#define HVM_GETPADDING		(HVM_FIRST + 62)
+#define HVM_SETADDROFFSET   (HVM_FIRST + 63)
 
 //
 //	HexView notifications
@@ -868,6 +869,16 @@ typedef struct _NMHVBOOKMARK
  */
 #define HexView_SetPadding(hwnd, left, right) \
 	(VOID)SNDMSG((hwnd), HVM_SETPADDING, (WPARAM)MAKEWPARAM((USHORT)(int)(left), (USHORT)(int)(right)), 0)
+
+/**
+ * Specify offset that the address display begins at (default is 0)
+ * This is purely a cosmetic change - actual offsets (such as cursor/selection)
+ * within the hexview do not change
+ *
+ * @param size_w offset - value by which to offset the address column
+ */
+#define HexView_SetAddressOffset(hwnd, offset) \
+	(VOID)SNDMSG((hwnd), HVM_SETADDROFFSET, WPARAM_SIZEW(offset), LPARAM_SIZEW(offset))
 
 
 //

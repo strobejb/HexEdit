@@ -139,7 +139,8 @@ HexView::HexView(HWND hwnd)	:
 	m_HighlightCurrent(0),
 	m_HighlightHot(0),
 	m_HitTestCurrent(0),
-	m_HitTestHot(0)
+	m_HitTestHot(0),
+	m_nAddressOffset(0)
 
 
 {
@@ -1032,6 +1033,10 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case HVM_SETFONTSPACING:
 		m_nFontWidth  += (short)LOWORD(lParam);
 		m_nFontHeight += (short)HIWORD(lParam);
+		return 0;
+
+	case HVM_SETADDROFFSET:
+		m_nAddressOffset = MAKE_SIZEW(wParam, lParam);
 		return 0;
 
 	default:

@@ -74,6 +74,8 @@ size_t HexView::FormatAddress(size_w addr, TCHAR *buf, size_t buflen)
 		return 0;
 	}
 
+	addr += m_nAddressOffset;
+
 	if(CheckStyle( HVS_ADDR_DEC ))
 	{
 		_stprintf_s(buf, buflen, _T(" %0.*I64u"), m_nAddressDigits, (UINT64)addr);
