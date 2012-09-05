@@ -910,6 +910,12 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case HVM_GETGROUPING:
 		return GetGrouping();
 
+	case HVM_SETCOLOR:
+		return SetHexColour((UINT)wParam, (COLORREF)lParam);
+
+	case HVM_GETCOLOR:
+		return GetHexColour((UINT)wParam);
+
 	//case HVM_HIGHLIGHT:
 	//	return Highlight(wParam);
 

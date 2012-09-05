@@ -219,7 +219,9 @@ typedef void * HBOOKMARK;
 #define HEX_GET_COLOR		0x00ffffff	// mask to 
 #define HEX_SYS_COLOR		0x80000000	// top bit in a COLORREF indicates that it is a COLOR_xx index 
 
-#define HEX_SYSCOLOR(code) (HEX_SYS_COLOR | (code))	// create a HexView color based on COLOR_xx system color index
+// create a HexView color based on one of the GetSysColor COLOR_* system color codes
+// the resulting
+#define HEX_SYSCOLOR(code) (HEX_SYS_COLOR | (code))	
 
 // Find (realise) the real colour
 // an RGB value will not have the top byte set to anything,
@@ -301,6 +303,8 @@ typedef void * HBOOKMARK;
 #define HVM_INITBUF			(HVM_FIRST + 56)
 #define HVM_INITBUF_SHARED  (HVM_FIRST + 57)
 #define HVM_SETFONTSPACING  (HVM_FIRST + 58)
+#define HVM_SETCOLOR		(HVM_FIRST + 59)
+#define HVM_GETCOLOR		(HVM_FIRST + 60)
 
 //
 //	HexView notifications
@@ -830,6 +834,24 @@ typedef struct _NMHVBOOKMARK
  */
 #define HexView_SetFont(hwnd, hFont) \
 	(VOID)SNDMSG((hwnd), WM_SETFONT, (WPARAM)(HFONT)(hFont), 0)
+
+/**
+ * Set a new color for the specified HexView display element
+ *
+ * @param UINT index     - one of the HVC_* color indices
+ * @param COLORREF color - a RGB value, or a HEX_SYSCOLOR value
+ */
+#define HexView_SetColor(hwnd, index, color) \
+	(VOID)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), (LPARAM)(COLORREF)(color))
+
+/**
+ * Get the color-value for the specified HexView display element
+ *
+ * @param UINT index     - one of the HVC_* color indices
+ */
+#define HexView_GetColor(hwnd, index) \
+	(VOID)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), 0)
+
 
 //
 //	Functions exported from HexLib (i.e not message macros)
