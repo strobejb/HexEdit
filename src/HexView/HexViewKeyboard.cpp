@@ -240,6 +240,8 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 
 		if(m_nCursorOffset > (unsigned)m_nBytesPerLine) 
 			m_nCursorOffset -= m_nBytesPerLine;
+		else if(m_nCursorOffset == m_nBytesPerLine && m_fCursorAdjustment == FALSE)
+			m_nCursorOffset = 0;
 
 		break;
 
