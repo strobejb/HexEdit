@@ -126,11 +126,12 @@ typedef void * HBOOKMARK;
 #define HVS_ASCII_VISIBLE	0x0000		// visible (default)
 #define HVS_ASCII_SHOWCTRLS	0x0800		// show control (0-31) chars
 #define HVS_ASCII_SHOWEXTD	0x1000		// show extended chars (128-255)
-#define HVS_ASCII_INSIVIBLE 0x2000		// invisible
+#define HVS_ASCII_INVISIBLE 0x2000		// hide the ascii display
 #define HVS_ASCII_MASK		0x3800
 
 // Basic HexView control styles
 #define HVS_ALWAYSDELETE	0x4000		// backspace/delete work even in OVR mode
+#define HVS_HEX_INVISIBLE   0x8000		// hide the hex display
 #define HVS_UPPERCASEHEX	0x000000	// hex characters (A-F) are upper-case (default)
 #define HVS_LOWERCASEHEX	0x010000	// hex characters (A-F) are lower-case
 #define HVS_FITTOWINDOW		0x020000	// adjust columns to fit in window		

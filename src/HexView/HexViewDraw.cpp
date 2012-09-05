@@ -247,8 +247,6 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	int colidx = 0;
 	ATTR *attrPtr = attrList;
 
-	//*ptr++ = ' ';
-	//ptr+=5;
 
 	//
 	//	Format the offset as a hex/dec address
@@ -264,60 +262,61 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	*ptr++ = _T(' ');
 	AddAttr(&attrPtr, 0, GetHexColour(HVC_BACKGROUND), 1);
 
+	highlight = FindBookmark(offset, offset+length);
+
 	//
 	//	Hex column
 	//
-	highlight = FindBookmark(offset, offset+length);
-
-	//TRACEA("off %x %x\n", offset, highlight);
-
-	for(i = 0; i < (int)length/* m_nBytesPerLine*/; i++)
+	if(CheckStyle(HVS_HEX_INVISIBLE) == FALSE)
 	{
-		HEXCOL col1, col2;
-
-		size_t len = FormatHexUnit(&data[i], ptr, 0);
-		ptr += len;
-
-		GetHighlightCol(offset+i, 0, highlight, &col1, &col2, 
-			infobuf[i].buffer != 1 ? true : false,
-			infobuf[i].userdata != 0 ? true : false,
-			fIncSelection
-			);
-
-		// add the colour information
-		if(col1 != col2 || i == m_nBytesPerLine - 1 || (i+1) % (m_nBytesPerColumn) != 0)
+		for(i = 0; i < (int)length/* m_nBytesPerLine*/; i++)
 		{
-			AddAttr(&attrPtr, col1.colFG, col1.colBG, len);
-			
-			if((i+1) % (m_nBytesPerColumn) == 0 && (i < length/*m_nBytesPerLine*/ - 1))
+			HEXCOL col1, col2;
+
+			size_t len = FormatHexUnit(&data[i], ptr, 0);
+			ptr += len;
+
+			GetHighlightCol(offset+i, 0, highlight, &col1, &col2, 
+				infobuf[i].buffer != 1 ? true : false,
+				infobuf[i].userdata != 0 ? true : false,
+				fIncSelection
+				);
+
+			// add the colour information
+			if(col1 != col2 || i == m_nBytesPerLine - 1 || (i+1) % (m_nBytesPerColumn) != 0)
+			{
+				AddAttr(&attrPtr, col1.colFG, col1.colBG, len);
+
+				if((i+1) % (m_nBytesPerColumn) == 0 && (i < length/*m_nBytesPerLine*/ - 1))
+				{
+					*ptr++ = ' ';
+					AddAttr(&attrPtr, col2.colFG, col2.colBG, 1);
+				}
+			}
+			else if(i < length - 1)
 			{
 				*ptr++ = ' ';
-				AddAttr(&attrPtr, col2.colFG, col2.colBG, 1);
+				AddAttr(&attrPtr, col1.colFG, col1.colBG, len+1);
+			}
+			else
+			{
+				AddAttr(&attrPtr, col1.colFG, col1.colBG, len);
 			}
 		}
-		else if(i < length - 1)
-		{
-			*ptr++ = ' ';
-			AddAttr(&attrPtr, col1.colFG, col1.colBG, len+1);
-		}
-		else
-		{
-			AddAttr(&attrPtr, col1.colFG, col1.colBG, len);
-		}
-	}
 
-	// dead space 
-	if(i != m_nBytesPerLine)
-	{
-		size_t len = m_nHexWidth - (ptr - (szBuf+(m_nAddressWidth + m_nHexPaddingLeft)));
+		// dead space 
+		if(i != m_nBytesPerLine)
+		{
+			size_t len = m_nHexWidth - (ptr - (szBuf+(m_nAddressWidth + m_nHexPaddingLeft)));
 		
-		for(i = 0; i < len; i++)
-			*ptr++ = ' ';
+			for(i = 0; i < len; i++)
+				*ptr++ = ' ';
 
-		AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), len);
+			AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), len);
+		}
 	}
 
-	//
+	// right-side padding
 	for(i = 0; i < (size_t)m_nHexPaddingRight; i++)
 		*ptr++ = _T(' ');
 
@@ -326,17 +325,25 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	//
 	//	Ascii column
 	//
-	for(i = 0; i < (int)length;/*m_nBytesPerLine*/ i++)
+	for(i = 0; !CheckStyle(HVS_ASCII_INVISIBLE) && i < (int)length;/*m_nBytesPerLine*/ i++)
 	{
 		HEXCOL col1, col2;
 		BYTE v = data[i];
 
-		if(v < 32) 
-			*ptr++ = '.';
-		else if(v >= 0x80 && v <= 0xa0)
-			*ptr++ = '.';
+		const int ctrlChar = '.';
+
+		if(CheckStyle(HVS_ASCII_SHOWCTRLS) == 0 && (v < 32) )
+		{
+			*ptr++ = ctrlChar;
+		}
+		else if(CheckStyle(HVS_ASCII_SHOWEXTD) == 0 && (v >= 0x80 && v <= 0xa0) )
+		{
+			*ptr++ = ctrlChar;
+		}
 		else
+		{
 			*ptr++ = v;
+		}
 
 		//*ptr++ = (data[i] < 32) ? data[i] = '.' : (data[i] >;
 
@@ -616,18 +623,28 @@ HRGN ThemeEditBorder(HWND hwnd, HTHEME hTheme, HRGN hrgnUpdate)
 	RECT rcWindow;
 	DWORD state = ETS_NORMAL;
 	HRGN hrgnClip;
+
+	//TRACEA("ThemeEditBorder\n");
 	
 	if(!IsWindowEnabled(hwnd))
+	{
 		state = ETS_DISABLED;
+	}
 	else if(GetFocus() == hwnd)
+	{
 		state = ETS_NORMAL;//ETS_HOT;
+	}
 	else
+	{
 		state = ETS_NORMAL;
+	}
 	
 	GetWindowRect(hwnd, &rcWindow);
 	GetClientRect(hwnd, &rc);
 	ClientToScreen(hwnd, (POINT *)&rc.left);
 	ClientToScreen(hwnd, (POINT *)&rc.right);
+
+	//TRACERECT(
 
 	rc.right = rcWindow.right - (rc.left - rcWindow.left);
 	rc.bottom = rcWindow.bottom - (rc.top - rcWindow.top);

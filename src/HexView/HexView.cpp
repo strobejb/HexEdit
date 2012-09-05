@@ -325,16 +325,25 @@ UINT HexView::SetGrouping(UINT nBytes)
 	m_nBytesPerColumn = nBytes;
 
 	numcols = m_nBytesPerLine / m_nBytesPerColumn;
-				
-	m_nHexWidth = (unitwidth * m_nBytesPerColumn + 1) * numcols - 1;
+			
+	if(!CheckStyle(HVS_HEX_INVISIBLE))
+	{
+		m_nHexWidth = (unitwidth * m_nBytesPerColumn + 1) * numcols - 1;
 
-	// take into account partial columns
-	if(m_nBytesPerLine % m_nBytesPerColumn)
-		m_nHexWidth += (m_nBytesPerLine % m_nBytesPerColumn) * unitwidth + 1;
+		// take into account partial columns
+		if(m_nBytesPerLine % m_nBytesPerColumn)
+			m_nHexWidth += (m_nBytesPerLine % m_nBytesPerColumn) * unitwidth + 1;
+	}
+	else
+	{
+		m_nHexWidth = 0;
+	}
 
-	m_nTotalWidth = (m_nAddressWidth+m_nHexPaddingLeft+m_nHexWidth+
-					m_nHexPaddingRight+m_nBytesPerLine)+1;
-
+	m_nTotalWidth = CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
+	m_nTotalWidth += m_nHexPaddingLeft + m_nHexPaddingRight + 1;
+	m_nTotalWidth += CheckStyle(HVS_HEX_INVISIBLE) ? 0 : m_nHexWidth;
+	m_nTotalWidth += CheckStyle(HVS_ASCII_INVISIBLE) ? 0 : m_nBytesPerLine;
+	
 	UpdateMetrics();
 	RefreshWindow();
 
