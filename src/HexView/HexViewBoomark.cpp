@@ -68,7 +68,7 @@ BOOL HexView::GetHighlightCol(size_w offset, int pane, BOOKNODE *itemStart,
 	}
 
 	// modified bytes override normal settings
-	if(fModified)
+	if(fModified && CheckStyle(HVS_SHOWMODS))
 		nSchemeIdxFG = HVC_MODIFY;
 
 	if(fMatched)

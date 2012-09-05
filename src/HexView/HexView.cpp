@@ -144,24 +144,8 @@ HexView::HexView(HWND hwnd)	:
 
 
 {
-	{
-		//BYTE *b = new BYTE[1000];
-		//for(int i = 0; i < 1000; i++)
-		//	b[i] = i ;//rand();
-		//m_pDataSeq->init((byte *)"blah", 5);
-		//m_pDataSeq->init(TmpData, sizeof(TmpData));
-		//delete[] b;
-	}
-	//m_sequence->addref();
-
-	m_nEditMode = HVMODE_OVERWRITE;
-
-	m_nControlStyles = //HVS_ADDR_MIDCOLON|//HVS_LOWERCASEHEX|HVS_ADDR_ENDCOLON;//|HVS_ADDR_DEC;
-		//HVS_INVERTSELECTION|
-		HVS_RESIZEBAR|HVS_ALWAYSVSCROLL//|HVS_ALWAYSDELETE
-		;//|HVS_FITTOWINDOW;
-
-	//m_pDataSeq->open(_T("C:\\Users\\James\\Desktop\\DSCF0258.JPG"), false);
+	m_nEditMode			= HVMODE_OVERWRITE;
+	m_nControlStyles	= 0;	// styles cleared by default
 
 	//
 	//	Initialize the default colour scheme
