@@ -868,7 +868,7 @@ typedef struct _NMHVBOOKMARK
  * @param int right - number of characters between the hex display & ascii display
  */
 #define HexView_SetPadding(hwnd, left, right) \
-	(VOID)SNDMSG((hwnd), HVM_SETPADDING, (WPARAM)MAKEWPARAM((USHORT)(int)(left), (USHORT)(int)(right)), 0)
+	(VOID)SNDMSG((hwnd), HVM_SETPADDING, 0, (LPARAM)MAKEWPARAM((USHORT)(int)(left), (USHORT)(int)(right)))
 
 /**
  * Specify offset that the address display begins at (default is 0)

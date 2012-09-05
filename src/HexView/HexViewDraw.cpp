@@ -256,13 +256,10 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	ptr += FormatAddress(offset, ptr, nBufLen);
 
 	//
-	for(i = 0; i < (size_t)m_nHexPaddingLeft-1; i++)
+	for(i = 0; i < (size_t)m_nHexPaddingLeft; i++)
 		*ptr++ = _T(' ');
 
-	AddAttr(&attrPtr, GetHexColour(HVC_ADDRESS), GetHexColour(HVC_BACKGROUND), ptr-szBuf);
-
-	*ptr++ = _T(' ');
-	AddAttr(&attrPtr, 0, GetHexColour(HVC_BACKGROUND), 1);
+	AddAttr(&attrPtr, GetHexColour(HVC_ADDRESS), GetHexColour(HVC_BACKGROUND), ptr - szBuf);
 
 	highlight = FindBookmark(offset, offset+length);
 
