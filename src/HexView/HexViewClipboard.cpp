@@ -223,9 +223,6 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 	if(fReplaceSelection)
 		m_pDataSeq->ungroup();
 
-	if(CheckStyle(HVS_DISABLE_UNDO))
-		m_pDataSeq->clear_undo();
-
 	if(m_fRedrawChanges)
 		ContentChanged(offset, nLength, m_nEditMode == HVMODE_INSERT ? HVMETHOD_INSERT : HVMETHOD_OVERWRITE);
 

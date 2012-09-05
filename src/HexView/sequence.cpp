@@ -685,8 +685,9 @@ bool sequence::undoredo (eventstack &source, eventstack &dest)
 
 void sequence::clear_undo()
 {
-	clearstack(undostack);
-	clearstack(redostack);
+	// very bad to do this!
+	//clearstack(undostack);
+	//clearstack(redostack);
 }
 
 // 

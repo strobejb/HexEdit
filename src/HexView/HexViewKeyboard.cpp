@@ -69,9 +69,6 @@ bool HexView::ForwardDelete()
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
-	if(CheckStyle(HVS_DISABLE_UNDO))
-		m_pDataSeq->clear_undo();
-
 	ContentChanged(m_nCursorOffset, length, HVMETHOD_DELETE);
 
 	return true;
@@ -100,9 +97,6 @@ bool HexView::BackDelete()
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
-
-	if(CheckStyle(HVS_DISABLE_UNDO))
-		m_pDataSeq->clear_undo();
 
 	ContentChanged(offset, length, HVMETHOD_DELETE);
 
@@ -526,6 +520,9 @@ UINT method(size_w newlen, size_w oldlen)
 
 bool HexView::Undo()
 {
+	if(CheckStyle(HVS_DISABLE_UNDO))
+		return false;
+	
 	size_w oldlen = m_pDataSeq->size();
 
 	if(m_pDataSeq->undo())
@@ -545,6 +542,9 @@ bool HexView::Undo()
 
 bool HexView::Redo()
 {
+	if(CheckStyle(HVS_DISABLE_UNDO))
+		return false;
+
 	size_w oldlen = m_pDataSeq->size();
 
 	if(m_pDataSeq->redo())
