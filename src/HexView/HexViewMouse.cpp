@@ -343,7 +343,7 @@ UINT HexView::HitTest(int x, int y, RECT *phirc, BOOKNODE **pbnp)// = 0)
 //	
 LRESULT HexView::OnMouseActivate(HWND hwndTop, UINT nHitTest, UINT nMessage)
 {
-	TRACEA("activate\n");
+	//TRACEA("activate\n");
 	POINT pt;
 	GetCursorPos(&pt);
 	ScreenToClient(m_hWnd, &pt);
