@@ -265,7 +265,10 @@ bool sequence::buffer_control::load(const TCHAR * filename, bool reado, bool qui
 
 	DWORD sizelow, sizehigh;
 	sizelow = GetFileSize(hFile, &sizehigh);
-	length  = (size_w)sizelow | ((size_w)sizehigh << 32);
+	length  = (size_w)sizelow;
+#ifdef SEQUENCE64
+	length |= ((size_w)sizehigh << 32);
+#endif
 	maxsize = length;
 	ownbuf  = true;
 

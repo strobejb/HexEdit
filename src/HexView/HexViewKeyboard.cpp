@@ -307,7 +307,7 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 			if(m_fCursorAdjustment == FALSE)
 			{
 				if(m_pDataSeq->size() - m_nBytesPerLine >= m_nCursorOffset
-					&& m_pDataSeq->size() >= m_nBytesPerLine)
+					&& m_pDataSeq->size() >= (size_t)m_nBytesPerLine)
 				{
 					m_nCursorOffset += 
 						m_nBytesPerLine - (m_nCursorOffset % m_nBytesPerLine);

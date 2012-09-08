@@ -378,9 +378,15 @@ typedef struct _NMHVBOOKMARK
 // macros to allow passing of 64bit values to the 32bit version of SendMessage
 // this works by passing the low 32bits in WPARAM, and the top 32bits in LPARAM
 //
+#ifdef SEQUENCE64
 #define MAKE_SIZEW(wParam, lParam) ((size_w)(wParam) | ((size_w)(lParam) << 32))
 #define WPARAM_SIZEW(sw) ((WPARAM)((size_w)(sw) & 0xffffffff))
 #define LPARAM_SIZEW(sw) ((LPARAM)((size_w)(sw) >> 32))
+#else
+#define MAKE_SIZEW(wParam, lParam) ((size_w)(wParam))
+#define WPARAM_SIZEW(sw) ((WPARAM)((size_w)(sw) & 0xffffffff))
+#define LPARAM_SIZEW(sw) ((LPARAM)0)
+#endif
 
 /**
  * Apply one or more of the HexView-specific HVS_xxx styles. 

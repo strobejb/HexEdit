@@ -162,7 +162,7 @@ HRESULT __stdcall CStream::Read(void *pv, ULONG cb, ULONG *pcbRead)
 	available = min(cb, (ULONG)(m_nLength.QuadPart - m_nOffset.QuadPart));
 
 	// extract the data from HexView
-	m_pSnapShot->Render(m_nOffset.QuadPart, (BYTE *)pv, available);
+	m_pSnapShot->Render((size_w)m_nOffset.QuadPart, (BYTE *)pv, available);
 
 	m_nOffset.QuadPart += available;
 
@@ -227,7 +227,7 @@ HRESULT __stdcall CStream::CopyTo(IStream *pstm, ULARGE_INTEGER cb, ULARGE_INTEG
 	{
 		len = (ULONG)min(cb.QuadPart, 512);
 		
-		if(m_pHexView->GetData(m_nOffset.QuadPart, buf, len))
+		if(m_pHexView->GetData((size_w)m_nOffset.QuadPart, buf, len))
 		{
 			pstm->Write(buf, len, &written);
 
