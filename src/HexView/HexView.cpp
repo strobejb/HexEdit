@@ -491,16 +491,18 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 		}
 		else
 		{
-			logwidth -= m_nHexPaddingLeft;
-
 			if(CheckStyle(HVS_ASCII_INVISIBLE) == true)
 			{
+				logwidth -= m_nHexPaddingLeft;
+
 				// just hex
 				m_nBytesPerLine = (logwidth * m_nBytesPerColumn) /
 					(m_nBytesPerColumn * UnitWidth() + 1);
 			}
 			else
 			{
+				logwidth -= m_nHexPaddingLeft + m_nHexPaddingRight;
+
 				// ascii + hex
 				m_nBytesPerLine = (logwidth * m_nBytesPerColumn) /
 					(m_nBytesPerColumn * UnitWidth() + m_nBytesPerColumn + 1);
@@ -512,7 +514,7 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 
 		// keep within legal limits
 		m_nBytesPerLine = max(m_nBytesPerLine, 1);
-		m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
+		//m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
 
 		// update display if anything has changed
 		if(m_nBytesPerLine != prevbpl)
