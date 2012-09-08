@@ -254,11 +254,7 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	//	Format the offset as a hex/dec address
 	//
 	ptr += FormatAddress(offset, ptr, nBufLen);
-
-	//
-	for(i = 0; i < (size_t)m_nHexPaddingLeft; i++)
-		*ptr++ = _T(' ');
-
+	
 	AddAttr(&attrPtr, GetHexColour(HVC_ADDRESS), GetHexColour(HVC_BACKGROUND), ptr - szBuf);
 
 	highlight = FindBookmark(offset, offset+length);
@@ -266,8 +262,14 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 	//
 	//	Hex column
 	//
-	if(CheckStyle(HVS_HEX_INVISIBLE) == FALSE)
+	if(CheckStyle(HVS_HEX_INVISIBLE) == false)
 	{
+		// left padding
+		for(i = 0; i < (size_t)m_nHexPaddingLeft; i++)
+			*ptr++ = _T(' ');
+
+		AddAttr(&attrPtr, GetHexColour(HVC_ADDRESS), GetHexColour(HVC_BACKGROUND), m_nHexPaddingLeft);
+
 		for(i = 0; i < (int)length/* m_nBytesPerLine*/; i++)
 		{
 			HEXCOL col1, col2;
@@ -315,61 +317,64 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 		}
 	}
 
-	// right-side padding
-	for(i = 0; i < (size_t)m_nHexPaddingRight; i++)
-		*ptr++ = _T(' ');
-
-	AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), m_nHexPaddingRight);
-	
-	//
-	//	Ascii column
-	//
-	for(i = 0; !CheckStyle(HVS_ASCII_INVISIBLE) && i < (int)length;/*m_nBytesPerLine*/ i++)
+	if(CheckStyle(HVS_ASCII_INVISIBLE) == false)
 	{
-		HEXCOL col1, col2;
-		BYTE v = data[i];
+		// right-side padding
+		for(i = 0; i < (size_t)m_nHexPaddingRight; i++)
+			*ptr++ = _T(' ');
 
-		const int ctrlChar = '.';
+		AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), m_nHexPaddingRight);
 
-		if(CheckStyle(HVS_ASCII_SHOWCTRLS) == 0 && (v < 32) )
+		//
+		//	Ascii column
+		//
+		for(i = 0; i < (int)length;/*m_nBytesPerLine*/ i++)
 		{
-			*ptr++ = ctrlChar;
+			HEXCOL col1, col2;
+			BYTE v = data[i];
+
+			const int ctrlChar = '.';
+
+			if(CheckStyle(HVS_ASCII_SHOWCTRLS) == 0 && (v < 32) )
+			{
+				*ptr++ = ctrlChar;
+			}
+			else if(CheckStyle(HVS_ASCII_SHOWEXTD) == 0 && (v >= 0x80 && v <= 0xa0) )
+			{
+				*ptr++ = ctrlChar;
+			}
+			else
+			{
+				*ptr++ = v;
+			}
+
+			//*ptr++ = (data[i] < 32) ? data[i] = '.' : (data[i] >;
+
+			GetHighlightCol(offset+i, 1, highlight, &col1, &col2, 
+				infobuf[i].buffer != 1 ? true : false,
+				infobuf[i].userdata != 0 ? true : false,
+				fIncSelection
+				);
+
+			//if(col1.colBG == 0xffffff)
+			//	col1.colBG = RGB(244,243,241);
+
+			AddAttr(&attrPtr, col1.colFG, col1.colBG, 1);
 		}
-		else if(CheckStyle(HVS_ASCII_SHOWEXTD) == 0 && (v >= 0x80 && v <= 0xa0) )
+
+		if(i != m_nBytesPerLine)
 		{
-			*ptr++ = ctrlChar;
+			size_t len = m_nBytesPerLine - i;
+
+			for(i = 0; i < len; i++)
+				*ptr++ = ' ';
+
+			AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), len);
 		}
-		else
-		{
-			*ptr++ = v;
-		}
 
-		//*ptr++ = (data[i] < 32) ? data[i] = '.' : (data[i] >;
 
-		GetHighlightCol(offset+i, 1, highlight, &col1, &col2, 
-			infobuf[i].buffer != 1 ? true : false,
-			infobuf[i].userdata != 0 ? true : false,
-			fIncSelection
-			);
-		
-		//if(col1.colBG == 0xffffff)
-		//	col1.colBG = RGB(244,243,241);
-
-		AddAttr(&attrPtr, col1.colFG, col1.colBG, 1);
+		*ptr = '\0';
 	}
-
-	if(i != m_nBytesPerLine)
-	{
-		size_t len = m_nBytesPerLine - i;
-		
-		for(i = 0; i < len; i++)
-			*ptr++ = ' ';
-
-		AddAttr(&attrPtr, GetHexColour(HVC_ASCII), GetHexColour(HVC_BACKGROUND), len);
-	}
-
-
-	*ptr = '\0';
 
 	return (ptr-szBuf);
 }
@@ -430,6 +435,8 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	offset	 = nLineNo * m_nBytesPerLine;
 	//datalen  = m_pDataSeq->render(offset, data, m_nBytesPerLine, infobuf);
 	len		 = FormatLine(data, datalen, offset, buf, 100, attrList, infobuf, true);
+
+	//TRACEA("%d - %d cars (%d)\n", len, m_nBytesPerLine, len*m_nFontWidth);
 
 	for(i = 0; i < len; i++)
 		advanceWidth[i] = m_nFontWidth;
@@ -567,6 +574,8 @@ LRESULT HexView::OnPaint()
 	RECT rect;
 	GetClientRect(m_hWnd, &rect);
 	rect.left = LogToPhyXCoord(m_nBytesPerLine, 1);
+
+	//TRACEA("filling from %d\n", rect.left);
 
 	// draw the display line-by-line
 	for(i = first; i <= last; i++)

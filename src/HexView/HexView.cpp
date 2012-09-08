@@ -324,10 +324,7 @@ UINT HexView::SetGrouping(UINT nBytes)
 		m_nHexWidth = 0;
 	}
 
-	m_nTotalWidth = CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
-	m_nTotalWidth += m_nHexPaddingLeft + m_nHexPaddingRight + 1;
-	m_nTotalWidth += CheckStyle(HVS_HEX_INVISIBLE) ? 0 : m_nHexWidth;
-	m_nTotalWidth += CheckStyle(HVS_ASCII_INVISIBLE) ? 0 : m_nBytesPerLine;
+	m_nTotalWidth =  CalcTotalWidth();
 	
 	UpdateMetrics();
 	RefreshWindow();
@@ -351,8 +348,22 @@ UINT HexView::SetLineLen(UINT nLineLen)
 VOID HexView::UpdateResizeBarPos()
 {
 	m_nResizeBarPos = (-m_nHScrollPos * m_nFontWidth+(m_nTotalWidth - 
-		m_nBytesPerLine - 1) * m_nFontWidth \
+		m_nBytesPerLine - 1) * m_nFontWidth 
 			- ((m_nHexPaddingRight*m_nFontWidth)/2));
+
+	m_nResizeBarPos = -m_nHScrollPos;
+	m_nResizeBarPos += CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
+	m_nResizeBarPos += CheckStyle(HVS_HEX_INVISIBLE)  ? 0 : m_nHexPaddingLeft;
+	m_nResizeBarPos += CheckStyle(HVS_HEX_INVISIBLE)  ? 0 : m_nHexWidth;
+
+	if(CheckStyle(HVS_HEX_INVISIBLE) == true)
+	{
+		m_nResizeBarPos += m_nBytesPerLine;
+		m_nResizeBarPos += m_nHexPaddingRight;
+	}
+	
+	m_nResizeBarPos *= m_nFontWidth;
+	m_nResizeBarPos += (m_nHexPaddingRight * m_nFontWidth)/2;
 }
 
 VOID HexView::RecalcPositions()
@@ -462,16 +473,36 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 	// fit to window!
 	if(CheckStyle(HVS_FITTOWINDOW))
 	{
-		int logwidth = width / m_nFontWidth;
-		int unitwidth = UnitWidth();
-		int prevbpl = m_nBytesPerLine;
+		int logwidth  = width / m_nFontWidth;			//logical width, in chars
+		int prevbpl   = m_nBytesPerLine;
 
 		// work out size of hex+ascii parts
-		logwidth = logwidth - (m_nAddressWidth + m_nHexPaddingLeft + m_nHexPaddingRight);
+		logwidth -= CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
 
-		// work out how many bytes-per-line will fit into specified width
-		m_nBytesPerLine = (logwidth * m_nBytesPerColumn) / 
-						  (m_nBytesPerColumn * (unitwidth + 1) + 1);
+		if(CheckStyle(HVS_HEX_INVISIBLE) == true)
+		{
+			// just ascii
+			logwidth -= m_nHexPaddingRight + 1;
+
+			m_nBytesPerLine = logwidth;
+		}
+		else
+		{
+			logwidth -= m_nHexPaddingLeft;
+
+			if(CheckStyle(HVS_ASCII_INVISIBLE) == true)
+			{
+				// just hex
+				m_nBytesPerLine = (logwidth * m_nBytesPerColumn) /
+					(m_nBytesPerColumn * UnitWidth() + 1);
+			}
+			else
+			{
+				// ascii + hex
+				m_nBytesPerLine = (logwidth * m_nBytesPerColumn) /
+					(m_nBytesPerColumn * UnitWidth() + m_nBytesPerColumn + 1);
+			}
+		}
 
 		// keep within legal limits
 		m_nBytesPerLine = max(m_nBytesPerLine, 1);

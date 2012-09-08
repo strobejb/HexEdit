@@ -95,6 +95,20 @@ size_w GetScrollPos64(HWND hwnd, int nBar, int fMask, size_w nMax)
 	}
 }
 
+int HexView::CalcTotalWidth()
+{
+	int width = 0;
+	
+	width += CheckStyle(HVS_ADDR_INVISIBLE)  ? 0 : m_nAddressWidth;
+	width += CheckStyle(HVS_HEX_INVISIBLE)   ? 0 : m_nHexPaddingLeft;
+	width += CheckStyle(HVS_HEX_INVISIBLE)   ? 0 : m_nHexWidth;
+	width += CheckStyle(HVS_ASCII_INVISIBLE) ? 0 : m_nHexPaddingRight;
+	width += CheckStyle(HVS_ASCII_INVISIBLE) ? 0 : m_nBytesPerLine;
+	width += 1;
+
+	return width;
+}
+
 //
 //	Set scrollbar positions and range
 //
@@ -119,8 +133,7 @@ VOID HexView::SetupScrollbars()
 	//
 	//	Horizontal scrollbar
 	//
-	m_nTotalWidth = (m_nAddressWidth+m_nHexPaddingLeft+m_nHexWidth+
-					m_nHexPaddingRight+m_nBytesPerLine)+1;
+	m_nTotalWidth = CalcTotalWidth();
 
 	fMask = CheckStyle(HVS_ALWAYSHSCROLL) ? SIF_DISABLENOSCROLL : 0;
 	fMask |= SIF_PAGE | SIF_POS | SIF_RANGE;

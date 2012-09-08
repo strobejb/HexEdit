@@ -36,48 +36,56 @@ int HexView::GetLogicalX(int x, int *pane)
 	// take into account the horizontal scroll position
 	x += m_nHScrollPos * m_nFontWidth;
 
-	// round down to character position
+	// round down to mid-character position
 	x = (x + (m_nFontWidth * 7) / 16) / m_nFontWidth;
 
 	TRACEA("xchar: %d: ", x);
 
 	// clicked in address column?
-	if(x < m_nAddressWidth + m_nHexPaddingLeft && !CheckStyle(HVS_ADDR_INVISIBLE))
+	if(CheckStyle(HVS_ADDR_INVISIBLE) == false)
 	{
-		TRACEA("%d %d\n", pane?*pane:-1, 0);
-		return 0;
-	}
+		if(x < m_nAddressWidth + m_nHexPaddingLeft)
+		{
+			TRACEA("%d %d\n", pane?*pane:-1, 0);
+			return 0;
+		}
 	
-	x -= m_nAddressWidth + m_nHexPaddingLeft;
-	
-	// clicked in hex column?
-	if(x < m_nHexWidth && !CheckStyle(HVS_HEX_INVISIBLE))
-	{
-		int unitwidth = UnitWidth();
-
-		int col    = x / (m_nBytesPerColumn * unitwidth + 1);
-		int coloff = min(m_nBytesPerColumn-1,(x - col * (m_nBytesPerColumn * unitwidth + 1)) / unitwidth);
-
-		col *= m_nBytesPerColumn;
-		col += coloff;
-
-		TRACEA("%d %d\n", pane?*pane:-1, col);
-		return col;
+		x -= m_nAddressWidth;
 	}
 
-	x -= m_nHexWidth + 1;			// errrm
-	
-	// clicked in hex-padding-right?
-	if(x < m_nHexPaddingRight / 2 && CheckStyle(HVS_HEX_INVISIBLE) == 0)
+	if(CheckStyle(HVS_HEX_INVISIBLE) == false)
 	{
-		TRACEA("%d %d\n", pane?*pane:-1, m_nBytesPerLine);
-		return m_nBytesPerLine;
+		x -= m_nHexPaddingLeft;
+	
+		// clicked in hex column?
+		if(x < m_nHexWidth)
+		{
+			int unitwidth = UnitWidth();
+
+			int col    = x / (m_nBytesPerColumn * unitwidth + 1);
+			int coloff = min(m_nBytesPerColumn-1,(x - col * (m_nBytesPerColumn * unitwidth + 1)) / unitwidth);
+
+			col *= m_nBytesPerColumn;
+			col += coloff;
+
+			TRACEA("%d %d\n", pane?*pane:-1, col);
+			return col;
+		}
+
+		x -= m_nHexWidth;// + 1;			// errrm
+	
+		// clicked in the 1st half of hex-padding-right?
+		if(x < m_nHexPaddingRight / 2)
+		{
+			TRACEA("%d %d\n", pane?*pane:-1, m_nBytesPerLine);
+			return m_nBytesPerLine;
+		}
 	}
 	
-	x -= m_nHexPaddingRight - 1;
-
-	if(CheckStyle(HVS_ASCII_INVISIBLE) == 0)
+	if(CheckStyle(HVS_ASCII_INVISIBLE) == false)
 	{
+		x -= m_nHexPaddingRight;// - 1;  // errrm
+
 		if(pane) *pane = 1;
 
 		// clicked in ascii column?
@@ -165,9 +173,12 @@ int HexView::LogToPhyXCoord(int x, int pane)
 		
 		x -= m_nHScrollPos;
 		x += CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
-		x += m_nHexPaddingLeft;
+		x += CheckStyle(HVS_HEX_INVISIBLE) ? 0 : m_nHexPaddingLeft;
 		x += CheckStyle(HVS_HEX_INVISIBLE) ? 0 : m_nHexWidth;
-		x += m_nHexPaddingRight;
+		
+		x += CheckStyle(HVS_ASCII_INVISIBLE) ? 0 : m_nHexPaddingRight;
+
+		x -= CheckStyle(HVS_ASCII_INVISIBLE) ? xpos : 0;
 		
 		return x * m_nFontWidth;
 		

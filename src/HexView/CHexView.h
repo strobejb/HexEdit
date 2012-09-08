@@ -56,7 +56,7 @@ public:
 
   COLORREF GetColor(UINT uIndex)
   {
-    return HexView_GetColor(uIndex);
+    return HexView_GetColor(m_hWnd, uIndex);
   }
 
   UINT SetFontSpacing(int xspace, int yspace)

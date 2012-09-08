@@ -281,6 +281,7 @@ private:
 	HGLOBAL BuildHGlobal(size_w offset, size_w length);
 	HexSnapShot *CreateSnapshot(size_w offset, size_w length);
 	VOID	ClipboardShutdown();
+	int		CalcTotalWidth();
 
 	
 	HWND		m_hWnd;
