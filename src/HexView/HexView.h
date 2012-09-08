@@ -577,7 +577,7 @@ typedef struct _NMHVBOOKMARK
  * @param UINT nEditMode - one of the 
  */
 #define HexView_SetEditMode(hwnd, nEditMode) \
-	(UINT)SendMessage((hwnd), HVM_SETEDITMODE, (WPARAM)(nEditMode), 0)
+	(UINT)SNDMSG((hwnd), HVM_SETEDITMODE, (WPARAM)(nEditMode), 0)
 
 /**
  * Return the current edit mode (one of the HVS_ values)
@@ -585,7 +585,7 @@ typedef struct _NMHVBOOKMARK
  * @param
  */
 #define HexView_GetEditMode(hwnd) \
-	(UINT)SendMessage((hwnd), HVM_GETEDITMODE, 0, 0)
+	(UINT)SNDMSG((hwnd), HVM_GETEDITMODE, 0, 0)
 
 //!
 //!	HexView_OpenFile
