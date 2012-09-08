@@ -14,7 +14,8 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
-#include <tmschema.h>
+#include <vsstyle.h>
+//#include <tmschema.h>
 #include "HexView.h"
 #include "HexViewInternal.h"
 #include <trace.h>
