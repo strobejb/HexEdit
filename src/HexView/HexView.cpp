@@ -423,8 +423,8 @@ BOOL HexView::SetFontSpacing(int x, int y)
 	//GetFontUnicodeRanges(hdc, glyphset);
 	//free(glyphset)
 
-	m_nFontHeight = tm.tmHeight + x;
-	m_nFontWidth  = tm.tmAveCharWidth + y;
+	m_nFontHeight = tm.tmHeight + y;
+	m_nFontWidth  = tm.tmAveCharWidth + x;
 
 	SelectObject(hdc, hOld);
 	ReleaseDC(m_hWnd, hdc);
