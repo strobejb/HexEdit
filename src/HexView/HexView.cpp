@@ -408,31 +408,34 @@ VOID HexView::OnLengthChange(size_w nNewLength)
 	m_nAddressWidth++;
 }
 
-LRESULT HexView::OnSetFont(HFONT hFont)
+BOOL HexView::SetFontSpacing(int x, int y)
 {
 	HDC hdc;
 	TEXTMETRIC tm;
 	HANDLE hOld;
-	GLYPHSET *glyphset;
-
-	m_hFont = hFont;
 
 	hdc  = GetDC(m_hWnd);
-	hOld = SelectObject(hdc, hFont);
+	hOld = SelectObject(hdc, m_hFont);
 
 	GetTextMetrics(hdc, &tm);
 
-	glyphset = (GLYPHSET*)malloc(GetFontUnicodeRanges(hdc, 0));
-	GetFontUnicodeRanges(hdc, glyphset);
+	//glyphset = (GLYPHSET*)malloc(GetFontUnicodeRanges(hdc, 0));
+	//GetFontUnicodeRanges(hdc, glyphset);
+	//free(glyphset)
 
-
-	m_nFontHeight = tm.tmHeight;
-	m_nFontWidth  = tm.tmAveCharWidth;//+2;//11;//tm.tmAveCharWidth;//9;//tm.tmAveCharWidth;;
+	m_nFontHeight = tm.tmHeight + x;
+	m_nFontWidth  = tm.tmAveCharWidth + y;
 
 	SelectObject(hdc, hOld);
 	ReleaseDC(m_hWnd, hdc);
+	
+	return TRUE;
+}
 
-
+LRESULT HexView::OnSetFont(HFONT hFont)
+{
+	m_hFont = hFont;
+	SetFontSpacing(0, 0);
 	return 0;
 }
 
@@ -1046,9 +1049,7 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return TRUE;
 
 	case HVM_SETFONTSPACING:
-		m_nFontWidth  += (short)LOWORD(lParam);
-		m_nFontHeight += (short)HIWORD(lParam);
-		return 0;
+		return SetFontSpacing((short)LOWORD(lParam), (short)HIWORD(lParam));
 
 	case HVM_SETADDROFFSET:
 		m_nAddressOffset = MAKE_SIZEW(wParam, lParam);

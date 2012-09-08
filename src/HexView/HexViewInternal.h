@@ -282,6 +282,7 @@ private:
 	HexSnapShot *CreateSnapshot(size_w offset, size_w length);
 	VOID	ClipboardShutdown();
 	int		CalcTotalWidth();
+	BOOL	SetFontSpacing(int x, int y);
 
 	
 	HWND		m_hWnd;
