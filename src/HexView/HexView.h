@@ -130,6 +130,7 @@ typedef void * HBOOKMARK;
 #define HVS_ASCII_MASK		0x3800
 
 // Basic HexView control styles
+#define HVS_FORCE_FIXEDCOLS 0x80		// force whole-sized hex columns
 #define HVS_FIXED_EDITMODE  0x0100		// prevent user from using INSERT to change edit mode
 #define HVS_DISABLE_UNDO	0x0200		// prevent undo/redo functionality
 #define HVS_ALWAYSDELETE	0x4000		// backspace/delete work even in OVR mode

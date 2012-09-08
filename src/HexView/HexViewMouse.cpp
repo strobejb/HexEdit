@@ -915,12 +915,25 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 		int prevbpl	  = m_nBytesPerLine;
 		int unitwidth = UnitWidth();
 
-		// work out the size of hex+ascii areas
-		width -= m_nAddressWidth + m_nHexPaddingLeft;
+		if(CheckStyle(HVS_HEX_INVISIBLE) == false)
+		{
+			// work out the size of hex area
+			width -= m_nAddressWidth + m_nHexPaddingLeft;
 		
-		// work out how many bytes-per-line will fit into specified width
-		m_nBytesPerLine = (width * m_nBytesPerColumn) / 
+			// work out how many bytes-per-line will fit into specified width
+			m_nBytesPerLine = (width * m_nBytesPerColumn) / 
 						  (m_nBytesPerColumn * (unitwidth) + 1);
+		}
+		else
+		{
+			// ascii 
+			width -= m_nAddressWidth + m_nHexPaddingRight;
+			m_nBytesPerLine = width;
+		}
+
+		// force whole-sized columns if necessary
+		if(CheckStyle(HVS_FORCE_FIXEDCOLS))
+			m_nBytesPerLine -= m_nBytesPerLine % m_nBytesPerColumn;
 
 		// make sure we stay within legal limits
 		m_nBytesPerLine = max(m_nBytesPerLine, 1);

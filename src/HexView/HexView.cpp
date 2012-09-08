@@ -507,6 +507,9 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 			}
 		}
 
+		if(CheckStyle(HVS_FORCE_FIXEDCOLS))
+			m_nBytesPerLine -= m_nBytesPerLine % m_nBytesPerColumn;
+
 		// keep within legal limits
 		m_nBytesPerLine = max(m_nBytesPerLine, 1);
 		m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
