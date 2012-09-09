@@ -911,6 +911,14 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
 		return ScrollTo(wParam);
 
+	case HVM_SCROLLTOP:
+		xparam = MAKE_SIZEW(wParam, lParam);
+
+		if(xparam > m_pDataSeq->size())
+			return FALSE;
+
+		return ScrollTop(wParam);
+
 	case HVM_SETCURPOS:
 		return OnSetCurPos(MAKE_SIZEW(wParam, lParam));
 

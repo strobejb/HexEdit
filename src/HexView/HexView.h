@@ -313,6 +313,8 @@ typedef void * HBOOKMARK;
 #define HVM_SETPADDING		(HVM_FIRST + 61)
 //#define HVM_GETPADDING		(HVM_FIRST + 62)
 #define HVM_SETADDROFFSET   (HVM_FIRST + 63)
+#define HVM_SCROLLTOP       (HVM_FIRST + 64)
+
 
 //
 //	HexView notifications
@@ -688,12 +690,21 @@ typedef struct _NMHVBOOKMARK
 
 /**
  * Adjust the viewport so that the specified file-offset
- * is scrolled into view, and the active cursor location adjusted
+ * is scrolled into view, if that offset is outside of the viewport
  *
  * @param  size_w pos  - offset within the file which will be scrolled into view
  */
 #define HexView_ScrollTo(hwnd, pos) \
 	(UINT)SNDMSG((hwnd), HVM_SCROLLTO, WPARAM_SIZEW(pos), LPARAM_SIZEW(pos))
+
+/**
+ * Adjust the viewport so that the specified file-offset
+ * is scrolled to the top of the viewport
+ *
+ * @param  size_w pos  - offset within the file which will be scrolled into view
+ */
+#define HexView_ScrollTop(hwnd, pos) \
+	(UINT)SNDMSG((hwnd), HVM_SCROLLTOP, WPARAM_SIZEW(pos), LPARAM_SIZEW(pos))
 
 #define HexView_FormatData(hwnd, fmtparam) \
 	(int)SNDMSG((hwnd), HVM_FORMATDATA, 0, (LPARAM)(HEXFMT_PARAMS *)(fmtparam))

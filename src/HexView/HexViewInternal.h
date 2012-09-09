@@ -180,6 +180,7 @@ public:
 	void   RepositionCaret();
 	VOID   ScrollToCaret();
 	BOOL   ScrollTo(size_w offset);
+	BOOL   ScrollTop(size_w offset);
 	bool   PinToBottomCorner();
 
 	bool   Undo();

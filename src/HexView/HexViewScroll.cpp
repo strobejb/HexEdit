@@ -144,6 +144,25 @@ VOID HexView::SetupScrollbars()
 	UpdateResizeBarPos();
 }
 
+//
+//	Reposition the viewport so the specified offset is at the top of the display
+//
+BOOL HexView::ScrollTop(size_w offset)
+{
+	if(offset > m_pDataSeq->size())
+		return FALSE;
+
+	m_nVScrollPos = min(offset / m_nBytesPerLine, m_nHScrollMax);
+
+	SetupScrollbars();
+	RefreshWindow();
+
+	return TRUE;
+}
+
+//
+//	Scroll to the specified offset - but only if cursor is outside the viewport
+//
 BOOL HexView::ScrollTo(size_w offset)
 {
 	bool fRedraw = false;
