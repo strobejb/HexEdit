@@ -295,12 +295,22 @@ public:
 		return HexView_ScrollTo(m_hWnd, pos);
 	}
 
-	int FormatData(HEXFMT_PARAMS *fmtparam)
+	UINT ScrollTop(size_w pos)
+	{
+		return HexView_ScrollTop(m_hWnd, pos);
+	}
+
+  int FormatData(HEXFMT_PARAMS *fmtparam)
 	{
 		return HexView_FormatData(m_hWnd, fmtparam);
 	}
 
-	UINT GetLineLen()
+	UINT GetLineChars()
+	{
+		return HexView_GetLineChars(m_hWnd);
+	}
+
+  UINT GetLineLen()
 	{
 		return HexView_GetLineLen(m_hWnd);
 	}
