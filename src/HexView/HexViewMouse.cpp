@@ -937,7 +937,7 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 
 		// make sure we stay within legal limits
 		m_nBytesPerLine = max(m_nBytesPerLine, 1);
-		m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
+		//m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
 
 		// update display if anything has changed
 		if(prevbpl != m_nBytesPerLine)

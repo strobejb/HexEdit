@@ -1003,6 +1003,9 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case HVM_GETLINELEN:
 		return GetLineLen();
 
+	case HVM_GETLINECHARS:
+		return m_nTotalWidth+1;
+
 	case HVM_SETLINELEN:
 		return SetLineLen(wParam);
 

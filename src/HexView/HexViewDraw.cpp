@@ -174,7 +174,7 @@ size_t HexView::FormatHexUnit(BYTE *data, TCHAR *buf, size_t buflen)
 
 VOID HexView::InvalidateRange(size_w start, size_w finish)
 {
-	int m_nPageMaxLines = 100;
+	int m_nPageMaxLines = m_nWindowLines;
 	size_w screenstartoffset = m_nVScrollPos * m_nBytesPerLine;
 	size_w screenendoffset   = (m_nVScrollPos + m_nPageMaxLines + 1) * m_nBytesPerLine;
 
@@ -242,13 +242,22 @@ void AddAttr(ATTR **attrListPtr, COLORREF fg, COLORREF bg, size_t count)
 	(*attrListPtr) += count;
 }
 
-size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBuf, size_t nBufLen, ATTR *attrList, seqchar_info *infobuf, bool fIncSelection)
+size_t HexView::FormatLine(
+	BYTE *          data,		// the data to display
+	size_t          length,		// length of data
+	size_w          offset,		// address-offset (display only)
+	TCHAR *         szBuf,		// text buffer to print into
+	size_t          nBufLen,    // size of szBuf
+	ATTR *          attrList,   // attribute-buffer (must be sizeof(szBuf))
+	seqchar_info *  infobuf,    // seqchar info (must be sizeof(szBuf))
+	bool            fIncSelection   // include the selection colors, if the data is selected
+	)
 {
-	TCHAR *ptr = szBuf;
-	size_t i;
+	TCHAR *    ptr = szBuf;
+	size_t     i;
 	BOOKNODE * highlight;
-	int colidx = 0;
-	ATTR *attrPtr = attrList;
+	int        colidx = 0;
+	ATTR     * attrPtr = attrList;
 
 
 	//
@@ -382,25 +391,43 @@ size_t HexView::FormatLine(BYTE *data, size_t length, size_w offset, TCHAR *szBu
 
 size_t HexView::FormatData(HEXFMT_PARAMS *fmtParams)//size_w offset, int length, TCHAR *out, int outlen, ATTR *attrList)
 {
-	BYTE			buf[100];
-	seqchar_info	infobuf[100];
-	size_t			length;
-	
-	length = min(fmtParams->length, 100);
-	length = m_pDataSeq->render(fmtParams->offset, buf, length, infobuf);
-	return FormatLine(buf, length, fmtParams->offset, fmtParams->szText, 200, fmtParams->attrList, infobuf, false);
+	BYTE			*buf;
+	seqchar_info	*infobuf;
+	size_t			length = 0;
+
+	if(fmtParams == 0 || fmtParams->length == 0)
+		return 0;
+
+	length  = fmtParams->length;
+	buf		= new BYTE[length];
+	infobuf = new seqchar_info[length];
+
+	if(buf && infobuf)
+	{
+		//length = min(fmtParams->length, 100);
+		length = m_pDataSeq->render(fmtParams->offset, buf, length, infobuf);
+		length = FormatLine(buf, length, fmtParams->offset, fmtParams->szText, fmtParams->bufferSize, fmtParams->attrList, infobuf, false);
+	}
+
+	delete[] buf;
+	delete[] infobuf;
+
+	return length;
 }
 
 //
 //	Draw the specified line of data
 //
+//	data - the data to render
+//  datalen - expected to be no bigger than m_nBytesPerLine
+//
 int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqchar_info *infobuf)
 {
-	TCHAR	buf[0x200];
+	TCHAR	*buf;//[0x200];
 	//BYTE	data[100];
 	//seqchar_info infobuf[100];
-	ATTR	attrList[0x200];
-	int		advanceWidth[0x100];
+	ATTR	*attrList;//[0x200];
+	int		*advanceWidth;//[0x100];
 	RECT	rect;
 	RECT	clip;
 	size_w	offset;
@@ -433,9 +460,12 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	//
 	//	Construct a text buffer and colour description buffer
 	//
+	buf				= new TCHAR[m_nTotalWidth+1];
+	attrList		= new ATTR[m_nTotalWidth];
+	advanceWidth	= new int[m_nTotalWidth];
+	
 	offset	 = nLineNo * m_nBytesPerLine;
-	//datalen  = m_pDataSeq->render(offset, data, m_nBytesPerLine, infobuf);
-	len		 = FormatLine(data, datalen, offset, buf, 100, attrList, infobuf, true);
+	len		 = FormatLine(data, datalen, offset, buf, m_nTotalWidth, attrList, infobuf, true);
 
 	//TRACEA("%d - %d cars (%d)\n", len, m_nBytesPerLine, len*m_nFontWidth);
 
@@ -477,6 +507,10 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	MoveToEx(hdc, 0, 0, &pt);
 //	SetRect(&rect, pt.x, pt.y, rect.right, pt.y + m_nFontHeight);
 //	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rect, 0, 0, 0);
+
+	delete[] buf;
+	delete[] attrList;
+	delete[] advanceWidth;
 
 	return pt.x;
 }
@@ -557,14 +591,19 @@ LRESULT HexView::OnPaint()
 		DrawVLine(&ps, GetHexColour(HVC_RESIZEBAR), m_nResizeBarPos);
 	}
 
-	BYTE bigbuf[4000];
-	seqchar_info bufinfo[4000];
 	size_w offset = first * m_nBytesPerLine;
 	size_t buflen = (size_t)(last - first + 1) * m_nBytesPerLine;
 
-	if(buflen > 4000)
+	BYTE *bigbuf;
+	seqchar_info *bufinfo;
+
+	if((bigbuf = new BYTE[buflen]) == 0)
+		return 0;
+
+	if((bufinfo = new seqchar_info[buflen]) == 0)
 	{
-		offset=offset;
+		delete[] bigbuf;
+		return 0;
 	}
 	
 	buflen = m_pDataSeq->render(offset, bigbuf, buflen, bufinfo);
@@ -621,6 +660,9 @@ LRESULT HexView::OnPaint()
 	ExtTextOut(ps.hdc, 0, 0, ETO_OPAQUE, &rect, 0, 0, 0);
 
 	EndPaint(m_hWnd, &ps);
+
+	delete[] bigbuf;
+	delete[] bufinfo;
 
 	return 0;
 }

@@ -60,12 +60,19 @@ typedef struct
 
 } HEXCOL, ATTR;
 
+//
+//	Input to HVM_FORMATDATA
+//  Caller must allocate szText and attrList to the
+//  size returned from HVM_GETLINECHARS
+//
 typedef struct _HEXFMT_PARAMS
 {
 	size_w	offset;
 	size_t	length;
-	TCHAR	szText[400];
-	ATTR	attrList[200];
+
+	size_t   bufferSize;
+	TCHAR	*szText;
+	ATTR	*attrList;
 
 } HEXFMT_PARAMS, *PHEXFMT_PARAMS;
 
@@ -314,6 +321,7 @@ typedef void * HBOOKMARK;
 //#define HVM_GETPADDING		(HVM_FIRST + 62)
 #define HVM_SETADDROFFSET   (HVM_FIRST + 63)
 #define HVM_SCROLLTOP       (HVM_FIRST + 64)
+#define HVM_GETLINECHARS	(HVM_FIRST + 65)
 
 
 //
@@ -897,6 +905,13 @@ typedef struct _NMHVBOOKMARK
  */
 #define HexView_SetAddressOffset(hwnd, offset) \
 	(VOID)SNDMSG((hwnd), HVM_SETADDROFFSET, WPARAM_SIZEW(offset), LPARAM_SIZEW(offset))
+
+/**
+ * Return the number of characters required to render a line in the hexview,
+ * includes the space required for the null character
+ */
+#define HexView_GetLineChars(hwnd) \
+	(UINT)SNDMSG((hwnd), HVM_GETLINECHARS, 0, 0)
 
 
 //
