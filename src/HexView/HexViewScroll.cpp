@@ -152,7 +152,7 @@ BOOL HexView::ScrollTop(size_w offset)
 	if(offset > m_pDataSeq->size())
 		return FALSE;
 
-	m_nVScrollPos = min(offset / m_nBytesPerLine, m_nHScrollMax);
+	m_nVScrollPos = min(offset / m_nBytesPerLine, m_nVScrollMax);
 
 	SetupScrollbars();
 	RefreshWindow();
