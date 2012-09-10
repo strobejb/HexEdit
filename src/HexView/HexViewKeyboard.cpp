@@ -51,11 +51,13 @@ void HexView::ScrollToCaret()
 bool HexView::ForwardDelete()
 {
 	size_w length;
+	bool success = false;
 
 	if(SelectionSize() > 0)
 	{
-		length = SelectionSize();
-		m_pDataSeq->erase(SelectionStart(), length);
+		length  = SelectionSize();
+		success = m_pDataSeq->erase(SelectionStart(), length);
+
 		m_nCursorOffset = SelectionStart();
 
 		m_pDataSeq->breakopt();
@@ -63,13 +65,14 @@ bool HexView::ForwardDelete()
 	else
 	{
 		length = 1;
-		m_pDataSeq->erase(m_nCursorOffset, length);
+		success = m_pDataSeq->erase(m_nCursorOffset, length);
 	}
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
-	ContentChanged(m_nCursorOffset, length, HVMETHOD_DELETE);
+	if(success)
+		ContentChanged(m_nCursorOffset, length, HVMETHOD_DELETE);
 
 	return true;
 }
@@ -77,13 +80,14 @@ bool HexView::ForwardDelete()
 bool HexView::BackDelete()
 {
 	size_w offset, length;
+	bool success = false;
 
 	if(SelectionSize())
 	{
 		offset = SelectionStart();
 		length = SelectionSize();
 
-		m_pDataSeq->erase(offset, length);
+		success = m_pDataSeq->erase(offset, length);
 		m_nCursorOffset = offset;
 
 		m_pDataSeq->breakopt();
@@ -92,13 +96,14 @@ bool HexView::BackDelete()
 	{
 		offset = --m_nCursorOffset;
 		length = 1;
-		m_pDataSeq->erase(offset, length);
+		success = m_pDataSeq->erase(offset, length);
 	}
 
 	m_nSelectionStart = m_nCursorOffset;
 	m_nSelectionEnd   = m_nCursorOffset;
 
-	ContentChanged(offset, length, HVMETHOD_DELETE);
+	if(success)
+		ContentChanged(offset, length, HVMETHOD_DELETE);
 
 	return true;
 }
@@ -166,14 +171,20 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 
 	case VK_DELETE:
 		
+		// cannot delete in readonly mode
+		if(m_nEditMode == HVMODE_READONLY)
+		{
+			return 0;
+		}
 		// can only erase when in Insert mode
-		if(m_nEditMode == HVMODE_INSERT || 
-			CheckStyle(HVS_ALWAYSDELETE) && 
-			SelectionSize() == 0)
+		else if(m_nEditMode == HVMODE_INSERT || 
+			CheckStyle(HVS_ALWAYSDELETE) 
+			)
 		{
 			ForwardDelete();
 		}
-		else if(m_nEditMode != HVMODE_READONLY)
+		// overwrite mode - clear byte values
+		else if(SelectionSize() > 0)
 		{
 			BYTE b[] = { 0 };
 			FillData(b, 1, SelectionSize());
@@ -183,12 +194,23 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 
 	case VK_BACK:
 		
+		// cannot delete in readonly mode
+		if(m_nEditMode == HVMODE_READONLY)
+		{
+			return 0;
+		}
 		// can only erase when in Insert mode
-		if(m_nEditMode == HVMODE_INSERT || 
+		else if(m_nEditMode == HVMODE_INSERT || 
 			CheckStyle(HVS_ALWAYSDELETE)
 			)
 		{
 			BackDelete();			
+		}
+		// overwrite mode - clear byte values
+		else if(SelectionSize() > 0)
+		{
+			BYTE b[] = { 0 };
+			FillData(b, 1, SelectionSize());
 		}
 
 		return 0;
