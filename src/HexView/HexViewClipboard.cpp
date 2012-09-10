@@ -148,6 +148,9 @@ ULONG HexView::FillData(BYTE *buf, ULONG buflen, size_w len)
 
 	SetRedraw(fRedraw);
 
+	size_w offset = min(SelectionStart(), m_nCursorOffset);
+	ContentChanged(offset, len, HVMETHOD_OVERWRITE);
+
 	m_pDataSeq->ungroup();
 	return 0;
 }
