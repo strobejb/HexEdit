@@ -476,8 +476,8 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 	// fit to window!
 	if(CheckStyle(HVS_FITTOWINDOW))
 	{
-		int logwidth  = width / m_nFontWidth;			//logical width, in chars
-		int prevbpl   = m_nBytesPerLine;
+		int logwidth   = width / m_nFontWidth;			//logical width, in chars
+		int prevbpl    = m_nBytesPerLine;
 
 		// work out size of hex+ascii parts
 		logwidth -= CheckStyle(HVS_ADDR_INVISIBLE) ? 0 : m_nAddressWidth;
@@ -509,12 +509,12 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 			}
 		}
 
-		if(CheckStyle(HVS_FORCE_FIXEDCOLS))
-			m_nBytesPerLine -= m_nBytesPerLine % m_nBytesPerColumn;
+		//
+		int minunit = CheckStyle(HVS_FORCE_FIXEDCOLS) ? m_nBytesPerColumn : 1;		
+		m_nBytesPerLine -= m_nBytesPerLine % m_nBytesPerColumn;
 
 		// keep within legal limits
-		m_nBytesPerLine = max(m_nBytesPerLine, 1);
-		//m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
+		m_nBytesPerLine = max(m_nBytesPerLine, minunit);
 
 		// update display if anything has changed
 		if(m_nBytesPerLine != prevbpl)

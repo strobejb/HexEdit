@@ -932,11 +932,13 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 		}
 
 		// force whole-sized columns if necessary
-		if(CheckStyle(HVS_FORCE_FIXEDCOLS))
-			m_nBytesPerLine -= m_nBytesPerLine % m_nBytesPerColumn;
+		int minunit = CheckStyle(HVS_FORCE_FIXEDCOLS) ? m_nBytesPerColumn : 1;
+
+		m_nBytesPerLine -= m_nBytesPerLine % minunit;
 
 		// make sure we stay within legal limits
-		m_nBytesPerLine = max(m_nBytesPerLine, 1);
+		m_nBytesPerLine = max(m_nBytesPerLine, minunit);
+
 		//m_nBytesPerLine = min(m_nBytesPerLine, HV_MAX_COLS);
 
 		// update display if anything has changed
