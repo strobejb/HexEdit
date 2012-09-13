@@ -305,6 +305,7 @@ private:
 	int		m_nCaretY;
 	int		m_nWhichPane;
 	size_w  m_nAddressOffset;
+	size_w  m_nDataStart;
 
 	//size_w  m_nFileLength;
 	size_w  m_nSelectionStart;
@@ -328,6 +329,8 @@ private:
 	size_w  m_nVScrollMax;
 	int		m_nHScrollPos;
 	int		m_nHScrollMax;
+
+	size_w  m_nVScrollPinned;
 
 	// Drag+Drop support
 	long   m_lRefCount;

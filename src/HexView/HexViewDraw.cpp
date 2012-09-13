@@ -175,8 +175,13 @@ size_t HexView::FormatHexUnit(BYTE *data, TCHAR *buf, size_t buflen)
 VOID HexView::InvalidateRange(size_w start, size_w finish)
 {
 	int m_nPageMaxLines = m_nWindowLines;
+
 	size_w screenstartoffset = m_nVScrollPos * m_nBytesPerLine;
 	size_w screenendoffset   = (m_nVScrollPos + m_nPageMaxLines + 1) * m_nBytesPerLine;
+
+	// take into account any data shift
+	start             -= m_nDataStart;
+	finish            -= m_nDataStart;
 
 	if(screenendoffset < screenstartoffset) 
 		screenendoffset = -1;
@@ -444,8 +449,13 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 
 	CopyRect(&clip, &rect);
 
+	// work out what data we want to draw
+	// include the display-offset if we have shifted the
+	// hex/ascii data by a certain amount
+	offset	 = nLineNo * m_nBytesPerLine + m_nDataStart;
+
 	// check we have data to draw on this line
-	if(nLineNo * m_nBytesPerLine >= m_pDataSeq->size())//nLineNo >= NumFileLines(m_pDataSeq->size()))
+	if(offset >= m_pDataSeq->size())//nLineNo >= NumFileLines(m_pDataSeq->size()))
 	{
 		SetTextColor(hdc, GetHexColour(HVC_BACKGROUND));
 		SetBkColor(hdc,   GetHexColour(HVC_BACKGROUND));
@@ -464,7 +474,6 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	attrList		= new ATTR[m_nTotalWidth];
 	advanceWidth	= new int[m_nTotalWidth];
 	
-	offset	 = nLineNo * m_nBytesPerLine;
 	len		 = FormatLine(data, datalen, offset, buf, m_nTotalWidth, attrList, infobuf, true);
 
 	//TRACEA("%d - %d cars (%d)\n", len, m_nBytesPerLine, len*m_nFontWidth);
@@ -591,7 +600,10 @@ LRESULT HexView::OnPaint()
 		DrawVLine(&ps, GetHexColour(HVC_RESIZEBAR), m_nResizeBarPos);
 	}
 
-	size_w offset = first * m_nBytesPerLine;
+	// work out what data we want to draw
+	// include the display-offset if we have shifted the
+	// hex/ascii data by a certain amount
+	size_w offset = first * m_nBytesPerLine + m_nDataStart;
 	size_t buflen = (size_t)(last - first + 1) * m_nBytesPerLine;
 
 	BYTE *bigbuf;

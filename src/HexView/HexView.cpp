@@ -140,7 +140,9 @@ HexView::HexView(HWND hwnd)	:
 	m_HighlightHot(0),
 	m_HitTestCurrent(0),
 	m_HitTestHot(0),
-	m_nAddressOffset(0)
+	m_nAddressOffset(0),
+	m_nDataStart(0),
+	m_nVScrollPinned(0)
 
 
 {
@@ -1070,6 +1072,12 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case HVM_SETADDROFFSET:
 		m_nAddressOffset = MAKE_SIZEW(wParam, lParam);
 		return 0;
+
+	case HVM_SETDATAOFFSET:
+		m_nDataStart = MAKE_SIZEW(wParam, lParam);
+		RepositionCaret();
+		return 0;
+
 
 	default:
 		return DefWindowProc(m_hWnd, msg, wParam, lParam);

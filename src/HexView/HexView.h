@@ -322,6 +322,7 @@ typedef void * HBOOKMARK;
 #define HVM_SETADDROFFSET   (HVM_FIRST + 63)
 #define HVM_SCROLLTOP       (HVM_FIRST + 64)
 #define HVM_GETLINECHARS	(HVM_FIRST + 65)
+#define HVM_SETDATAOFFSET	(HVM_FIRST + 66)
 
 
 //
@@ -912,6 +913,14 @@ typedef struct _NMHVBOOKMARK
  */
 #define HexView_GetLineChars(hwnd) \
 	(UINT)SNDMSG((hwnd), HVM_GETLINECHARS, 0, 0)
+
+/**
+ * Offset the hex&ascii display by the given amount 
+ *
+ * @param size_w offset  - number of bytes to offset the display by
+ */
+#define HexView_SetDataOffset(hwnd, offset) \
+	(UINT)SNDMSG((hwnd), HVM_SETDATAOFFSET, WPARAM_SIZEW(offset), LPARAM_SIZEW(offset))
 
 
 //

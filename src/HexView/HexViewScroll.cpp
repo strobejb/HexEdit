@@ -356,6 +356,9 @@ LRESULT HexView::OnVScroll(UINT nSBCode, UINT nPos)
 		RepositionCaret();
 	}
 
+	m_nVScrollPinned = m_nVScrollPos * m_nBytesPerLine;
+	//m_nDataStart = 
+
 	return 0;
 }
 

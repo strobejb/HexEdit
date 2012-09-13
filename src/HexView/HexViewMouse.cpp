@@ -39,14 +39,13 @@ int HexView::GetLogicalX(int x, int *pane)
 	// round down to mid-character position
 	x = (x + (m_nFontWidth * 7) / 16) / m_nFontWidth;
 
-	TRACEA("xchar: %d: ", x);
+	//TRACEA("xchar: %d: ", x);
 
 	// clicked in address column?
 	if(CheckStyle(HVS_ADDR_INVISIBLE) == false)
 	{
 		if(x < m_nAddressWidth + m_nHexPaddingLeft)
 		{
-			TRACEA("%d %d\n", pane?*pane:-1, 0);
 			return 0;
 		}
 	
@@ -68,7 +67,7 @@ int HexView::GetLogicalX(int x, int *pane)
 			col *= m_nBytesPerColumn;
 			col += coloff;
 
-			TRACEA("%d %d\n", pane?*pane:-1, col);
+			//TRACEA("%d %d\n", pane?*pane:-1, col);
 			return col;
 		}
 
@@ -77,7 +76,7 @@ int HexView::GetLogicalX(int x, int *pane)
 		// clicked in the 1st half of hex-padding-right?
 		if(x < m_nHexPaddingRight / 2)
 		{
-			TRACEA("%d %d\n", pane?*pane:-1, m_nBytesPerLine);
+			//TRACEA("%d %d\n", pane?*pane:-1, m_nBytesPerLine);
 			return m_nBytesPerLine;
 		}
 	}
@@ -100,7 +99,7 @@ int HexView::GetLogicalX(int x, int *pane)
 	if(x < 0) 
 		x = 0;
 
-	TRACEA("%d %d\n", pane ? *pane : -1, x);
+	//TRACEA("%d %d\n", pane ? *pane : -1, x);
 	return x;
 }
 
@@ -115,6 +114,9 @@ int HexView::GetLogicalY(int y)
 
 void HexView::CaretPosFromOffset(size_w offset, int *x, int *y)
 {
+	// take into account any offset/shift in the datasource
+	offset -= m_nDataStart;
+
 	if(m_fCursorAdjustment && offset > 0)//>= m_nBytesPerLine)
 	{
 		*y = (int)(offset / m_nBytesPerLine - m_nVScrollPos - 1);
@@ -220,7 +222,8 @@ size_w HexView::OffsetFromPhysCoord(int x, int y, int *pane, int *lx, int *ly)
 		}
 	}
 
-	return offset;
+	// take into account any offset/shift in the datasource
+	return offset + m_nDataStart;
 }
 
 void HexView::PositionCaret(int x, int y, int pane)
@@ -945,10 +948,20 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 		if(prevbpl != m_nBytesPerLine)
 		{
 			m_fCursorAdjustment = FALSE;
+
+			TRACEA("VSP1: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * prevbpl);
+
+			// work out what the new scroll position should be - this keeps
+			// the cursor within the viewport when we change the window width
+			m_nVScrollPos = m_nVScrollPinned / m_nBytesPerLine;//(prevbpl * m_nVScrollPos) / m_nBytesPerLine;
+			m_nDataStart = m_nVScrollPinned % m_nBytesPerLine;
+
+			TRACEA("VSP2: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * m_nBytesPerLine);
+			//SetupScrollbars();
 			
 			RecalcPositions();
 			FakeSize();
-			//SetupScrollbars();
+			SetupScrollbars();
 
 			if(m_nVScrollPos > m_nVScrollMax)
 			{
@@ -959,6 +972,7 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 
 			RepositionCaret();
 			RefreshWindow();
+			TRACEA("VSP3: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * m_nBytesPerLine);
 		}
 
 		return 0;

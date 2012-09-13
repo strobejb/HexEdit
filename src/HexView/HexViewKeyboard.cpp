@@ -25,7 +25,7 @@ void HexView::ScrollToCaret()
 	// first of all bring the view into view
 	ScrollTo(m_nCursorOffset);
 
-	if(m_nCursorOffset % m_nBytesPerLine != 0)
+	if((m_nCursorOffset - m_nDataStart) % m_nBytesPerLine != 0)
 	{
 		m_fCursorAdjustment = FALSE;
 	}
@@ -120,6 +120,13 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 
 	if(nVirtualKey == VK_CONTROL || nVirtualKey == VK_SHIFT || nVirtualKey == VK_MENU)
 		return 0;
+
+	// take into account any offset/shift in the datasource
+	// we'll restore it again after the cursor logic has taken place. this tricks
+	// the switch-statement into thinking we are using a zero-based adddressing scheme,
+	// which is important as the keyboard logic assumes this when keeping the cursor
+	// within the bounds of the hex display
+	m_nCursorOffset -= min(m_nCursorOffset, m_nDataStart);
 
 	switch(nVirtualKey)
 	{
@@ -260,7 +267,7 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 			return 0;
 		}
 
-		if(m_nCursorOffset > (unsigned)m_nBytesPerLine) 
+		if(m_nCursorOffset > (unsigned)m_nBytesPerLine)
 			m_nCursorOffset -= m_nBytesPerLine;
 		else if(m_nCursorOffset == m_nBytesPerLine && m_fCursorAdjustment == FALSE)
 			m_nCursorOffset = 0;
@@ -331,15 +338,15 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 				if(m_pDataSeq->size() - m_nBytesPerLine >= m_nCursorOffset
 					&& m_pDataSeq->size() >= (size_t)m_nBytesPerLine)
 				{
-					m_nCursorOffset += 
-						m_nBytesPerLine - (m_nCursorOffset % m_nBytesPerLine);
-					
+					m_nCursorOffset += m_nBytesPerLine - (m_nCursorOffset % m_nBytesPerLine);
 					m_fCursorAdjustment = TRUE;
 				}
 				else
 				{
-					m_nCursorOffset += m_pDataSeq->size()-m_nCursorOffset;
+					m_nCursorOffset += m_pDataSeq->size() - m_nCursorOffset;
 				}
+
+				
 			}
 
 			if(m_nCursorOffset >= m_pDataSeq->size() && m_pDataSeq->size() % m_nBytesPerLine == 0)
@@ -382,6 +389,9 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 	}
 
 	m_nSubItem = 0;
+
+	// restore the true cursor position - take into account any offset/shift in the datasource
+	m_nCursorOffset += min(m_pDataSeq->size() - m_nCursorOffset, m_nDataStart);
 
 	if(m_nCursorOffset != oldoffset || fForceUpdate)
 	{
