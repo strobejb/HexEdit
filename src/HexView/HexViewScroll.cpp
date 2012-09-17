@@ -154,6 +154,7 @@ BOOL HexView::ScrollTop(size_w offset)
 		return FALSE;
 
 	PinToOffset(offset);
+	m_nVScrollPinned = offset;
 
 	//m_nVScrollPos = min(offset / m_nBytesPerLine, m_nVScrollMax);
 
