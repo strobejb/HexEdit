@@ -115,7 +115,8 @@ int HexView::GetLogicalY(int y)
 void HexView::CaretPosFromOffset(size_w offset, int *x, int *y)
 {
 	// take into account any offset/shift in the datasource
-	offset -= m_nDataStart;
+	//offset -= m_nDataShift;
+	offset += m_nDataShift;
 
 	if(m_fCursorAdjustment && offset > 0)//>= m_nBytesPerLine)
 	{
@@ -189,28 +190,46 @@ int HexView::LogToPhyXCoord(int x, int pane)
 	}
 }
 
-size_w HexView::OffsetFromPhysCoord(int x, int y, int *pane, int *lx, int *ly)
+size_w HexView::OffsetFromPhysCoord(int mx, int my, int *pane, int *lx, int *ly)
 {
 	size_w offset;
 
-	x = GetLogicalX(x, pane);
-	y = GetLogicalY(y);
+	int x = GetLogicalX(mx, pane);
+	int y = GetLogicalY(my);
 
 	if(y >= m_nWindowLines)   y = m_nWindowLines -1;
 	if(x >= m_nWindowColumns) x = m_nWindowColumns -1;
 	if(x < 0) x = 0;
 	if(y < 0) y = 0;
 
+	size_w adjdocsize = m_pDataSeq->size() + m_nDataShift;
+
 	// need to do this in two stages to avoid overflow
 	offset = /*x+*/(y + m_nVScrollPos) * m_nBytesPerLine;
-	offset += min((size_w)x, m_pDataSeq->size() - offset);
+	//offset -= m_nDataShift;
+	offset += min((size_w)x, adjdocsize - offset);
+
+	if(offset < m_nDataShift)
+	{
+		// did we click in the deadspace at start of the file?
+		x = m_nDataShift;
+	}
+
+//	TRACEA("SMEG: %d\n", offset);
 
 	if(lx) *lx = x;
 	if(ly) *ly = y;
 	
-	if(offset >= m_pDataSeq->size())
+	// take into account any offset/shift in the datasource
+	//int shft = min(m_nDataShift, offset);
+	///offset -= min(m_nDataShift, offset);
+
+
+//	offset -= min(m_nDataShift, offset);
+
+	if(offset >= adjdocsize)
 	{
-		offset = m_pDataSeq->size();
+		offset = adjdocsize;
 		m_fCursorAdjustment = (offset % m_nBytesPerLine == 0);
 
 		if(lx && ly)
@@ -218,12 +237,17 @@ size_w HexView::OffsetFromPhysCoord(int x, int y, int *pane, int *lx, int *ly)
 			if(offset == 0)
 				*lx = *ly = 0;
 			else
-				CaretPosFromOffset(offset, lx, ly);
+				CaretPosFromOffset(offset - m_nDataShift, lx, ly);
 		}
 	}
+	else
+	{
+		//offset - min(m_nDataShift, offset);
+	}
 
-	// take into account any offset/shift in the datasource
-	return offset + m_nDataStart;
+	offset -= min(m_nDataShift, offset);
+	//return offset + m_nDataShift;
+	return offset ;//- min(m_nDataShift, offset);
 }
 
 void HexView::PositionCaret(int x, int y, int pane)
@@ -244,6 +268,9 @@ void HexView::RepositionCaret()
 {
 	int x, y;
 //	TRACEA("repos");
+
+	//m_nVScrollPinned = m_nVScrollPos * m_nBytesPerLine;
+
 	CaretPosFromOffset(m_nCursorOffset, &x, &y);
 	PositionCaret(x, y, m_nWhichPane);
 }
@@ -262,9 +289,19 @@ UINT HexView::HitTest(int x, int y, RECT *phirc, BOOKNODE **pbnp)// = 0)
 		*pbnp = 0;
 		
 	// mouse within the resize bar?
-	if(!CheckStyle(HVS_FITTOWINDOW) && CheckStyle(HVS_RESIZEBAR) && (x / BARWIDTH) == (m_nResizeBarPos / BARWIDTH))
+	if(!CheckStyle(HVS_FITTOWINDOW) && CheckStyle(HVS_RESIZEBAR))
 	{
-		return HVHT_RESIZE;
+				int pos1 = (m_nAddressWidth - m_nHScrollPos) * m_nFontWidth + 
+					(m_nHexPaddingLeft * m_nFontWidth) / 2;
+
+		if((x / BARWIDTH) == (m_nResizeBarPos / BARWIDTH))
+		{
+			return HVHT_RESIZE;
+		}
+		else if((x / BARWIDTH) == (pos1/BARWIDTH))
+		{
+			return HVHT_RESIZE0;
+		}
 	}
 
 	x -= m_nHScrollPos;
@@ -548,10 +585,14 @@ LRESULT HexView::OnLButtonDown(UINT nFlags, int x, int y)
 	m_HitTestCurrent = ht;
 	m_HitTestHot	 = ht;
 
-	// if clicked on the resize bar
-	if(ht == HVHT_RESIZE)//!CheckStyle(HVS_FITTOWINDOW) && CheckStyle(HVS_RESIZEBAR) && IsOverResizeBar(x))
+	// if clicked on either resize bar
+	if(ht & HVHT_RESIZE)//!CheckStyle(HVS_FITTOWINDOW) && CheckStyle(HVS_RESIZEBAR) && IsOverResizeBar(x))
 	{
-		m_fResizeBar = true;
+		if(ht == HVHT_RESIZE)
+			m_fResizeBar = true;
+		else if(ht == HVHT_RESIZE0)
+			m_fResizeAddr = true;
+
 		SetCapture(m_hWnd);
 		return 0;
 	}	
@@ -806,6 +847,7 @@ TCHAR * CursorFromHittest(UINT ht)
 //	case HVHT_HEXCOL:	return IDC_IBEAM;
 //	case HVHT_ASCCOL:	return IDC_IBEAM;
 	case HVHT_RESIZE:	return IDC_SIZEWE;
+	case HVHT_RESIZE0:	return IDC_SIZEWE;
 	case HVHT_BOOKMARK:	return IDC_ARROW;
 	case HVHT_BOOKCLOSE:return IDC_ARROW;
 	case HVHT_BOOKSIZE:	return IDC_SIZENWSE;
@@ -935,7 +977,7 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 		}
 
 		// force whole-sized columns if necessary
-		int minunit = CheckStyle(HVS_FORCE_FIXEDCOLS) ? m_nBytesPerColumn : 1;
+		int minunit = 1;//CheckStyle(HVS_FORCE_FIXEDCOLS) ? m_nBytesPerColumn : 1;
 
 		m_nBytesPerLine -= m_nBytesPerLine % minunit;
 
@@ -949,14 +991,12 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 		{
 			m_fCursorAdjustment = FALSE;
 
-			TRACEA("VSP1: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * prevbpl);
+			// maintain the vertical scrollbar position, such that the 
+			// offset at the top-left is always 'locked' at the same value.
+			// this requires that we 
+			PinToOffset(m_nVScrollPinned);
 
-			// work out what the new scroll position should be - this keeps
-			// the cursor within the viewport when we change the window width
-			m_nVScrollPos = m_nVScrollPinned / m_nBytesPerLine;//(prevbpl * m_nVScrollPos) / m_nBytesPerLine;
-			m_nDataStart = m_nVScrollPinned % m_nBytesPerLine;
-
-			TRACEA("VSP2: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * m_nBytesPerLine);
+			TRACEA("VSP2: %I64x - %d    (%I64x)\n", m_nVScrollPinned, m_nDataShift, m_nVScrollPos * m_nBytesPerLine+ m_nDataShift);
 			//SetupScrollbars();
 			
 			RecalcPositions();
@@ -975,6 +1015,33 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 			TRACEA("VSP3: %I64x - %I64x\n", m_nVScrollPos, m_nVScrollPos * m_nBytesPerLine);
 		}
 
+		return 0;
+	}
+	else if(m_fResizeAddr)
+	{
+		// the resizebar next to the address column is used to
+		// set the m_nDataShift value
+		int pos1 = (m_nAddressWidth - m_nHScrollPos) * m_nFontWidth + 
+					(m_nHexPaddingLeft * m_nFontWidth) / 2;
+
+		int oldds = m_nDataShift;
+
+		int pos = mx / m_nFontWidth + m_nHScrollPos;
+		m_nDataShift = (pos - pos1 / m_nFontWidth) / 2;
+		
+		m_nDataShift = max(0, m_nDataShift);		// don't allow negative
+		m_nDataShift = min(m_nDataShift, m_nBytesPerLine-1);
+
+		if(m_nDataShift != oldds)
+		{
+			TRACEA("addr: %d\n", m_nDataShift);
+
+			RecalcPositions();
+			FakeSize();
+			SetupScrollbars();
+			RepositionCaret();
+			RefreshWindow();
+		}
 		return 0;
 	}
 	//
@@ -1187,9 +1254,10 @@ LRESULT HexView::OnLButtonUp(UINT nFlags, int x, int y)
 	}
 
 	// resize bar?
-	if(m_fResizeBar)
+	if(m_fResizeBar || m_fResizeAddr)
 	{
 		m_fResizeBar = false;
+		m_fResizeAddr = false;
 		ReleaseCapture();
 	}
 	// normal mouse selection

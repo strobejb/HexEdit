@@ -142,6 +142,7 @@ VOID HexView::SetupScrollbars()
 	m_nHScrollMax = m_nTotalWidth - m_nWindowColumns;
 
 	UpdateResizeBarPos();
+	UpdatePinnedOffset();
 }
 
 //
@@ -306,6 +307,15 @@ VOID HexView::Scroll(int dx, int dy)
 	ScrollRgn(dx, dy, false);
 }
 
+void HexView::UpdatePinnedOffset()
+{
+	m_nVScrollPinned = m_nVScrollPos * m_nBytesPerLine;
+	
+	// take the datashift into account!
+	m_nVScrollPinned -= m_nDataShift;
+
+}
+
 //
 //	Vertical scrollbar support
 //
@@ -355,9 +365,6 @@ LRESULT HexView::OnVScroll(UINT nSBCode, UINT nPos)
 		SetupScrollbars();
 		RepositionCaret();
 	}
-
-	m_nVScrollPinned = m_nVScrollPos * m_nBytesPerLine;
-	//m_nDataStart = 
 
 	return 0;
 }

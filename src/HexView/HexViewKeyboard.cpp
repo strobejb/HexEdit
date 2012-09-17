@@ -25,7 +25,7 @@ void HexView::ScrollToCaret()
 	// first of all bring the view into view
 	ScrollTo(m_nCursorOffset);
 
-	if((m_nCursorOffset - m_nDataStart) % m_nBytesPerLine != 0)
+	if((m_nCursorOffset + m_nDataShift) % m_nBytesPerLine != 0)
 	{
 		m_fCursorAdjustment = FALSE;
 	}
@@ -126,7 +126,9 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 	// the switch-statement into thinking we are using a zero-based adddressing scheme,
 	// which is important as the keyboard logic assumes this when keeping the cursor
 	// within the bounds of the hex display
-	m_nCursorOffset -= min(m_nCursorOffset, m_nDataStart);
+	//m_nCursorOffset += m_nDataShift;//+= min((size_w)-1 - m_nCursorOffset, m_nDataShift);
+
+//	m_nCursorOffset += m_nDataShift;//+= min((size_w)-1 - m_nCursorOffset, m_nDataShift);
 
 	switch(nVirtualKey)
 	{
@@ -310,10 +312,14 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 		}
 		else
 		{
+			m_nCursorOffset += m_nDataShift;
+
 			if(m_fCursorAdjustment && m_nCursorOffset > 0)
 				m_nCursorOffset--;
 
 			m_nCursorOffset -= m_nCursorOffset % m_nBytesPerLine;
+
+			m_nCursorOffset -= min(m_nDataShift, m_nCursorOffset);
 		}
 
 		m_fCursorAdjustment = FALSE;
@@ -332,25 +338,30 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 		}
 		else
 		{
+			// take into account the datashift
+			// we need to 'shift' the end-of-file as well!
+			m_nCursorOffset += m_nDataShift;
+			size_w adjdocsize = m_pDataSeq->size() + m_nDataShift;
+
 			// if not already at very end of line
 			if(m_fCursorAdjustment == FALSE)
 			{
-				if(m_pDataSeq->size() - m_nBytesPerLine >= m_nCursorOffset
-					&& m_pDataSeq->size() >= (size_t)m_nBytesPerLine)
+				if(adjdocsize - m_nBytesPerLine >= m_nCursorOffset
+					&& adjdocsize >= (size_t)m_nBytesPerLine)
 				{
 					m_nCursorOffset += m_nBytesPerLine - (m_nCursorOffset % m_nBytesPerLine);
 					m_fCursorAdjustment = TRUE;
 				}
 				else
 				{
-					m_nCursorOffset += m_pDataSeq->size() - m_nCursorOffset;
+					m_nCursorOffset += adjdocsize - m_nCursorOffset;
 				}
-
-				
 			}
 
-			if(m_nCursorOffset >= m_pDataSeq->size() && m_pDataSeq->size() % m_nBytesPerLine == 0)
+			if(m_nCursorOffset >= adjdocsize && adjdocsize % m_nBytesPerLine == 0)
 				m_fCursorAdjustment = TRUE;
+
+			m_nCursorOffset -= min(m_nDataShift, m_nCursorOffset);
 		}
 
 		break;
@@ -389,9 +400,6 @@ LRESULT HexView::OnKeyDown(UINT nVirtualKey, UINT nRepeatCount, UINT nFlags)
 	}
 
 	m_nSubItem = 0;
-
-	// restore the true cursor position - take into account any offset/shift in the datasource
-	m_nCursorOffset += min(m_pDataSeq->size() - m_nCursorOffset, m_nDataStart);
 
 	if(m_nCursorOffset != oldoffset || fForceUpdate)
 	{

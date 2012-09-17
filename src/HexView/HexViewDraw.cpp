@@ -110,6 +110,11 @@ size_t HexView::FormatAddress(size_w addr, TCHAR *buf, size_t buflen)
 	if(CheckStyle( HVS_ADDR_ENDCOLON ))
 		_tcscat(buf, _T(":"));
 
+	size_t len = _tcslen(buf);
+
+	if(len > m_nAddressWidth)
+		wmemmove(buf+1, buf + (len - m_nAddressWidth) + 1, len-m_nAddressWidth+1);
+
 	return _tcslen(buf);
 }
 
@@ -180,8 +185,8 @@ VOID HexView::InvalidateRange(size_w start, size_w finish)
 	size_w screenendoffset   = (m_nVScrollPos + m_nPageMaxLines + 1) * m_nBytesPerLine;
 
 	// take into account any data shift
-	start             -= m_nDataStart;
-	finish            -= m_nDataStart;
+	start             += m_nDataShift;//Start;
+	finish            += m_nDataShift;//Start;
 
 	if(screenendoffset < screenstartoffset) 
 		screenendoffset = -1;
@@ -246,7 +251,7 @@ void AddAttr(ATTR **attrListPtr, COLORREF fg, COLORREF bg, size_t count)
 
 	(*attrListPtr) += count;
 }
-
+int fixthis = 0;
 size_t HexView::FormatLine(
 	BYTE *          data,		// the data to display
 	size_t          length,		// length of data
@@ -297,6 +302,13 @@ size_t HexView::FormatLine(
 				infobuf[i].userdata != 0 ? true : false,
 				fIncSelection
 				);
+
+			if(i < fixthis)
+			{
+				col1.colBG = col2.colBG = GetHexColour(HVC_BACKGROUND);
+				wmemset(ptr-len, ' ', len);
+			}
+
 
 			// add the colour information
 			if(col1 != col2 || i == m_nBytesPerLine - 1 || (i+1) % (m_nBytesPerColumn) != 0)
@@ -370,6 +382,12 @@ size_t HexView::FormatLine(
 				infobuf[i].userdata != 0 ? true : false,
 				fIncSelection
 				);
+
+			if(i < fixthis)
+			{
+				col1.colBG = col2.colBG = GetHexColour(HVC_BACKGROUND);
+				*(ptr-1) = ' ';
+			}
 
 			//if(col1.colBG == 0xffffff)
 			//	col1.colBG = RGB(244,243,241);
@@ -452,10 +470,10 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	// work out what data we want to draw
 	// include the display-offset if we have shifted the
 	// hex/ascii data by a certain amount
-	offset	 = nLineNo * m_nBytesPerLine + m_nDataStart;
+	offset	 = nLineNo * m_nBytesPerLine;// + m_nDataStart;
 
-	// check we have data to draw on this line
-	if(offset >= m_pDataSeq->size())//nLineNo >= NumFileLines(m_pDataSeq->size()))
+	// check we have data to draw on this line!
+	if(offset - min(m_nDataShift, offset) >= m_pDataSeq->size())
 	{
 		SetTextColor(hdc, GetHexColour(HVC_BACKGROUND));
 		SetBkColor(hdc,   GetHexColour(HVC_BACKGROUND));
@@ -470,13 +488,13 @@ int HexView::PaintLine(HDC hdc, size_w nLineNo, BYTE *data, size_t datalen, seqc
 	//
 	//	Construct a text buffer and colour description buffer
 	//
-	buf				= new TCHAR[m_nTotalWidth+1];
+	buf				= new TCHAR[m_nTotalWidth+100];
 	attrList		= new ATTR[m_nTotalWidth];
 	advanceWidth	= new int[m_nTotalWidth];
-	
-	len		 = FormatLine(data, datalen, offset, buf, m_nTotalWidth, attrList, infobuf, true);
 
-	//TRACEA("%d - %d cars (%d)\n", len, m_nBytesPerLine, len*m_nFontWidth);
+	//
+	offset -= m_nDataShift;
+	len		 = FormatLine(data, datalen, offset, buf, m_nTotalWidth, attrList, infobuf, true);
 
 	for(i = 0; i < len; i++)
 		advanceWidth[i] = m_nFontWidth;
@@ -603,8 +621,8 @@ LRESULT HexView::OnPaint()
 	// work out what data we want to draw
 	// include the display-offset if we have shifted the
 	// hex/ascii data by a certain amount
-	size_w offset = first * m_nBytesPerLine + m_nDataStart;
-	size_t buflen = (size_t)(last - first + 1) * m_nBytesPerLine;
+	size_w offset = first * m_nBytesPerLine;// + m_nDataStart;
+	size_t buflen = (size_t)(last - first + 1) * m_nBytesPerLine + m_nDataShift;
 
 	BYTE *bigbuf;
 	seqchar_info *bufinfo;
@@ -618,7 +636,20 @@ LRESULT HexView::OnPaint()
 		return 0;
 	}
 	
-	buflen = m_pDataSeq->render(offset, bigbuf, buflen, bufinfo);
+	int shift = 0;
+	int shift2 = 0;
+	if(m_nDataShift > offset)
+	{
+		shift = max(m_nDataShift, 0);//m_nDataStart % m_nBytesPerLine;
+		memset(bigbuf, '?', shift);
+	}
+	else
+	{
+		shift2 = m_nDataShift;//abs(min(m_nDataShift, 0));
+	}
+	
+	buflen = m_pDataSeq->render(offset - shift2, bigbuf + shift, buflen - shift, bufinfo + shift);
+	buflen += shift;
 
 	// identify any characters that match the current search-pattern
 	IdentifySearchPatterns(bigbuf, buflen, bufinfo);
@@ -633,10 +664,11 @@ LRESULT HexView::OnPaint()
 	for(i = first; i <= last; i++)
 	{
 		offset = (i - first) * m_nBytesPerLine;
+
+		size_t len = (size_t)min(buflen - offset, m_nBytesPerLine);
+		fixthis = (i == 0) ? m_nDataShift : 0;
 		
-		int width = PaintLine(ps.hdc, i, bigbuf + offset, 
-				(size_t)min(buflen - offset, m_nBytesPerLine), 
-				bufinfo + offset);
+		int width = PaintLine(ps.hdc, i, bigbuf + offset, len, bufinfo + offset);
 
 		
 		// draw the ghost item

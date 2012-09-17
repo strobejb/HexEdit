@@ -250,7 +250,7 @@ BOOL HexView::GetHighlightCol(size_w offset, int pane, BOOKNODE *itemStart,
 	} 
 
 	// take into account any offset/shift in the datasource
-	offset -= m_nDataStart;
+	offset += m_nDataShift;//Start;
 	if((offset + 1) % (m_nBytesPerLine) == 0 && offset != 0)
 	{
 		col2->colFG = col1->colFG;

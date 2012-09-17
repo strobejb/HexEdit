@@ -109,6 +109,7 @@ HexView::HexView(HWND hwnd)	:
 	//m_fMouseDown(FALSE),
 	m_nSelectionMode(SEL_NONE),
 	m_fResizeBar(false),
+	m_fResizeAddr(false),
 	m_nScrollCounter(0),
 	m_nScrollTimer(0),
 	m_fCursorAdjustment(FALSE),
@@ -141,7 +142,7 @@ HexView::HexView(HWND hwnd)	:
 	m_HitTestCurrent(0),
 	m_HitTestHot(0),
 	m_nAddressOffset(0),
-	m_nDataStart(0),
+	m_nDataShift(0),
 	m_nVScrollPinned(0)
 
 
@@ -374,11 +375,15 @@ VOID HexView::RecalcPositions()
 	GetClientRect(m_hWnd, &rect);
 
 	OnLengthChange(m_pDataSeq->size());
+
+	m_nDataShift %= m_nBytesPerLine;
 	SetGrouping(m_nBytesPerColumn);
 
 	m_nWindowColumns = min((rect.right-rect.left) / m_nFontWidth, m_nTotalWidth);
 	
 	UpdateResizeBarPos();
+
+	PinToOffset(m_nVScrollPinned);
 }
 
 UINT HexView::GetStyleMask(UINT uStyleFlag)
@@ -446,10 +451,15 @@ size_w HexView::NumFileLines(size_w length)
 	if(length == 0)
 		return 0;
 
-	length = length / m_nBytesPerLine; 
+	size_w olen = length + m_nDataShift;
+
+	length = olen / m_nBytesPerLine; 
 	
-	if(length % m_nBytesPerLine)
+	if(olen % m_nBytesPerLine)
 		length++;
+
+	//if((olen + m_nDataShift )% m_nBytesPerLine < m_nDataShift)
+		//length++;
 
 	return length;
 }
@@ -471,6 +481,20 @@ bool HexView::PinToBottomCorner()
 	}
 
 	return repos;
+}
+
+// maintain the vertical scrollbar position, such that the 
+// offset at the top-left is always 'locked' at the same value.
+// this requires that we shift the starting position of the
+// document so that the specified offset always locates at the
+// top-left of the viewport
+void HexView::PinToOffset(size_w offset)
+{
+	if(m_nVScrollPos > 0)
+	{
+		m_nDataShift  = m_nBytesPerLine - offset % m_nBytesPerLine;
+		m_nVScrollPos = (offset + m_nDataShift) / m_nBytesPerLine;
+	}
 }
 
 LRESULT HexView::OnSize(UINT nFlags, int width, int height)
@@ -521,6 +545,8 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 		// update display if anything has changed
 		if(m_nBytesPerLine != prevbpl)
 		{
+			PinToOffset(m_nVScrollPinned);
+
 			m_nHScrollPos = 0;
 			RecalcPositions();
 			RefreshWindow();
@@ -1073,8 +1099,8 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		m_nAddressOffset = MAKE_SIZEW(wParam, lParam);
 		return 0;
 
-	case HVM_SETDATAOFFSET:
-		m_nDataStart = MAKE_SIZEW(wParam, lParam);
+	case HVM_SETDATASHIFT:
+		m_nDataShift = max(0, (int)wParam);//(int)MAKE_SIZEW(wParam, lParam);
 		RepositionCaret();
 		return 0;
 

@@ -40,6 +40,7 @@ struct _HIGHLIGHT_LIST;
 //#define HVHT_ASCCOL		(HVHT_MAIN | 0x08)
 #define HVHT_SELECTION	0x02
 #define HVHT_RESIZE		0x10
+#define HVHT_RESIZE0    (0x20 | HVHT_RESIZE)
 #define HVHT_BOOKMARK	0x100
 #define HVHT_BOOKCLOSE	(HVHT_BOOKMARK | 0x200)
 #define HVHT_BOOKSIZE	(HVHT_BOOKMARK | 0x400)
@@ -182,6 +183,8 @@ public:
 	BOOL   ScrollTo(size_w offset);
 	BOOL   ScrollTop(size_w offset);
 	bool   PinToBottomCorner();
+	void   PinToOffset(size_w offset);
+	void   UpdatePinnedOffset();
 
 	bool   Undo();
 	bool   Redo();
@@ -305,7 +308,10 @@ private:
 	int		m_nCaretY;
 	int		m_nWhichPane;
 	size_w  m_nAddressOffset;
-	size_w  m_nDataStart;
+	//size_w  m_nDataStart;
+
+	//size_w  m_nVScrollOffsetPinned;	// offset 
+	int     m_nDataShift;			// range from -m_nBytesPerLine to +m_nBytesPerLine
 
 	//size_w  m_nFileLength;
 	size_w  m_nSelectionStart;
@@ -364,6 +370,7 @@ private:
 	LONG		m_nScrollCounter;
 	BOOL		m_fCursorAdjustment;
 	bool		m_fResizeBar;
+	bool		m_fResizeAddr;
 	UINT		m_nEditMode;
 	int			m_nSubItem;
 	HMENU		m_hUserMenu;
