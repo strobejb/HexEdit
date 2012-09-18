@@ -58,7 +58,7 @@ BOOL HexView::GetHighlightCol(size_w offset, int pane, BOOKNODE *itemStart,
 
 	if(pane == 0)
 	{
-		nSchemeIdxFG = ((offset % m_nBytesPerLine) / m_nBytesPerColumn) & 1 ? HVC_HEXEVEN : HVC_HEXODD;
+		nSchemeIdxFG = (((offset + m_nDataShift)% m_nBytesPerLine) / m_nBytesPerColumn) & 1 ? HVC_HEXEVEN : HVC_HEXODD;
 		nSchemeIdxBG = HVC_BACKGROUND;
 	}
 	else
