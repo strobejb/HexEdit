@@ -383,7 +383,8 @@ VOID HexView::RecalcPositions()
 	
 	UpdateResizeBarPos();
 
-	PinToOffset(m_nVScrollPinned);
+	if(m_nVScrollPos > 0)
+		PinToOffset(m_nVScrollPinned);
 }
 
 UINT HexView::GetStyleMask(UINT uStyleFlag)
@@ -490,11 +491,12 @@ bool HexView::PinToBottomCorner()
 // top-left of the viewport
 void HexView::PinToOffset(size_w offset)
 {
-	if(m_nVScrollPos > 0)
-	{
-		m_nDataShift  = m_nBytesPerLine - offset % m_nBytesPerLine;
-		m_nVScrollPos = (offset + m_nDataShift) / m_nBytesPerLine;
-	}
+	// work out the datashift first of all
+	m_nDataShift  = m_nBytesPerLine - offset % m_nBytesPerLine;
+	m_nDataShift %= m_nBytesPerLine;
+
+	// now work out the corresponding scrollbar position 
+	m_nVScrollPos = (offset + m_nDataShift) / m_nBytesPerLine;
 }
 
 LRESULT HexView::OnSize(UINT nFlags, int width, int height)
@@ -545,7 +547,8 @@ LRESULT HexView::OnSize(UINT nFlags, int width, int height)
 		// update display if anything has changed
 		if(m_nBytesPerLine != prevbpl)
 		{
-			PinToOffset(m_nVScrollPinned);
+			if(m_nVScrollPos > 0)
+				PinToOffset(m_nVScrollPinned);
 
 			m_nHScrollPos = 0;
 			RecalcPositions();

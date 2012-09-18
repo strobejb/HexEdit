@@ -994,7 +994,8 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 			// maintain the vertical scrollbar position, such that the 
 			// offset at the top-left is always 'locked' at the same value.
 			// this requires that we 
-			PinToOffset(m_nVScrollPinned);
+			if(m_nVScrolLPos > 0)
+				PinToOffset(m_nVScrollPinned);
 
 			TRACEA("VSP2: %I64x - %d    (%I64x)\n", m_nVScrollPinned, m_nDataShift, m_nVScrollPos * m_nBytesPerLine+ m_nDataShift);
 			//SetupScrollbars();
