@@ -29,9 +29,10 @@ bool __inline inrange(size_w offset, size_w start, size_w finish)
 		   offset >= finish && offset < start;
 }
 
-int HexView::GetLogicalX(int x, int *pane)
+int HexView::GetLogicalX(int x, int *pane, int *subitem /*= 0*/)
 {
 	if(pane) *pane = CheckStyle(HVS_HEX_INVISIBLE) ? 1 : 0;
+	if(subitem) *subitem = 0;
 
 	// take into account the horizontal scroll position
 	x += m_nHScrollPos * m_nFontWidth;
@@ -67,7 +68,10 @@ int HexView::GetLogicalX(int x, int *pane)
 			col *= m_nBytesPerColumn;
 			col += coloff;
 
-			//TRACEA("%d %d\n", pane?*pane:-1, col);
+			if(subitem)
+				//*subitem = 0;
+				*subitem = (x % (m_nBytesPerColumn * unitwidth + 1)) % unitwidth;
+
 			return col;
 		}
 
@@ -190,11 +194,11 @@ int HexView::LogToPhyXCoord(int x, int pane)
 	}
 }
 
-size_w HexView::OffsetFromPhysCoord(int mx, int my, int *pane, int *lx, int *ly)
+size_w HexView::OffsetFromPhysCoord(int mx, int my, int *pane, int *lx, int *ly, int *subitem)
 {
 	size_w offset;
 
-	int x = GetLogicalX(mx, pane);
+	int x = GetLogicalX(mx, pane, subitem);
 	int y = GetLogicalY(my);
 
 	if(y >= m_nWindowLines)   y = m_nWindowLines -1;
@@ -252,7 +256,9 @@ size_w HexView::OffsetFromPhysCoord(int mx, int my, int *pane, int *lx, int *ly)
 
 void HexView::PositionCaret(int x, int y, int pane)
 {
-//	TRACEA("poscaret\n");
+	if(m_nLastEditOffset != m_nCursorOffset)
+		m_fCursorMoved = true;
+
 	m_fCursorAdjustment = (x == m_nBytesPerLine);
 
 	int physx = LogToPhyXCoord(x, pane);
@@ -267,9 +273,6 @@ void HexView::PositionCaret(int x, int y, int pane)
 void HexView::RepositionCaret()
 {
 	int x, y;
-//	TRACEA("repos");
-
-	//m_nVScrollPinned = m_nVScrollPos * m_nBytesPerLine;
 
 	CaretPosFromOffset(m_nCursorOffset, &x, &y);
 	PositionCaret(x, y, m_nWhichPane);
@@ -639,8 +642,8 @@ LRESULT HexView::OnLButtonDown(UINT nFlags, int x, int y)
 	else
 	{
 		// convert actual coords to font-based
-		m_nCursorOffset = OffsetFromPhysCoord(x, y, &m_nWhichPane, &x, &y);
 		m_nSubItem = 0;
+		m_nCursorOffset = OffsetFromPhysCoord(x, y, &m_nWhichPane, &x, &y, &m_nSubItem);
 		
 		// if the mouse is pressed when it is over a selection, 
 		// then start a drag-drop as soon as the mouse moves
@@ -906,6 +909,8 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 			if(m_nCursorOffset != offset)
 			{
 				m_nCursorOffset = offset;
+				m_nSubItem = 0;
+
 				InvalidateRange(m_nCursorOffset, m_nSelectionEnd);
 				m_nSelectionEnd = m_nCursorOffset;
 				PositionCaret(x, y, m_nWhichPane);
@@ -921,6 +926,8 @@ LRESULT HexView::OnMouseMove(UINT nFlags, int x, int y)
 			if(m_nCursorOffset != offset)
 			{
 				m_nCursorOffset = offset;
+				m_nSubItem = 0;
+
 				PositionCaret(x, y, m_nWhichPane);
 
 				NotifyParent(HVN_SELECTION_CHANGE);

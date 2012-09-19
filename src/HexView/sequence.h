@@ -145,7 +145,7 @@ public:
 	size_t		render(size_w index, seqchar *buf, size_t len, seqchar_info *infobuf = 0) const;
 	seqchar		peek(size_w index) const;
 	bool		poke(size_w index, seqchar val);
-	seqchar&    getlastmodref();
+	seqchar&    getlastmodref(size_w *offset = 0);
 
 	seqchar		operator[] (size_w index) const;
 	ref			operator[] (size_w index);

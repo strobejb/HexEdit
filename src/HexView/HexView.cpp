@@ -143,7 +143,9 @@ HexView::HexView(HWND hwnd)	:
 	m_HitTestHot(0),
 	m_nAddressOffset(0),
 	m_nDataShift(0),
-	m_nVScrollPinned(0)
+	m_nVScrollPinned(0),
+	m_nLastEditOffset(0),
+	m_fCursorMoved(true)
 
 
 {

@@ -453,11 +453,11 @@ LRESULT HexView::OnChar(UINT nChar)
 		BYTE b = 0;
 
 		// get data under caret
-		if(m_nSubItem > 0)
+		/*if(m_nSubItem > 0)
 		{
 			b = m_pDataSeq->getlastmodref();
 		}
-		else if(m_nEditMode == HVMODE_INSERT)
+		else*/ if(m_nEditMode == HVMODE_INSERT)
 		{
 			b = 0;
 		}
@@ -501,13 +501,17 @@ LRESULT HexView::OnChar(UINT nChar)
 			val -= b % power;
 		}
 
+		m_nSubItem++;
 
-		if(m_nSubItem++ == 0)
+		if(m_fCursorMoved)
 		{	
 			b = (BYTE)val;
 
 			// enter the data
 			EnterData(&b, 1, m_nWhichPane == 0 ? false : true, true, false);
+			
+			m_nLastEditOffset = m_nCursorOffset;
+			m_fCursorMoved	  = false;
 		}
 		else
 		{
@@ -525,6 +529,8 @@ LRESULT HexView::OnChar(UINT nChar)
 			
 			RepositionCaret();
 		}
+
+
 	}
 	else
 	{

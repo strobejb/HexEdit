@@ -1430,10 +1430,12 @@ void sequence::breakopt()
 	lastaction = action_invalid;
 }
 
-seqchar&  sequence::getlastmodref()
+seqchar&  sequence::getlastmodref(size_w *offset /*=0*/)
 {
 	static seqchar tmp = 0;
 	buffer_control *bc;
+
+	if(offset) *offset = 0;
 	
 	if(modifybuffer_id < buffer_list.size())
 	{
@@ -1441,6 +1443,9 @@ seqchar&  sequence::getlastmodref()
 
 		if(bc && bc->length > 0)
 		{
+			if(offset)
+				*offset = lastaction_index;
+
 			return bc->viewlist[0].buffer[bc->length - 1];
 		}
 	}

@@ -171,13 +171,13 @@ public:
 
 	HMENU CreateContextMenu();
 
-	int  GetLogicalX(int nScreenX, int *pane);
+	int  GetLogicalX(int nScreenX, int *pane, int *subitem = 0);
 	int  GetLogicalY(int nScreenY);
 	void PositionCaret(int x, int y, int pane);
 	int  LogToPhyXCoord(int x, int pane);
 	void CaretPosFromOffset(size_w offset, int *x, int *y);
 
-	size_w OffsetFromPhysCoord(int x, int y, int *pane = 0, int *lx = 0, int *ly = 0);
+	size_w OffsetFromPhysCoord(int x, int y, int *pane = 0, int *lx = 0, int *ly = 0, int *subitem = 0);
 	void   RepositionCaret();
 	VOID   ScrollToCaret();
 	BOOL   ScrollTo(size_w offset);
@@ -308,12 +308,12 @@ private:
 	int		m_nCaretY;
 	int		m_nWhichPane;
 	size_w  m_nAddressOffset;
-	//size_w  m_nDataStart;
 
-	//size_w  m_nVScrollOffsetPinned;	// offset 
-	int     m_nDataShift;			// range from -m_nBytesPerLine to +m_nBytesPerLine
+	int     m_nDataShift;			// range from 0 to (m_nBytesPerLine-1)
+	size_w  m_nLastEditOffset;
+	bool	m_fCursorMoved;
+	//bool	
 
-	//size_w  m_nFileLength;
 	size_w  m_nSelectionStart;
 	size_w  m_nSelectionEnd;
 
