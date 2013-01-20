@@ -19,6 +19,14 @@
 
 #include "ComboUtil.h"
 
+static WNDPROC  oldPreviewProc;
+static HFONT	g_hPreviewFont;
+
+static COLORREF g_crPreviewFG = 0;
+static COLORREF g_crPreviewBG = RGB(200,130,220);
+
+
+
 BOOL SetExplorerContextMenu(BOOL fAddToMenu);
 BOOL IsContextMenuInstalled();
 
@@ -37,12 +45,23 @@ typedef struct _GUIITEM {
 
 GUIITEM g_guiItem[] = 
 {
-	TEXT("HexView"),
-	TEXT("Consolas"), 
-	10,
+	{
+		TEXT("HexView"),
+		TEXT("Consolas"), 
+		10,
+		FALSE
+	},
+
+	{
+		TEXT("GridView"),
+		TEXT("MS Shell Dlg"),
+
+
+		},
+
 };
 
-HFONT EasyCreateFont(TCHAR *szName, int pointSize)
+HFONT EasyCreateFont(TCHAR *szName, int pointSize, BOOL bold)
 {
 	HDC hdc = GetDC(0);
 	HFONT hFont;
@@ -144,12 +163,6 @@ void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, TCHAR *szNam
 	SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }*/
 
-static WNDPROC  oldPreviewProc;
-static HFONT	g_hPreviewFont;
-
-static COLORREF g_crPreviewFG = 0;
-static COLORREF g_crPreviewBG = RGB(200,130,220);
-
 LRESULT CALLBACK PreviewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	RECT		rect;
@@ -185,6 +198,55 @@ LRESULT CALLBACK PreviewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	return CallWindowProc(oldPreviewProc, hwnd, msg, wParam, lParam);
 }
 
+void InitHexPreview(HWND hwndHV)
+{
+	char sample_data[] = "sample data. selected data";
+	char modify_data[] = "modified bytes";
+
+	HexView_InitBuf(hwndHV, sample_data, sizeof(sample_data));
+	HexView_SetEditMode(hwndHV, HVMODE_INSERT);
+	HexView_SetData(hwndHV, 13, (BYTE *)modify_data, sizeof(modify_data));
+
+	SendMessage(hwndHV, WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), 0);
+
+	SetWindowLong(hwndHV, GWL_EXSTYLE, WS_EX_CLIENTEDGE|WS_EX_CONTROLPARENT);
+
+	HexView_SetStyle(hwndHV, -1, HVS_DISABLE_UNDO);
+	//HexView_SetEditMode(hwndHV, HVMODE_READONLY);
+	HexView_SetLineLen(hwndHV, 8);
+
+	HexView_SetAddressOffset(hwndHV, 0x12345);
+
+	HexView_SetPadding(hwndHV, 2, 1);
+}
+
+void UpdateFontPreview(HWND hwnd)
+{
+	TCHAR szFont[LF_FACESIZE];
+	int   nSize;
+	HFONT hFont;
+
+	//idx = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
+	GetDlgItemText(hwnd, IDC_FONTLIST, szFont, sizeof(szFont));
+
+	//ComboBox_GetDlgSelData(
+	nSize = GetDlgItemInt(hwnd, IDC_FONTSIZE, 0, FALSE);
+
+	hFont = EasyCreateFont(szFont, nSize, FALSE);
+
+	if(hFont)
+	{
+		HWND hwndHV = GetDlgItem(hwnd, IDC_HEXVIEW_PREVIEW);
+		DeleteObject(g_hPreviewFont);
+
+		g_hPreviewFont = hFont;
+
+		SendMessage(hwndHV, WM_SETFONT, (WPARAM)hFont, 0);
+		InvalidateRect(hwndHV, 0, 0);
+	}
+	//HexView_SetFont
+	
+}
 
 INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -203,6 +265,8 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		SetComboItemHeight(GetDlgItem(hwnd, IDC_BGCOLCOMBO), 14);
 
 		InitSizeList(GetDlgItem(hwnd, IDC_SIZELIST), TEXT("Courier New"));
+
+		InitHexPreview(GetDlgItem(hwnd, IDC_HEXVIEW_PREVIEW));
 
 	//
 	//	Subclass the PREVIEW static control so we can custom-draw it
@@ -224,9 +288,10 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 	case WM_COMMAND:
 		
-		if(HIWORD(wParam) == LBN_SELCHANGE)
+		if(HIWORD(wParam) == LBN_SELCHANGE || HIWORD(wParam) == CBN_SELCHANGE)
 		{
 			int idx;
+			
 
 			switch(LOWORD(wParam))
 			{
@@ -235,9 +300,17 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				g_crPreviewFG = HexView_RealiseColour(g_colorItem[idx].fgColor);
 				g_crPreviewBG = HexView_RealiseColour(g_colorItem[idx].bgColor);
 				InvalidateRect(GetDlgItem(hwnd, IDC_PREVIEW), 0, 0);
+
+				break;
+
+			case IDC_SIZELIST:
+			case IDC_FONTLIST:
+				UpdateFontPreview(hwnd);
 				break;
 			}
 		}
+		
+
 
 		return 0;
 

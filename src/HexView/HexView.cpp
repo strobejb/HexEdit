@@ -71,8 +71,7 @@ LRESULT HexView::NotifyParent(UINT nNotifyCode, NMHDR *optional /* = 0*/)
 		*nmptr = nmhdr;
 	}
 
-	SendMessage(GetParent(m_hWnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)nmptr);
-	return 0;
+	return SendMessage(GetParent(m_hWnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)nmptr);
 }
 
 HexView::HexView(HWND hwnd)	:
@@ -594,9 +593,18 @@ VOID HexView::UpdateMetrics()
 	RepositionCaret();
 }
 
+bool HexView::AllowChange(size_w offset, size_w length, UINT method, BYTE *data /*=0*/, UINT mask /*=0*/)
+{
+	NMHVCHANGED nmchanging = { { 0,0,0 }, method, mask, offset, length, data };
+
+	UINT result = NotifyParent(HVN_CHANGING, (NMHDR *)&nmchanging);
+	
+	return (result == -1) ? false : true;
+}
+
 void HexView::ContentChanged(size_w offset, size_w length, UINT method)
 {
-	NMHVCHANGED nmchanged = { { 0,0,0 }, method, offset, length };
+	NMHVCHANGED nmchanged = { { 0,0,0 }, method, 0, offset, length, NULL };
 	UpdateMetrics();
 	ScrollToCaret();
 	NotifyParent(HVN_CHANGED, (NMHDR *)&nmchanged);

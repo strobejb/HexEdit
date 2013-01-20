@@ -178,6 +178,8 @@
 #define IDC_SYSLINK2                    1046
 #define IDC_ABOUT_TERMS                 1046
 #define IDC_STRING_TYPES                1047
+#define IDC_CUSTOM1                     1048
+#define IDC_HEXVIEW_PREVIEW             1048
 #define IDC_DATETIMEPICKER1             1049
 #define IDC_DATETIMEPICKER2             1050
 #define IDC_DATETIMEPICKER3             1051
@@ -398,7 +400,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        172
 #define _APS_NEXT_COMMAND_VALUE         40129
-#define _APS_NEXT_CONTROL_VALUE         1048
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

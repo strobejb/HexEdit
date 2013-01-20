@@ -164,6 +164,7 @@ ULONG HexView::FillData(BYTE *buf, ULONG buflen, size_w len)
 size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, bool fReplaceSelection, bool fSelectData, HexSnapShot *hss /*= 0*/)
 {
 	size_w offset = m_nCursorOffset;
+	bool fAllowChange = true;
 
 	if(m_nEditMode == HVMODE_READONLY)
 		return 0;
@@ -171,13 +172,16 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 	if(pSource == NULL && hss == NULL)
 		return 0;
 
+	if(m_fRedrawChanges)
+		fAllowChange = AllowChange(m_nCursorOffset, nLength, m_nEditMode == HVMODE_OVERWRITE ? HVMETHOD_OVERWRITE:HVMETHOD_INSERT, pSource);
+
 	if(m_nEditMode != HVMODE_INSERT)
 		fReplaceSelection = false;
 
 	if(fReplaceSelection && SelectionSize() == 0)
 		fReplaceSelection = false;
 
-	if(fReplaceSelection)
+	if(fReplaceSelection && fAllowChange)
 	{
 		// group this erase with the insert/replace operation
 		m_pDataSeq->group();
@@ -192,20 +196,26 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 	// are we entering a snapshot?
 	if(hss)
 	{
-		if(m_nEditMode == HVMODE_OVERWRITE)
-			m_pDataSeq->replace_snapshot(m_nCursorOffset, hss->m_length, hss->m_desclist, hss->m_count);
-		else
-			m_pDataSeq->insert_snapshot(m_nCursorOffset, hss->m_length, hss->m_desclist, hss->m_count);
+		if(fAllowChange)
+		{
+			if(m_nEditMode == HVMODE_OVERWRITE)
+				m_pDataSeq->replace_snapshot(m_nCursorOffset, hss->m_length, hss->m_desclist, hss->m_count);
+			else			
+				m_pDataSeq->insert_snapshot(m_nCursorOffset, hss->m_length, hss->m_desclist, hss->m_count);
+		}
 
 		nLength = hss->m_length;
 	}
 	// regular data entry
 	else
 	{
-		if(m_nEditMode == HVMODE_OVERWRITE)
-			m_pDataSeq->replace(m_nCursorOffset, pSource, nLength);
-		else
-			m_pDataSeq->insert(m_nCursorOffset, pSource, nLength);
+		if(fAllowChange)
+		{
+			if(m_nEditMode == HVMODE_OVERWRITE)
+				m_pDataSeq->replace(m_nCursorOffset, pSource, nLength);
+			else
+				m_pDataSeq->insert(m_nCursorOffset, pSource, nLength);
+		}
 	}
 
 	if(fSelectData)
@@ -223,7 +233,7 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 		m_nSelectionEnd   = m_nCursorOffset;
 	}
 
-	if(fReplaceSelection)
+	if(fReplaceSelection && fAllowChange)
 		m_pDataSeq->ungroup();
 
 	if(m_fRedrawChanges)

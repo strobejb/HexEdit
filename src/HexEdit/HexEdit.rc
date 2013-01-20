@@ -784,9 +784,10 @@ BEGIN
     PUSHBUTTON      "Custom...",IDC_BUTTON3,223,78,60,14
     CONTROL         "&Bold",IDC_BOLD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,98,41,10
     LTEXT           "Sample:",IDC_STATIC,7,115,41,8
-    LTEXT           "Static",IDC_PREVIEW,7,126,276,36,SS_NOTIFY
+    LTEXT           "Static",IDC_PREVIEW,7,126,276,36,SS_NOTIFY | NOT WS_VISIBLE
     CONTROL         "&Highlight Modified Bytes",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,164,88,10
     CONTROL         "Show Active Selection",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,175,82,10
+    CONTROL         "Custom1",IDC_HEXVIEW_PREVIEW,"HexView32",WS_TABSTOP,7,125,274,37
 END
 
 IDD_GOTO2 DIALOGEX 0, 0, 256, 122
@@ -1314,12 +1315,6 @@ IDB_SELARROW            PNG                     "media\\selarrow.png"
 IDB_SELBOX              PNG                     "media\\selbox.png"
 IDB_SELARROW2           PNG                     "media\\selarrow2.png"
 IDB_SELBOX2             PNG                     "media\\selbox2.png"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

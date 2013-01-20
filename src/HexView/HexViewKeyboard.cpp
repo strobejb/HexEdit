@@ -53,6 +53,9 @@ bool HexView::ForwardDelete()
 	size_w length;
 	bool success = false;
 
+	if(!AllowChange(m_nCursorOffset, max(SelectionSize(), 1), HVMETHOD_DELETE))
+		return false;
+
 	if(SelectionSize() > 0)
 	{
 		length  = SelectionSize();
@@ -87,6 +90,9 @@ bool HexView::BackDelete()
 		offset = SelectionStart();
 		length = SelectionSize();
 
+		if(!AllowChange(offset, length, HVMETHOD_DELETE))
+			return false;
+
 		success = m_pDataSeq->erase(offset, length);
 		m_nCursorOffset = offset;
 
@@ -96,6 +102,10 @@ bool HexView::BackDelete()
 	{
 		offset = --m_nCursorOffset;
 		length = 1;
+
+		if(!AllowChange(offset, length, HVMETHOD_DELETE))
+			return false;
+
 		success = m_pDataSeq->erase(offset, length);
 	}
 
@@ -501,12 +511,12 @@ LRESULT HexView::OnChar(UINT nChar)
 			val -= b % power;
 		}
 
+		b = (BYTE)val;
+
 		m_nSubItem++;
 
 		if(m_fCursorMoved)
 		{	
-			b = (BYTE)val;
-
 			// enter the data
 			EnterData(&b, 1, m_nWhichPane == 0 ? false : true, true, false);
 			
@@ -518,7 +528,7 @@ LRESULT HexView::OnChar(UINT nChar)
 			// directly edit the byte in the sequence - this
 			// prevents us from introducing any more spans than necessary
 			// and keeps this as a single 'byte' edit
-			m_pDataSeq->getlastmodref() = val;
+			m_pDataSeq->getlastmodref() = b;
 			ContentChanged(m_nCursorOffset, 1, HVMETHOD_OVERWRITE);
 
 			if(m_nSubItem == cl[cf])
@@ -535,6 +545,9 @@ LRESULT HexView::OnChar(UINT nChar)
 	else
 	{
 		BYTE b = nChar;
+
+		//if(!AllowChange(m_nCursorOffset, 1, HVMETHOD_OVERWRITE, &b))
+			//return 0;
 
 		// ascii column - enter the data as-is
 		m_nSubItem = 0;

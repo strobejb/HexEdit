@@ -256,6 +256,7 @@ public:
 	bool ForwardDelete();
 	bool BackDelete();
 
+	bool AllowChange(size_w offset, size_w length, UINT method, BYTE *data = 0, UINT mask = 0);
 	void ContentChanged(size_w offset, size_w length, UINT method);
 	//size_w nStartOffset, size_w nLength
 

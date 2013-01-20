@@ -21,7 +21,6 @@
 //	HISTORY:	v1.0 16/04/2002 J Brown		- Initial version
 //
 
-#define STRICT
 #define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS
 

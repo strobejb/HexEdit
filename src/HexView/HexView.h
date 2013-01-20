@@ -140,6 +140,8 @@ typedef void * HBOOKMARK;
 #define HVS_FORCE_FIXEDCOLS 0x80		// force whole-sized hex columns
 #define HVS_FIXED_EDITMODE  0x0100		// prevent user from using INSERT to change edit mode
 #define HVS_DISABLE_UNDO	0x0200		// prevent undo/redo functionality
+#define HVS_SUBPOSITIONING  0x0200      // use keyboard & mouse to allow inter-byte (bit/nibble) editing & positioning
+
 #define HVS_ALWAYSDELETE	0x4000		// backspace/delete work even in OVR mode
 #define HVS_HEX_INVISIBLE   0x8000		// hide the hex display
 #define HVS_UPPERCASEHEX	0x000000	// hex characters (A-F) are upper-case (default)
@@ -338,24 +340,31 @@ typedef void * HBOOKMARK;
 #define HVN_PROGRESS			(HVN_BASE + 5)  // NMHVPROGRESS
 #define HVN_BOOKCLOSE			(HVN_BASE + 6)  // a bookmark has been closed
 #define HVN_CONTEXTMENU			(HVN_BASE + 7)  // the context menu is being displayed
+#define HVN_CHANGING            (HVN_BASE + 8)  // the file content is about to change (return TRUE to prevent edits)
 
 /**
  * NMHVCHANGED
  *
- * Sent via the WM_NOTIFY message (with HVN_CHANGE)
+ * Sent via the WM_NOTIFY message (with HVN_CHANGE and HVN_CHANGING)
  * Indicates that a range of bytes has changed due to 
- * an action by the user - e
+ * an action by the user
+ *
+ * HVN_CHANGING - return TRUE to prevent the edit from occuring
+ * HVN_CHANGED  - sent AFTER the edit has occured
 */
 typedef struct _NMHVCHANGED
 {
-#define HVMETHOD_OVERWRITE 1
-#define HVMETHOD_INSERT    2
+#define HVMETHOD_INSERT    1
+#define HVMETHOD_OVERWRITE 2
 #define HVMETHOD_DELETE    3
 
 	NMHDR	hdr;
 	UINT	method;		// how the data changed - one of the HVMETHOD_xxx values
+	UINT    bitmask;    // bitmask that indicates which bit(s) have changed
+
 	size_w  offset;     // starting offset of where data changed
 	size_w  length;     // number of bytes that were affected
+	BYTE *  data;		// optional pointer to data that is being inserted
 
 } NMHVCHANGED;
 
