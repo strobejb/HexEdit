@@ -111,7 +111,10 @@ char *hexdata(char *ach, UINT64 *data, int *count)
 	*data  = 0;
 	*count = 0;
 
-	ach = skipspace(ach);
+	if(!isxdigit(*ach))
+		return 0;
+
+	//ach = skipspace(ach);
 
 	while(isxdigit(*ach))
 	{
@@ -120,7 +123,12 @@ char *hexdata(char *ach, UINT64 *data, int *count)
 		ach++;
 	}
 
-	return (*ach == 0 || isspace(*ach)) ? ach : NULL;
+	// allow one space or a '-' following this
+	if(isspace(*ach) || *ach == '-')
+		ach++;
+
+	//return (*ach == 0 || isspace(*ach) || *ach == '-') ? ach : NULL;
+	return ach;//(*ach == 0 || isxdigit(*ach)) ? ach : NULL;
 }
 
 BOOL JumpAndPad(HWND hwndHexView, size_w addr)
@@ -169,14 +177,21 @@ size_w ImportText(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IMPE
 		// get the address/offset
 		if((ptr = hexdata(ptr, &addr, &count)) == 0)
 		{
-			SetLastError(ERROR_INVALID_DATA);
-			return FALSE;
+			if(total > 0)
+			{
+				SetLastError(ERROR_INVALID_DATA);
+			}
+
+			break;
 		}
 
 		if(ieopt->fUseAddress)
 		{
 			JumpAndPad(hwndHexView, addr);
 		}
+
+		// skip whitespace
+		ptr = skipspace(ptr);
 	
 		// get any hex data
 		while(ptr && *ptr)
