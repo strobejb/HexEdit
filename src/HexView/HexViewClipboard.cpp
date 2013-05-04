@@ -224,7 +224,7 @@ size_w HexView::EnterData(BYTE *pSource, size_w nLength, bool fAdvanceCaret, boo
 		m_nCursorOffset  += nLength;
 		m_nSelectionEnd   = m_nCursorOffset;
 	}
-	else
+	else if(fAllowChange)
 	{
 		if(fAdvanceCaret)
 			m_nCursorOffset  += nLength;

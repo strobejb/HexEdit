@@ -580,13 +580,13 @@ LONG_PTR HexViewNotifyHandler(MAINWND *mainWnd, HWND hwnd, NMHDR *hdr)
 
 	switch(hdr->code)
 	{
-	case HVN_CHANGING:
+	/*case HVN_CHANGING:
 		hvc = (NMHVCHANGED *)hdr;
 		if(hvc->data)
 			hexData[hvc->offset] = hvc->data[0];
 
 		return -1;
-
+		*/
 	case HVN_CHANGED:
 
 		hvc = (NMHVCHANGED *)hdr;
