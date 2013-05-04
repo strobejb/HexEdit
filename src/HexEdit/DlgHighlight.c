@@ -343,7 +343,11 @@ BOOL GetBookmarkFileName(HWND hwndHexView, LPCTSTR szFileName, TCHAR *szBookPath
 
 		bookid = GetTickCount();//(UINT64)bhfi.nFileIndexLow | ((UINT64)bhfi.nFileIndexHigh << 32);
 
-		SaveFileData(szFileName, TEXT("HexEdit.bookmark"), &bookid, sizeof(UINT64));
+		// only save if the file exists
+		if(GetFileAttributes(szFileName) != INVALID_HANDLE_VALUE)
+		{
+			SaveFileData(szFileName, TEXT("HexEdit.bookmark"), &bookid, sizeof(UINT64));
+		}
 	}
 
 	if((pszName = _tcsrchr(szFileName, '\\')) == 0)
@@ -445,7 +449,12 @@ BOOL SaveHighlights(HWND hwndHexView)
 	filedata  = CreateConfigSection(config, TEXT("hexFileData"));
 
 	HexView_GetFileName(hwndHexView, szFilePath, MAX_PATH);
-	SetConfigStr(filedata, TEXT("filePath"), szFilePath);
+
+	// only save if the file exists
+	if(GetFileAttributes(szFilePath) != INVALID_FILE_ATTRIBUTES)
+	{
+		SetConfigStr(filedata, TEXT("filePath"), szFilePath);
+	}
 
 	bookmarks = CreateConfigSection(filedata, TEXT("bookmarks"));
 
