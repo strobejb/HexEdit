@@ -575,6 +575,11 @@ size_w ImportBase64(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 			//only break if
 			//break;
 		}
+
+		// skip the --BEGIN at the top
+		// just check for a '-' because that's not a base64 character anyway
+		if(ach[0] == '-' || isspace(ach[0])) 
+			continue;
 		
 		if((len = base64_decode(ach, alen - rem, buf)) != 0)
 		{
