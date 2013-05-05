@@ -393,13 +393,15 @@
 #define ID_VIEW_TOOLBAR40125            40125
 #define IDM_VIEW_TOOLBAR                40126
 #define ID_ACCELERATOR40128             40128
+#define ID_VIEW_FITTOWINDOW             40129
+#define IDM_VIEW_FITTOWINDOW            40130
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        172
-#define _APS_NEXT_COMMAND_VALUE         40129
+#define _APS_NEXT_COMMAND_VALUE         40131
 #define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

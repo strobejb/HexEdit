@@ -21,6 +21,7 @@ HFONT g_hHexViewFont = 0;
 
 TCHAR g_szHexViewFontName[100];
 BOOL  g_fFirstTimeExecution = TRUE;
+BOOL  g_fFitToWindow = FALSE;
 
 void FirstTimeOptions(HWND hwndMain)
 {

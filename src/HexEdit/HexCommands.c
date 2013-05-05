@@ -262,6 +262,10 @@ LONG HexEdit_OnCommand(HWND hwnd, UINT nCommandId, UINT nNotify, HWND hwndContro
 		DockWnd_Show(hwnd, DWID_TOOLBAR, !DockWnd_IsOpen(hwnd, DWID_TOOLBAR));
 		return 0;
 
+	case IDM_VIEW_FITTOWINDOW:
+		g_fFitToWindow = !g_fFitToWindow;
+		return 0;
+
 	case IDM_TOOLS_SEARCHBAR:
 		DockWnd_Show(hwnd, DWID_SEARCHBAR, !DockWnd_IsOpen(hwnd, DWID_SEARCHBAR));
 		return 0;

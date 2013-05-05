@@ -123,6 +123,8 @@ extern BOOL g_fDisplayBigEndian;
 
 extern HFONT g_hHexViewFont;
 
+#define HEXVIEW_DEFAULT_STYLE (HVS_RESIZEBAR|HVS_ALWAYSVSCROLL|HVS_SHOWMODS|HVS_FORCE_FIXEDCOLS)
+
 TCHAR		g_szFileName[MAX_PATH];
 TCHAR		g_szAppName[] = APPNAME;
 TCHAR		g_szFileTitle[MAX_PATH];
@@ -952,13 +954,14 @@ HWND CreateHexViewCtrl(HWND hwndParent)
 {
 	HWND hwndHV = CreateHexView(hwndParent);
 
-	HMENU   hMenu = LoadMenu(GetModuleHandle(0), MAKEINTRESOURCE(IDR_HEXCONTEXT));
+	HMENU hMenu   = LoadMenu(GetModuleHandle(0), MAKEINTRESOURCE(IDR_HEXCONTEXT));
+	DWORD dwStyle = HEXVIEW_DEFAULT_STYLE;// | HVS_FITTOWINDOW;
 
 	// set the right-click context menu
 	HexView_SetContextMenu(hwndHV, GetSubMenu(hMenu, 0));
 
-	// set the default styles
-	HexView_SetStyle(hwndHV, -1, HVS_RESIZEBAR|HVS_ALWAYSVSCROLL|HVS_SHOWMODS|HVS_FORCE_FIXEDCOLS|HVS_FITTOWINDOW);//|HVS_ASCII_INVISIBLE);//|HVS_FITTOWINDOW);//|HVS_ASCII_INVISIBLE );
+	// set the default styles	
+	HexView_SetStyle(hwndHV, -1, dwStyle);//|HVS_ASCII_INVISIBLE);//|HVS_FITTOWINDOW);//|HVS_ASCII_INVISIBLE );
 	HexView_SetDataShift(hwndHV, 0);
 
 
@@ -1148,9 +1151,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_INITMENUPOPUP:
 		hMenu = (HMENU)wParam;//GetMenu(hwnd);
 		
-		MenuCheckMark(hMenu, IDM_VIEW_TOOLBAR, DockWnd_IsOpen(hwnd, DWID_TOOLBAR));
-		MenuCheckMark(hMenu, IDM_TOOLS_TYPEVIEW, DockWnd_IsOpen(hwnd, DWID_TYPEVIEW));
-		MenuCheckMark(hMenu, IDM_TOOLS_SEARCHBAR, DockWnd_IsOpen(hwnd, DWID_SEARCHBAR));
+		MenuCheckMark(hMenu, IDM_VIEW_FITTOWINDOW,  g_fFitToWindow);
+		MenuCheckMark(hMenu, IDM_VIEW_TOOLBAR,		DockWnd_IsOpen(hwnd, DWID_TOOLBAR));
+		MenuCheckMark(hMenu, IDM_TOOLS_TYPEVIEW,	DockWnd_IsOpen(hwnd, DWID_TYPEVIEW));
+		MenuCheckMark(hMenu, IDM_TOOLS_SEARCHBAR,	DockWnd_IsOpen(hwnd, DWID_SEARCHBAR));
 
 		CheckMenuRadioItem(hMenu, IDM_VIEW_HEX, IDM_VIEW_BIN, 
 			IDM_VIEW_HEX + (HexView_GetStyle(hwndHV) & HVS_FORMAT_MASK),

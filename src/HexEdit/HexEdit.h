@@ -26,7 +26,7 @@ extern HWND		 g_hwndStatusBar;
 extern BOOL			g_fStatusHexCursor	;
 extern BOOL			g_fStatusHexSize	;
 extern int			g_nStatusValueType  ;
-
+extern BOOL			g_fFitToWindow ;
 
 #define WEBSITE_STR _T("www.catch22.net")
 #define WEBSITE_URL _T("http://") WEBSITE_STR
