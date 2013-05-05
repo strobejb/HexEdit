@@ -326,17 +326,22 @@ bool sequence::save(const TCHAR * filename /* = 0*/)
 		if(quicksave == false)
 			CloseHandle(hFile);
 
-		// clear the sequence
+		// remember the file we have open, because we need to re-open it
+		TCHAR origfile[MAX_PATH];
+		_tcscpy_s(origfile, MAX_PATH, origfile_name);
+
+		// clear the sequence. This *should* free all buffers
+		// and close all open file handles
 		clear();
 
 		// if we had to create a temporary, then move it back over the original
 		if(newname[0])// == '\0')
-			MoveFileEx(newname, origfile_name, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
+			MoveFileEx(newname, origfile, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
 			
 		// reinitialize with the new file
 		if(filename == 0)
 		{
-			_tcscpy_s(newname, MAX_PATH, origfile_name);
+			_tcscpy_s(newname, MAX_PATH, origfile);
 			filename = newname;
 		}
 			

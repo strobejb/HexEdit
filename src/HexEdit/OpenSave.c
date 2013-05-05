@@ -680,6 +680,10 @@ BOOL HexSaveCurrent(HWND hwndMain)
 	// 
 	if(HexView_SaveFile(hwndHV, 0, NULL))
 	{
+		TCHAR szFile[MAX_PATH];
+		HexView_GetFileName(hwndHV, szFile, MAX_PATH);
+		UpdateCurFileName(hwndMain, hwndHV, szFile, FALSE);
+		
 		return TRUE;
 	}
 
