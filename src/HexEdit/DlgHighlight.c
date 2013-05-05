@@ -344,7 +344,7 @@ BOOL GetBookmarkFileName(HWND hwndHexView, LPCTSTR szFileName, TCHAR *szBookPath
 		bookid = GetTickCount();//(UINT64)bhfi.nFileIndexLow | ((UINT64)bhfi.nFileIndexHigh << 32);
 
 		// only save if the file exists
-		if(GetFileAttributes(szFileName) != INVALID_HANDLE_VALUE)
+		if(GetFileAttributes(szFileName) != INVALID_FILE_ATTRIBUTES)
 		{
 			SaveFileData(szFileName, TEXT("HexEdit.bookmark"), &bookid, sizeof(UINT64));
 		}

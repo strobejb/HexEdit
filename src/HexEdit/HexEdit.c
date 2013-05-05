@@ -1395,8 +1395,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShowC
 	//ShowOwnedPopups(g_hwndMain, TRUE);
 	DockWnd_ShowDeferredPopups(g_hwndMain);
 
-	
+#ifdef _DEBUG
 	HexView_InitBufShared(g_hwndHexView, hexData, sizeof(hexData));
+#endif
 
 
 	//

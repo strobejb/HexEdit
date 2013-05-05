@@ -597,7 +597,7 @@ bool HexView::AllowChange(size_w offset, size_w length, UINT method, BYTE *data 
 {
 	NMHVCHANGED nmchanging = { { 0,0,0 }, method, mask, offset, length, data };
 
-	UINT result = NotifyParent(HVN_CHANGING, (NMHDR *)&nmchanging);
+	UINT result = (UINT)NotifyParent(HVN_CHANGING, (NMHDR *)&nmchanging);
 	
 	return (result == -1) ? false : true;
 }
@@ -1048,7 +1048,7 @@ LRESULT HexView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return m_nTotalWidth+1;
 
 	case HVM_SETLINELEN:
-		return SetLineLen(wParam);
+		return SetLineLen((UINT)wParam);
 
 	case HVM_FINDINIT:
 		return FindInit((BYTE *)lParam, wParam, FALSE, FALSE);
