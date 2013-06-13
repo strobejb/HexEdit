@@ -250,6 +250,33 @@ bool Parser::lex_initbuf(const char *buffer, size_t len)
 	return true;
 }
 
+bool Parser::file_included(const char *filename)
+{
+	char fullpath[_MAX_PATH];
+
+	// get the full path to the specified file.
+	if(getfullname(curFile->filePath, filename, fullpath, _MAX_PATH) == false)
+	{
+		if(!parent) parent = this;
+		parent->Error(ERROR_NOSUCHFILE, filename);
+		return false;
+	}
+
+	// has it been included already?
+	for(size_t i = 0; i < globalFileHistory.size(); i++)
+	{
+		FILE_DESC *fd = globalFileHistory[i];
+
+		if(_strcmpi(fd->filePath, fullpath) == 0)
+		{
+			// do nothing!
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool Parser::lex_init(const char *filename)
 {
 	bool   preprocess = true;//false;
@@ -277,17 +304,8 @@ bool Parser::lex_init(const char *filename)
 	if((curFile = new FILE_DESC(fullpath, filename)) == 0)
 		return false;
 	
-	size_t s = globalFileHistory.size();
-
-	for(size_t i = 0; i < s; i++)
-	{
-		FILE_DESC *fd = globalFileHistory[i];
-
-	}
 	globalFileHistory.push_back(curFile);
 
-	s = globalFileHistory.size();
-	FILE_DESC *fd = globalFileHistory[0];
 
 	// read the file into FILE_DESC::buf
 	while(!feof(fp))

@@ -1036,9 +1036,6 @@ void InitTypeLibrary()
 		lstrcat(szPath, TEXT("\\typelib"));
 	}
 
-	lstrcat(szPath, TEXT("\\pe.txt"));
-
-
 	size_t s = globalFileHistory.size();
 	globalFileHistory.clear();
 	globalIdentifierList.clear();
@@ -1049,13 +1046,25 @@ void InitTypeLibrary()
 	//lstrcat(szPath, TEXT("\\typelib\\zip.txt"));
 	//lstrcat(szPath, TEXT("\\test.txt"));
 
+	WIN32_FIND_DATA w32fd;
+	lstrcat(szPath, L"\\*.*");
+	HANDLE hFind = FindFirstFile(szPath, &w32fd);
 
-	sprintf(path, "%ls", szPath);
-	Parser::Initialize();
-//	Init(
-	Parse(path);
-//	Parse("zip.t
+	if(hFind)
+	{
+		TCHAR *ptr = _tcsrchr(szPath, '\\'); *ptr = '\0';
+		do 
+		{
+			if((w32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			{
+				sprintf(path, "%ls\\%ls", szPath, w32fd.cFileName);
+				Parser::Initialize();
 
+				Parse(path);
+			}
+		} 
+		while(FindNextFile(hFind, &w32fd));
+	}
 }
 
 extern "C" void Initialize()

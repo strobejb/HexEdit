@@ -180,16 +180,18 @@ Statement * Parser::ParseInclude()
 	if(t == ';')
 	{
 		// initialize the lexical-analyser with this new file
-		//if(!lex_init(fileName))
-		//	return 0;
-		Parser p(this);
-		p.SetErrorStream(fperr);
-		if(!p.Ooof(fileName))
+		if(file_included(fileName) == false)
 		{
-			errcount += p.errcount;
-			lasterr   =  p.lasterr;
-			strcpy(errstr, p.errstr);
-			return 0;
+			Parser p(this);
+			p.SetErrorStream(fperr);
+		
+			if(!p.Ooof(fileName))
+			{
+				errcount += p.errcount;
+				lasterr   =  p.lasterr;
+				strcpy(errstr, p.errstr);
+				return 0;
+			}
 		}
 
 		Expected(';');

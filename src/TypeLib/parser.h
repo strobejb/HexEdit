@@ -98,6 +98,7 @@ private:
 	void newline();
 	bool lex_initbuf(const char *buffer, size_t len);
 	bool lex_init(const char *filename);
+	bool file_included(const char *filename);
 	void lex_cleanup();
 	void lex_fileref(FILEREF *fileRef);
 	TOKEN gettok();

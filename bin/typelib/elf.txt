@@ -9,6 +9,21 @@
 
 // http://www.ouah.org/RevEng/x430.htm
 
+include "basetypes.txt";
+
+typedef uint32   Elf32_Addr;
+typedef uint16   Elf32_Half;
+typedef uint32   Elf32_Off;
+typedef int32    Elf32_Sword;
+typedef uint32   Elf32_Word;
+ 
+/* 64-bit ELF base types. */
+typedef uint64   Elf64_Addr;
+typedef uint16   Elf64_Half;
+typedef int16    Elf64_SHalf;
+typedef uint64   Elf64_Off;
+typedef int64    Elf64_Sword;
+typedef uint64   Elf64_Word;
 
 /* ELF File Header */
 typedef struct
