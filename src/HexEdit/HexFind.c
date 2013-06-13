@@ -713,7 +713,7 @@ BOOL IsHexString(char *str, int len)
 	int i;
 	for(i = 0; i < len; i++)
 	{
-		if(!(isxdigit(str[i]) || isspace(str[i])))
+		if(!(isxdigit(str[i]) || str[i] == ' '))
 			return FALSE;
 	}
 
