@@ -471,6 +471,10 @@ BOOL ExportIntelHex(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 
 	char	ach[300];
 	size_t  alen;
+	size_t  count = 0;
+
+	if(eopt->fUseAddress == FALSE)
+		offset = 0;
 
 	if(offset > 0xffffffff)
 		return FALSE;
@@ -479,7 +483,7 @@ BOOL ExportIntelHex(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 	{
 		// extended linear address record (hex386, type=4)
 		// contains the upper 16bits of the address
-		WORD highaddr = (WORD)((offset >> 16) & 0xFFFF);
+		WORD highaddr = reverse16((WORD)(offset >> 16) & 0xFFFF);
 		alen = intel_frame(ach, 4, sizeof(WORD), 0, (BYTE *)&highaddr);
 		fprintf(fp, "%.*s\n", alen, ach);
 	}
@@ -487,7 +491,7 @@ BOOL ExportIntelHex(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 	{
 		// extended segment address record (hex86, type=2)
 		// contains the upper 4bits of the address (=20bit address)
-		WORD highaddr = (WORD)((offset >> 16) & 0x0FFF);
+		WORD highaddr = reverse16((WORD)(offset >> 16) & 0x0FFF);
 		alen = intel_frame(ach, 2, sizeof(WORD), 0, (BYTE *)&highaddr);
 		fprintf(fp, "%.*s\n", alen, ach);
 	}
@@ -498,8 +502,19 @@ BOOL ExportIntelHex(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 
 	while(length > 0 && !ferror(fp))
 	{
-		BYTE   buf[256];
+		BYTE   buf[MAX_SRECORD_LEN];
 		size_t len = (size_t)min(length, MAX_SRECORD_LEN);
+
+		if(count > 0xFFFF)
+		{
+			// write a new address record every 65536 bytes (hex386, type=4)
+			// contains the upper 16bits of the address
+			WORD highaddr = reverse16((WORD)(offset >> 16) & 0xFFFF);
+			alen = intel_frame(ach, 4, sizeof(WORD), 0, (BYTE *)&highaddr);
+			
+			fprintf(fp, "%.*s\n", alen, ach);
+			count = 0;
+		}
 
 		HexView_GetDataAdv(hwndHexView, buf, len);
 
@@ -509,6 +524,7 @@ BOOL ExportIntelHex(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IM
 
 		length -= len;
 		offset += len;
+		count  += len;
 	}
 
 	// end-of-file record (type=1)
@@ -612,6 +628,12 @@ BOOL Export(TCHAR *szFileName, HWND hwndHexView, IMPEXP_OPTIONS *eopt)
 	
 	HexView_GetSelStart(hwndHexView, &offset);
 	HexView_GetSelSize(hwndHexView, &length);
+
+	if(length == 0)
+	{
+		offset = 0;
+		HexView_GetFileSize(hwndHexView, &length);
+	}
 	
 	eopt->linelen  = HexView_GetLineLen(hwndHexView);
 
