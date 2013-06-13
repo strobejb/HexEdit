@@ -11,6 +11,7 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <stdio.h>
 #include <commctrl.h>
 #include "resource.h"
 #include "trace.h"
@@ -494,14 +495,18 @@ BOOL UpdateSearchData(HWND hwndSource, SEARCHTYPE searchType, BOOL fBigEndian, B
 	return fSuccess;
 }
 
+int GetSearchType(HWND hwndCombo)
+{
+	int idx	= (int)SendMessage(hwndCombo, CB_GETCURSEL, 0, 0);
+	return    (int)SendMessage(hwndCombo, CB_GETITEMDATA, idx, 0);
+}
+
 BOOL UpdateSearchDataDlg(HWND hwndDlg, int sourceId, BOOL fBigEndian, BYTE *searchData, int *searchLen)
 {
-	int idx;
 	int searchType;
 
 	// get the searchType from the datatype dropdown
-	idx			= (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_DATATYPE, CB_GETCURSEL, 0, 0);
-	searchType	= (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_DATATYPE, CB_GETITEMDATA, idx, 0);
+	searchType = GetSearchType(GetDlgItem(hwndDlg, IDC_COMBO_DATATYPE));
 
 	if(UpdateSearchData(GetDlgItem(hwndDlg, sourceId), searchType, fBigEndian, searchData, searchLen))
 	{
@@ -653,16 +658,11 @@ BOOL Find(HWND hwnd, HWND hwndHV)
 
 void Replace(HWND hwndDlg, HWND hwndHV)
 {
-	//BYTE replaceData[100];
-	//int  replaceLen = sizeof(replaceData);
-
-	int idx;
 	int searchType;
 	size_w selsize;
 
 	// get the searchType from the datatype dropdown
-	idx = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_DATATYPE, CB_GETCURSEL, 0, 0);
-	searchType = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_DATATYPE, CB_GETITEMDATA, idx, 0);
+	searchType = GetSearchType(GetDlgItem(hwndDlg, IDC_COMBO_DATATYPE));
 
 	replaceLen = sizeof(replaceData);
 	UpdateSearchData(GetDlgItem(hwndDlg, IDC_COMBO2), searchType, g_fBigEndian, replaceData, &replaceLen);
@@ -679,6 +679,92 @@ void Replace(HWND hwndDlg, HWND hwndHV)
 	}
 }
 
+static DWORD GetClipboardDataBuf(UINT uFormat, PVOID pData, DWORD nLength)
+{
+	HANDLE	hMem;
+	PVOID	ptr;
+
+	if((hMem = GetClipboardData(uFormat)) == 0)
+		return FALSE;
+
+	if((ptr = GlobalLock(hMem)) == 0)
+		return FALSE;
+
+	nLength = (DWORD)min(nLength, GlobalSize(hMem));
+
+	memcpy(pData, ptr, nLength);
+
+	GlobalUnlock(hMem);
+	return nLength;
+}
+
+static int BinToHex(BYTE *buf, int len, char *text)
+{
+	int i;
+	for(i = 0; i < len; i++)
+	{
+		text += wsprintfA(text, "%02X ", buf[i]);
+	}
+	return i*3;
+}
+
+BOOL IsHexString(char *str, int len)
+{
+	int i;
+	for(i = 0; i < len; i++)
+	{
+		if(!(isxdigit(str[i]) || isspace(str[i])))
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+static INT_PTR CALLBACK EditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	WNDPROC oldProc = (WNDPROC)GetProp(hwnd, TEXT("oldProc"));
+	DWORD len;
+	char  buf[64];
+
+	switch(msg)
+	{
+	case WM_PASTE:
+		OpenClipboard(hwnd);
+
+		if((len = GetClipboardDataBuf(CF_TEXT, buf, sizeof(buf))) > 1)
+		{
+			HWND hwndCombo = GetParent(hwnd);
+			HWND hwndDlg   = GetParent(hwndCombo);
+
+			int searchType = GetSearchType(GetDlgItem(hwndDlg, IDC_COMBO_DATATYPE));
+
+			if(searchType != SEARCHTYPE_HEX || IsHexString(buf, len-1))
+			{
+				SetWindowTextA(hwnd, buf);
+			}
+			else
+			{
+				char buf2[256];
+				BinToHex((BYTE *)buf, len-1, buf2);
+				SetWindowTextA(hwnd, buf2);				
+			}
+
+			SendMessage(hwndCombo, CB_SETEDITSEL, 0, MAKELONG(0,-1));//-1, -1);
+			SendMessage(hwndDlg, WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(hwndCombo), CBN_EDITUPDATE), (LPARAM)hwndCombo);
+		}
+
+		CloseClipboard();
+		return 0;
+	}
+
+	return CallWindowProc(oldProc, hwnd, msg, wParam, lParam);
+}
+
+void HookEdit(HWND hwndEdit)
+{
+	WNDPROC oldProc = (WNDPROC)SetWindowLongPtr(hwndEdit, GWLP_WNDPROC, (LONG_PTR)EditProc);
+	SetProp(hwndEdit, TEXT("oldProc"), (WNDPROC)oldProc);
+}
 
 INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -705,6 +791,13 @@ INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		EnableDialogTheme(hwnd);
 
 		UpdateFindGui(hwnd, sps);
+
+		// hex or replace dialogs
+		if(sps->uDialogId == IDD_FINDHEX+0 || sps->uDialogId == IDD_FINDHEX+3)
+		{
+			HookEdit(GetWindow(GetDlgItem(hwnd, IDC_COMBO1), GW_CHILD));
+			HookEdit(GetWindow(GetDlgItem(hwnd, IDC_COMBO2), GW_CHILD));
+		}
 
 		hwndPin = CreatePinToolbar(hwnd, IDC_KEEPVISIBLE, FALSE);//TRUE);
 
@@ -920,6 +1013,26 @@ HWND GetCurFindTab(HWND hwndFindDlg)
 	return g_hwndFindPane[i];
 }
 
+void SetFindTabData(HWND hwndFindDlg, int idx, BYTE *buf, int len)
+{
+	HWND hwndPanel = g_hwndFindPane[idx];
+	HWND hwndCtrl = GetDlgItem(hwndPanel, IDC_COMBO1);
+	char buf2[256];
+
+	if(len == 0) return;
+
+	if(idx == 0)
+	{
+		BinToHex(buf, len, buf2);
+	}
+	else
+	{
+		sprintf_s(buf2, sizeof(buf2), "%.*s", len, buf);
+	}
+
+	SetWindowTextA(hwndCtrl, buf2);
+}
+
 void SetFindTab(HWND hwndFindDlg, int idx, BOOL fMouseActivated)
 {
 	int i;
@@ -1079,29 +1192,35 @@ INT_PTR CALLBACK SearchDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 BOOL ShowFindDialog(HWND hwndMain, int nCurrentFindTab)
 {
+	BYTE initial[64];
+	size_w sellen = 0;
+	size_w offset;
+
+	if(HexView_GetSelSize(g_hwndHexView, &sellen))
+	{
+		sellen = min(64, sellen);
+		HexView_GetSelStart(g_hwndHexView, &offset);
+		HexView_GetData(g_hwndHexView, offset, initial, (ULONG)sellen);
+	}
+
 	if(nCurrentFindTab == -1)
 	{
-		nCurrentFindTab = HexView_GetCurPane(g_hwndHexView);// == 0 ? 0 : 1;
+		nCurrentFindTab = HexView_GetCurPane(g_hwndHexView);
 	}
 	else if(nCurrentFindTab == -2 && g_hwndSearch)
 	{
-		nCurrentFindTab = TabCtrl_GetCurSel(GetDlgItem(g_hwndSearch, IDC_TAB1));//GetCurFindTab(g_hwndSearch);
+		nCurrentFindTab = TabCtrl_GetCurSel(GetDlgItem(g_hwndSearch, IDC_TAB1));
 	}
 
 	if(g_hwndSearch == 0)
 	{
 		g_hwndSearch = CreateDialog(GetModuleHandle(0), MAKEINTRESOURCE(IDD_SEARCH), hwndMain, SearchDlg);
-		//CenterWindow(g_hwndSearch);
 	
+		SetFindTabData(g_hwndSearch, nCurrentFindTab, initial, (int)sellen);
 		ShowWindow(g_hwndSearch, SW_SHOW);
-	
-		//PostMessage(g_hwndSearch, [nCurrentFindTab], WM_NEXTDLGCTL, IDC_COMBO1, TRUE);
 	}
 
 	SetFindTab(g_hwndSearch, nCurrentFindTab, FALSE);
-	//SetForegroundWindow(g_hwndFindPane[nCurrentFindTab]);
-	//SetFocus(GetDlgItem(g_hwndFindPane[nCurrentFindTab], IDC_COMBO1));
-	//PostMessage(g_hwndFindPane[nCurrentFindTab], WM_NEXTDLGCTL, IDC_COMBO1, TRUE);
 
 	return TRUE;
 }
