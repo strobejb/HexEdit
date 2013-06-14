@@ -71,6 +71,7 @@ typedef vector<TypeDecl *> TypeDeclList;
 Symbol *InstallSymbol(SymbolTable &table, char *name);
 Symbol *LookupSymbol(SymbolTable &table, char *name);
 
+TypeDecl *LookupTypeDecl(char *name);
 Type *BreakLink(Type *type, Type *term);
 
 template <typename t>

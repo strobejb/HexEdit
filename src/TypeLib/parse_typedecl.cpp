@@ -57,6 +57,24 @@ Symbol *LookupSymbol(SymbolTable &table, char *name)
 	return sym;
 }
 
+TypeDecl *LookupTypeDecl(char *name)
+{
+	TypeDeclList &table = globalTypeDeclList;
+	TypeDecl *decl = 0;
+
+	for(size_t i = 0; i < table.size(); i++)
+	{
+		TypeDecl *t = table[i];
+		if(strcmp(t->baseType->sym->name, name) == 0)
+		{
+			decl = table[i];
+			break;
+		}
+	}
+
+	return decl;
+}
+
 void InstallTypeAliases()
 {
 	MakeTypeDef(typeTIMET,		"time_t", typeDWORD);

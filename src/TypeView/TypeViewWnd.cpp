@@ -43,6 +43,8 @@ extern "C" void Initialize();
 extern vector <TypeDecl *> globalTypeDeclList;
 size_w FmtData(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOffset, TypeDecl *typeDecl);
 size_w InsertTypeGV(HWND hwndGridView, HGRIDITEM hRoot, TypeDecl *typeDecl, size_w dwOffset);
+size_w InsertStructType(HWND hwndGV, HGRIDITEM hRoot, size_w dwOffset, Type *ty);
+
 bool Evaluate(HGRIDITEM hParent, ExprNode *expr, INUMTYPE *result, DWORD baseOffset, HWND hwndHV, HWND hwndGV);
 extern bool fShowFullType;
 size_w SizeOf(Type *type, size_w offset, HWND hwndHV);
@@ -65,7 +67,7 @@ HWND PrepGridView(HWND hwndGridView, int widthArray[], TCHAR *szTypeName);
 HWND PrepAllTypes(HWND hwndGridView, int widthArray[]);
 void UpdateAllTypesGridView(HWND hwndGV, size_w baseOffset);
 HWND GetActiveHexView(HWND hwndMain);
-void UpdateTypeGridView(HWND hwndGridView, size_w baseOffset);
+void UpdateTypeGridView(HWND hwndGridView, size_w baseOffset, char *typeName);
 void UpdateTypeView();
 
 DWORD SetTypeGV(HWND hwndGridView, HGRIDITEM hItem, TypeDecl *typeDecl, DWORD offset);
@@ -519,8 +521,15 @@ LRESULT CALLBACK TypeViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		case IDC_TYPEVIEW_TYPECOMBO:
 			if(HIWORD(wParam) == CBN_SELCHANGE)
 			{
-				TCHAR buf[100];
-				GetDlgItemText(hwnd, 4, buf, 100);
+				char typeName[256];
+				HWND hwndCombo = GetDlgItem(hwnd, IDC_TYPEVIEW_TYPECOMBO);
+				//GetDlgItemTextA(hwnd, IDC_TYPEVIEW_TYPECOMBO, typeName, 100);
+
+				int idx = (int)SendMessage(hwndCombo, CB_GETCURSEL, 0, 0);
+				(int)SendMessageA(hwndCombo, CB_GETLBTEXT, (idx), (LPARAM)typeName);
+
+				HWND hwndGridView = GetDlgItem(hwnd, IDC_TYPEVIEW_GRIDVIEW);
+				UpdateTypeGridView(hwndGridView, 0, typeName);
 				//OpenTypeView(hwnd, buf);
 			}
 			return 0;
@@ -792,7 +801,7 @@ HWND CreateTypeView(HWND hwndParent, HKEY hKey, BOOL fAllTypes)
 	{
 		fShowFullType = false;
 		PrepGridView(hwndGridView, widthArray, 0);		
-		UpdateTypeGridView(hwndGridView, 0);
+		UpdateTypeGridView(hwndGridView, 0, "");
 	}
 
 	HWND hwndHeader = GridView_GetHeader(hwndGridView);
@@ -822,7 +831,7 @@ extern "C" void UpdateAllTypesGridView(HWND hwndGV, size_w baseOffset)
 
 	SendMessage(hwndGV, WM_SETREDRAW, TRUE, 0);
 }
-
+/*
 BOOL UpdateAllTypes()
 {
 	HWND hwndAllTypes = DockWnd_GetContents(g_hwndMain, DWID_ALLTYPES);
@@ -837,19 +846,28 @@ BOOL UpdateAllTypes()
 		return FALSE;
 	}
 }
-
+*/
 extern "C"
-void UpdateTypeGridView(HWND hwndGridView, size_w baseOffset)
+void UpdateTypeGridView(HWND hwndGridView, size_w baseOffset, char *typeName)
 {
 	fShowFullType = true;
 
 	SendMessage(hwndGridView, WM_SETREDRAW, FALSE, 0);
 
-	size_w offset = 0;
-	for(size_t i = 0; i < globalTypeDeclList.size(); i++)
+	GridView_DeleteAll(hwndGridView);
+
+	/*for(size_t i = 0; i < globalTypeDeclList.size(); i++)
 	{
 		TypeDecl *typeDecl = globalTypeDeclList[i];
 		InsertTypeGV(hwndGridView, 0, typeDecl, baseOffset);
+	}*/
+
+	//TypeDecl *typeDecl = LookupTypeDecl(typeName);
+	Symbol *sym = LookupSymbol(globalTagSymbolList, typeName);
+
+	if(sym && sym->type->ty == typeSTRUCT)
+	{	
+		InsertStructType(hwndGridView, 0, baseOffset, sym->type);
 	}
 
 	SendMessage(hwndGridView, WM_SETREDRAW, TRUE, 0);
@@ -872,8 +890,8 @@ void UpdateTypeView()
 	for(i = 0; l[i] != 0; i++)
 	{
 		id = l[i];
-		HWND hwndTypeView = DockWnd_GetContents(g_hwndMain, id);
-		HWND hwndGridView = GetDlgItem(hwndTypeView, IDC_TYPEVIEW_GRIDVIEW);
+		HWND hwndTypeView  = DockWnd_GetContents(g_hwndMain, id);
+		HWND hwndGridView  = GetDlgItem(hwndTypeView, IDC_TYPEVIEW_GRIDVIEW);
 
 		SetDlgItemBaseInt(hwndTypeView, IDC_TYPEVIEW_ADDRESS, offset, 16, TRUE);
 
@@ -883,7 +901,9 @@ void UpdateTypeView()
 		}
 		else
 		{
-			UpdateTypeGridView(hwndGridView, offset);
+			char typeName[100];
+			GetDlgItemTextA(hwndTypeView, IDC_TYPEVIEW_TYPECOMBO, typeName, 100);
+			UpdateTypeGridView(hwndGridView, offset, typeName);
 		}
 	}
 

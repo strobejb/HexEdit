@@ -235,6 +235,7 @@ typedef struct
 #define GVM_GETNEXTSIBLING			(GVM_FIRST + 82)
 #define GVM_INSERTUNIQUECHILD		(GVM_FIRST + 83)
 #define GVM_FINDCHILDR				(GVM_FIRST + 84)
+#define GVM_EXPANDITEM				(GVM_FIRST + 85)
 
 //
 //	Notification messages
@@ -362,6 +363,9 @@ typedef struct
 
 #define GridView_SetFont(hwnd, hFont, nFontIdx) \
 	(UINT)SNDMSG((hwnd), WM_SETFONT, (WPARAM)(HFONT)(hFont), (LPARAM)(int)(nFontIdx))
+
+#define GridView_ExpandItem(hwnd, hItem, expanded, recurse) \
+	(UINT)SNDMSG((hwnd), GVM_EXPANDITEM, (WPARAM)(HGRIDITEM)(hItem), MAKELPARAM((BOOL)(expanded), (BOOL)(recurse)))
 
 
 //

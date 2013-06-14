@@ -669,7 +669,7 @@ HGRIDITEM InsertIdentifier(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOf
 	gvitem.iImage  = IsStruct(type) ? 1 : 0;
 	//gvitem.iImage  = isstruct ? 3 : 2;
 
-	if(typeDecl->tagList)
+	if(typeDecl && typeDecl->tagList)
 		gvitem.iImage+=2;
 
 
@@ -709,6 +709,20 @@ HGRIDITEM InsertIdentifier(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOf
 	return hItem;
 }
 
+size_w InsertStructType(HWND hwndGV, HGRIDITEM hRoot, size_w dwOffset, Type *type)
+{
+	Structure *sptr = type->sptr;
+	hRoot = InsertIdentifier(hwndGV, hRoot, type, dwOffset, 0);
+	GridView_ExpandItem(hwndGV, hRoot, TRUE, FALSE);
+	
+	for(size_t i = 0; i < sptr->typeDeclList.size(); i++)
+	{
+		TypeDecl *typeDecl = sptr->typeDeclList[i];
+		dwOffset += InsertTypeGV(hwndGV, hRoot, typeDecl, dwOffset);
+	}
+
+	return dwOffset;
+}
 
 //
 //	hwndGV		- handle to GridView control

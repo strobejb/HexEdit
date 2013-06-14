@@ -91,6 +91,7 @@ private:
 	GVRow *		GetFirstVisibleRow();
 	GVRow *		GetRowItem(ULONG nLine, ULONG nColumn, GVITEM **gvitem);
 	GVRow *		GetCurRow();
+	BOOL		ExpandItem(GVRow *gvrow, BOOL expand, BOOL recurse);
 
 	GVCOLUMN *	GetColumn(ULONG nColumn, int *nHeaderIndex);
 

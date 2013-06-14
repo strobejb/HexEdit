@@ -371,6 +371,15 @@ LRESULT GridView::SetImageList(HIMAGELIST hImgList)
 	return 0;
 }
 
+BOOL GridView::ExpandItem(GVRow *gvrow, BOOL expand, BOOL recurse)
+{
+	if(expand)	gvrow->items[0].state |= GVIS_EXPANDED;
+	else		gvrow->items[0].state &= ~GVIS_EXPANDED;
+		
+	UpdateMetrics();
+	return TRUE;
+}
+
 LRESULT GridView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	MSG *msgptr;
@@ -601,6 +610,9 @@ LRESULT GridView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	// find any child of specified parent
 	case GVM_FINDCHILDR:
 		return (LRESULT)FindChild((GVRow *)wParam, (GVITEM *)lParam, -1);
+
+	case GVM_EXPANDITEM:
+		return (LRESULT)ExpandItem((GVRow *)wParam, LOWORD(lParam), HIWORD(lParam));
 
 	case GVM_GETCURSEL:
 		return m_nCurrentLine;
