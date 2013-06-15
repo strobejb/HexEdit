@@ -345,18 +345,18 @@ ExprNode * Parser::AssignmentExpression(TOKEN term)
 //	On return, the 'left' nodes hold the values, the 'right' nodes
 //  are used to recursively link to the next expression
 //
-/*ExprNode *CommaExpression(TOKEN tok)
+ExprNode *Parser::CommaExpression(TOKEN tok)
 {
-	ExprNode *left = AssignmentExpression(0);
-
+	ExprNode *left = AssignmentExpression(tok);
+	ExprNode *right = 0;
 	if(t == ',')
 	{
-		t = gettok();
-		p = CommaExpression(p);
+		t     = gettok();
+		right = CommaExpression(tok);
 	}
 
-	return new ExprNode(EXPR_COMMA, TOKEN(','), left, p);
-}*/
+	return new ExprNode(EXPR_COMMA, TOKEN(','), left, right);
+}
 
 ExprNode * Parser::Expression(TOKEN term)
 {

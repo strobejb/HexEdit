@@ -91,7 +91,7 @@ bool Parser::ParseTags(Tag **tagList, TOKEN allowed[])
 		switch(t)
 		{
 		// TAGS which don't take any parameters
-		case TOK_IGNORE:	case TOK_STRING:	
+		case TOK_IGNORE:	case TOK_STRING:	case TOK_EXPORT:
 			tag = new Tag(t, tag);
 			t = gettok();
 			break;
@@ -103,6 +103,7 @@ bool Parser::ParseTags(Tag **tagList, TOKEN allowed[])
 		case TOK_STYLE:		case TOK_SWITCHIS:
 		case TOK_CASE:		case TOK_DISPLAY:
 		case TOK_NAME:		case TOK_ENUM:
+		case TOK_ASSOC:
 
 			tmp = t;
 			t = gettok();
@@ -111,10 +112,10 @@ bool Parser::ParseTags(Tag **tagList, TOKEN allowed[])
 			if(!Expected('('))
 				return false;
 
-			if(tmp == TOK_SIZEIS || tmp == TOK_LENGTHIS)
+			if(tmp == TOK_SIZEIS || tmp == TOK_LENGTHIS || tmp == TOK_ASSOC)
 			{
 				// full comma-separated expression 
-				if((expr = Expression(TOK_NULL)) == 0)
+				if((expr = CommaExpression(TOK_NULL)) == 0)
 				{
 					Error(ERROR_SYNTAX_ERROR, inenglish(t));
 					return false;
@@ -254,6 +255,51 @@ bool Parser::Ooof(const char *file)
 	return Parse() ? true : false;
 }
 
+//
+//	associate("*.txt", "*.exe");
+//
+/*
+bool Parser::ParseAssociate()
+{
+	char str[MAX_STRING_LEN];
+
+	if(!Expected(TOK_ASSOC))
+		return false;
+
+	if(!Expected('('))
+		return false;
+
+	for(;;)
+	{
+		strcpy(str, tstr);
+		if(!Expected(TOK_STRINGBUF))
+			return 0;
+
+		if(t == ',')
+		{
+			t = gettok();
+		}
+		else if(t == ')')
+		{
+			break;
+		}
+		else
+		{
+			Unexpected(t);
+			return false;
+		}
+	} 
+
+	if(!Expected(')'))
+		return false;
+
+	if(!Expected(';'))
+		return false;
+
+	return true;
+}
+*/
+
 int Parser::Parse()
 {
 	Tag *tagList;
@@ -264,12 +310,21 @@ int Parser::Parse()
 	// keep going until there are no more tokens!
 	while(t)
 	{
+		TOKEN allowed[] = 
+		{ 
+			TOK_LENGTHIS, TOK_SIZEIS, TOK_IGNORE, TOK_STRING,
+			TOK_OFFSET, TOK_ALIGN, TOK_BITFLAG, TOK_STYLE, TOK_DISPLAY,
+			TOK_ENDIAN,	TOK_SWITCHIS, TOK_CASE, TOK_NAME, 
+			TOK_ENUM, TOK_EXPORT, TOK_ASSOC,
+			TOK_NULL 
+
+		};
 
 		// save any whitespace before the tags
 		FILEREF fileRef;
 		lex_fileref(&fileRef);
 
-		if(!ParseTags(&tagList, 0))
+		if(!ParseTags(&tagList, allowed))
 			return 0;
 		
 		//
@@ -320,8 +375,56 @@ int Parser::Parse()
 		}
 	}
 
+	ExportStructs();
 
 	return (errcount == 0) ? 1 : 0;
+}
+
+void Parser::ExportStructs()
+{
+	bool foundExport = false;
+
+	// go through every struct that we parsed in THIS file
+	for(size_t i = 0; i < globalTypeDeclList.size(); i++)
+	{
+		TypeDecl *typeDecl = globalTypeDeclList[i];
+
+		if(typeDecl->baseType->ty == typeSTRUCT && typeDecl->fileRef.fileDesc == curFile)
+		{
+			if(FindTag(typeDecl->tagList, TOK_EXPORT, 0))
+				foundExport = true;
+		}
+	}
+
+	if(foundExport)
+	{
+		// clear the export flag on all structs
+		for(size_t i = 0; i < globalTypeDeclList.size(); i++)
+		{
+			TypeDecl *typeDecl = globalTypeDeclList[i];
+
+			if(typeDecl->baseType->ty == typeSTRUCT && typeDecl->fileRef.fileDesc == curFile)
+			{
+				typeDecl->exported = false;
+				typeDecl->baseType->sptr->exported = false;
+			}
+		}
+
+		// set the export flag on explicity defined structs (with the "export" attribute)
+		for(size_t i = 0; i < globalTypeDeclList.size(); i++)
+		{
+			TypeDecl *typeDecl = globalTypeDeclList[i];
+
+			if(typeDecl->baseType->ty == typeSTRUCT && typeDecl->fileRef.fileDesc == curFile)
+			{
+				if(FindTag(typeDecl->tagList, TOK_EXPORT, 0))
+				{
+					typeDecl->exported = true;
+					typeDecl->baseType->sptr->exported = true;
+				}
+			}
+		}
+	}
 }
 
 void Parser::Cleanup()

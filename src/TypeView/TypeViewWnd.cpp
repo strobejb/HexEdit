@@ -683,7 +683,7 @@ void FillTypeList(HWND hwndCombo)
 	{
 		Symbol *sym = globalTagSymbolList[i];
 
-		if(IsStruct(sym->type))
+		if(IsExportedStruct(sym->type) && sym->anonymous == false)
 		{
 			SendMessageA(hwndCombo, CB_ADDSTRING, 0, (LPARAM)sym->name);
 		}
@@ -691,7 +691,37 @@ void FillTypeList(HWND hwndCombo)
 
 	SendMessageA(hwndCombo, CB_SETCURSEL, 0, 0);
 }
+ 
+void SetDefaultType(HWND hwndTypeView)
+{
+	TCHAR buf[MAX_PATH], *ptr;
+	HexView_GetFileName(g_hwndHexView, buf, MAX_PATH);
+	ptr = _tcsrchr(buf, '.');
+	char ext[MAX_PATH];
+	if(ptr) sprintf(ext, "%ls", ptr);
+	
+	for(size_t i = 0; ptr && i < globalTypeDeclList.size(); i++)
+	{
+		TypeDecl *typeDecl = globalTypeDeclList[i];
+		ExprNode *commaExpr;
 
+		if(typeDecl->baseType->ty == typeSTRUCT &&
+			FindTag(typeDecl->tagList, TOK_ASSOC, &commaExpr))
+		{
+			for( ; commaExpr; commaExpr = commaExpr->right)
+			{
+				if(commaExpr->left->type == EXPR_STRINGBUF && strcmp(commaExpr->left->str, ext) == 0)
+				{
+					char *typeName = typeDecl->baseType->sptr->symbol->name;
+					SendDlgItemMessageA(hwndTypeView, IDC_TYPEVIEW_TYPECOMBO, CB_SELECTSTRING, -1, (LPARAM)typeName);
+					UpdateTypeGridView(GetDlgItem(hwndTypeView, IDC_TYPEVIEW_GRIDVIEW), 0, typeName);
+					return;
+				}
+			}
+		}
+	}
+
+}
 
 HWND CreateTypeViewPanel(HWND hwndParent, HKEY hSettingsKey)
 {
@@ -809,6 +839,10 @@ HWND CreateTypeView(HWND hwndParent, HKEY hKey, BOOL fAllTypes)
 	
 	// populate the combo dropdown
 	FillTypeList(GetDlgItem(hwndPanel, IDC_TYPEVIEW_TYPECOMBO));
+
+	// choose a default structure
+	if(!fAllTypes)
+		SetDefaultType(hwndPanel);
 
 	//RegCloseKey(hKey);
 	return hwndPanel;

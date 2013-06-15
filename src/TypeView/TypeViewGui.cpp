@@ -1268,7 +1268,7 @@ size_w InsertTypeGV(HWND hwndGridView, HGRIDITEM hRoot, TypeDecl *typeDecl, size
 
 			r = sizeof(IMAGE_DOS_HEADER);
 			Evaluate(hRoot,	offsetExpr, &r, dwOffset, hwndHV, hwndGridView);
-			dwOffset = r;
+			dwOffset = r & 0xffff;
 		}
 
 		// embedded struct/union that has no variables (i.e. just a plain unnamed struct decl)
@@ -1329,6 +1329,7 @@ HGRIDITEM FindGridItem(HGRIDITEM hParent, ExprNode * expr, HWND hwndGridView)
 		
 		// look for the Type* node in the GridView
 		gvitem.iSubItem = COLIDX_NAME;
+		gvitem.mask     = GVIF_PARAM;
 		gvitem.param    = (ULONG_PTR)sym->type;
 		
 		// this *should* succeed, but just in case...
@@ -1378,6 +1379,7 @@ bool Evaluate(HGRIDITEM hParent, ExprNode *expr, INUMTYPE *result, size_w baseOf
 	case EXPR_FIELD:
 
 		HGRIDITEM hItem;
+		ExprNode *baseType; baseType = expr->type == EXPR_FIELD ? expr->right : expr;
 		
 		// look for the note in the GridView that corresponds to the field expression!
 		if((hItem = FindGridItem(hParent, expr, hwndGV)) == 0)
@@ -1411,6 +1413,7 @@ bool Evaluate(HGRIDITEM hParent, ExprNode *expr, INUMTYPE *result, size_w baseOf
 		gvi2.mask			= GVIF_PARAM;
 		GridView2_GetItem(hwndGV, hParent, &gvi2);
 
+		*result = 0;
 		HexView_GetData(hwndHV, gvitem.param + gvi2.param, (BYTE *)result, sizeof(*result));
 		return true;
 

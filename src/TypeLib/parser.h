@@ -47,6 +47,7 @@ public:
 
 	TypeDecl * ParseTypeDecl(Tag *tagList, SymbolTable &symTable, bool nested /*=false*/, bool allowMultiDecl /*=true*/);
 	ExprNode * ParseExpression();
+
 	
 	static const char *inenglish(TOKEN t);
 
@@ -70,6 +71,7 @@ private:
 	// parser
 	bool		ParseTags(Tag **tagList, TOKEN allowed[]);
 	Statement * ParseInclude();
+	void		ExportStructs();
 	void		Cleanup();
 
 	// typedecls
@@ -91,7 +93,7 @@ private:
 	ExprNode * AssignmentExpression(TOKEN term);
 	ExprNode * Expression(TOKEN term);
 	ExprNode * FullExpression(TOKEN term);
-
+	ExprNode * CommaExpression(TOKEN tok);
 
 
 	// lexer

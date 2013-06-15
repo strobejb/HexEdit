@@ -233,6 +233,7 @@ Type * Parser::PrefixDecl(SymbolTable &symTable)
 		if((sym = LookupSymbol(symTable, tstr)) == 0)
 		{
 			sym = InstallSymbol(symTable, tstr);
+			sym->fileRef = FILEREF(curFile);
 		}
 		else
 		{
@@ -439,7 +440,7 @@ Type * Parser::ParseStructBody(Symbol *sym, TYPE ty)
 
 		};
 
-		FILEREF fileRef(curFile);
+		FILEREF tagRef(curFile);
 
 		if(!ParseTags(&tagList, allowed))
 			return 0;
@@ -447,10 +448,7 @@ Type * Parser::ParseStructBody(Symbol *sym, TYPE ty)
 		size_t s;
 		s = globalFileHistory.size();
 
-		FILEREF tagRef;
-		if(tagList)
-			tagRef.MakeRef(curFile);
-		
+		FILEREF fileRef(curFile);
 
 		//
 		//	get the member-variable declaration
@@ -637,6 +635,7 @@ Type * Parser::ParseBaseType(TypeDecl *typeDecl, bool nested)
 				if((type = ParseStructBody(sym, TokenToType(tmp))) == 0)
 					return 0;
 
+				//if(exportType) type->sptr->exported  = true;
 				typeDecl->compoundType = true;
 				return type;
 			}
@@ -693,6 +692,8 @@ TypeDecl * Parser::ParseTypeDecl(Tag *tagList, SymbolTable &symTable, bool neste
 	TypeDecl *	typeDecl		= new TypeDecl();
 	//bool		allowMultiDecl	= true;
 
+	typeDecl->fileRef = FILEREF(curFile);
+
 	switch(t)
 	{
 	// all built-in types / aliased types
@@ -704,6 +705,7 @@ TypeDecl * Parser::ParseTypeDecl(Tag *tagList, SymbolTable &symTable, bool neste
 	case TOK_SIGNED: case TOK_UNSIGNED:
 	case TOK_ENUM:	 case TOK_CONST: 
 	case TOK_IDENTIFIER:
+	case TOK_EXPORT:
 		
 		// parse the base-type portion of the type declaration
 		if((typeDecl->baseType = ParseBaseType(typeDecl, nested)) == 0)

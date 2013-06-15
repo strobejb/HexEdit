@@ -45,6 +45,7 @@ struct FOO
   };
 };
 
+[export]
 struct BAR 
 {
    struct 
@@ -246,7 +247,10 @@ typedef struct _IMAGE_SECTION_HEADER
 } IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 
 
-
+[
+   export, 
+   assoc(".exe", ".sys", ".dll")
+]
 typedef struct _PE
 {
   IMAGE_DOS_HEADER dosHeader;

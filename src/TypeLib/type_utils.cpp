@@ -544,6 +544,11 @@ bool IsStruct(Type *type)
 	return IsStruct(BaseType(type));
 }
 
+bool IsExportedStruct(Type *type)
+{
+	return IsStruct(BaseType(type)) && type->sptr->exported;
+}
+
 Enum * FindEnum(char *enumName)
 {
 	Symbol *sym;

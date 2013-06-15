@@ -202,7 +202,7 @@ void PrintType(Type *type);
 
 struct TypeDecl
 {
-	TypeDecl() : baseType(0), tagList(0), comment(0), parent(0), typeAlias(false), nested(false), compoundType(false)
+	TypeDecl() : baseType(0), tagList(0), comment(0), parent(0), typeAlias(false), nested(false), compoundType(false), exported(true)
 	{
 	}
 
@@ -232,16 +232,16 @@ struct TypeDecl
 	TypeList		declList;
 	Tag			*	tagList;
 
-	FILEREF		fileRef;
-	FILEREF		tagRef;
-	FILEREF		postRef;
+	FILEREF			fileRef;
+	FILEREF			tagRef;
+	FILEREF			postRef;
 	char		*	comment;
 
 	Type		*	parent;
 	bool			typeAlias;
 	bool			nested;
 	bool			compoundType;
-
+	bool			exported;
 };
 
 
@@ -305,7 +305,7 @@ struct Field
 
 struct Structure
 {
-	Structure(Symbol *sym) : symbol(sym), tagList(0) 
+	Structure(Symbol *sym) : symbol(sym), tagList(0), exported(true)
 	{
 		
 
@@ -335,14 +335,12 @@ struct Structure
 	void Build();
 
 	vector<Field>		fieldList;
-	//TypeList			fieldList;
-
-	//Container<Symbol>	fieldList;
-	//Container<TypeDecl> typeDeclList;
 
 	FILEREF				 postNameRef;
 	FILEREF				 lastBraceRef;
 	FILEREF				 postBraceRef;
+
+	bool				 exported;
 };
 
 struct Function
@@ -380,6 +378,7 @@ bool IsInt(TYPE ty);
 bool IsFloat(TYPE ty);
 bool IsStruct(TYPE ty);
 bool IsStruct(Type *type);
+bool IsExportedStruct(Type *type);
 Enum * FindEnum(char *enumName);
 
 void RenderType(TCHAR *buf, int len, Type *type);
