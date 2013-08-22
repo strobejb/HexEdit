@@ -140,7 +140,11 @@ static size_t decode(char *inbuf, size_t inlen, BYTE *outbuf, const char *table,
 			inbuf++;
 			inlen--;
 		}
-		else
+		else if(*inbuf == '\0')
+		{
+			break;
+		}
+		else if(inlen > 4)
 		{
 			BYTE in[4] = { 0 };
 			int  v = 0;
@@ -150,7 +154,7 @@ static size_t decode(char *inbuf, size_t inlen, BYTE *outbuf, const char *table,
 				v = *inbuf;
 
 				if(v > 127 || table[v] == -1)
-					return 0;
+					return outlen;//return 0;
 
 				in[i] = table[v];
 			}
@@ -170,6 +174,10 @@ static size_t decode(char *inbuf, size_t inlen, BYTE *outbuf, const char *table,
 				break;
 			}
 		}	
+		else
+		{
+			break;
+		}
     }
 
 	return outlen;

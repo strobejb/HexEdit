@@ -185,13 +185,22 @@ size_w ImportText(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IMPE
 			break;
 		}
 
-		if(ieopt->fUseAddress)
+		// was it an address? 
+		if(count > 2)
 		{
-			JumpAndPad(hwndHexView, addr);
-		}
+			if(ieopt->fUseAddress)
+			{
+				JumpAndPad(hwndHexView, addr);
+			}
 
-		// skip whitespace
-		ptr = skipspace(ptr);
+			// skip whitespace
+			ptr = skipspace(ptr);
+		}
+		// otherwise the address column is missing 
+		else
+		{
+			ptr = ach;
+		}
 	
 		// get any hex data
 		while(ptr && *ptr)
@@ -553,33 +562,183 @@ size_w ImportMotorola(FILE *fp, HWND hwndHexView, size_w offset, size_w length, 
 	return total;//!ferror(fp);
 }
 
+typedef struct
+{
+	FILE *	fp;
+	char *  buf;
+	size_t  pos;
+	size_t  len;
+	//char *  tmp;
+	//size_t	tmplen;
+	size_t  size;
+	//BOOL	startln;
+} FILE_READER;
 
+void init_reader(FILE_READER *rfp, FILE *fp, size_t size)
+{
+	rfp->fp			= fp;
+	rfp->size		= size;
+	rfp->buf		= malloc(size);
+	//rfp->tmp		= malloc(size);
+	//rfp->tmplen		= 0;
+	//rfp->startln	= 0;
+	rfp->pos		= 0;
+	rfp->len		= 0;
+}
+
+static int frgetch(FILE_READER *rfp, BOOL consume)
+{
+	if(rfp->pos == rfp->len)
+	{
+		rfp->len	= fread(rfp->buf, 1, rfp->size, rfp->fp);
+		rfp->pos    = 0;
+	}
+
+	if(rfp->len == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		int ch = rfp->buf[rfp->pos];
+		rfp->pos += consume;
+		return ch;
+	}
+}
+
+char * fgets_r(FILE_READER *rfp, char *buf, size_t len)
+{
+	size_t i = 0;
+
+	if(len < 1)
+		return NULL;
+
+	while(i < len - 1)
+	{
+		int ch = frgetch(rfp, TRUE);
+
+		// deal with CR/LF combos
+		if(ch == '\r')
+		{
+			ch = '\n';
+			if(frgetch(rfp, FALSE) == '\n')
+				frgetch(rfp, TRUE);
+		}
+		else if(ch == 0)
+			break;
+		
+		buf[i++] = ch;
+	}
+
+	buf[i] = '\0';
+	return i == 0 ? NULL : buf;
+}
+
+void fgets_skip(FILE_READER *rfp)
+{
+	int ch = frgetch(rfp, TRUE);
+	
+	while(ch && ch != '\n')
+		ch = frgetch(rfp, TRUE);
+}
+
+/*
+char * fgets_r(FILE_READER *rfp)
+{
+	size_t rlen = rfp->tmplen;
+	size_t i	= 0;
+
+	// restore from last read
+	memmove(rfp->buf, rfp->tmp, rlen);
+
+	// fill up the rest of the user buffer (if there's any space left)
+	rlen += fread(rfp->buf + rlen, 1, rfp->size - rlen, rfp->fp);
+
+	// scan for the end of line
+	while(i < rlen && rfp->buf[i] != '\n' && rfp->buf[i] != '\r')
+		i++;
+
+	// turn CR -> LF
+	if(rlen > 1 && i < rlen && rfp->buf[i] == '\r') 
+	{
+		rfp->buf[i] = '\n';
+
+		if(i < rlen - 1 && rfp->buf[i+1] == '\r')
+			rlen--;
+	}
+
+	// make sure there is space for a nul-terminator
+	i = min(i, rfp->size - 1);
+
+	// move anything after the newline, back into the tmp buffer
+	memmove(rfp->tmp, rfp->buf + i, rlen - i);
+	rfp->tmplen = rlen - i;
+
+	// nul-terminate
+	rfp->buf[i] = '\0';
+
+	return i > 0 ? rfp->buf : NULL;
+}
+
+void fgets_s(FILE_READER *rfp)
+{
+	size_t i;
+
+	// the user got a whole line last time, so don't worry
+	if(rfp->tmplen == 0)
+		return;
+
+	for(;;)
+	{
+		for(i = 0; i < rfp->tmplen; i++)
+		{
+			if(rfp->tmp[i] == '\r')
+			{
+				memmove(rfp->tmp, rfp->tmp+i, rfp->tmplen - i);
+			}
+			else if(rfp->tmp[i] == '\n')
+			{
+				break;
+			}
+		}
+
+		if(i == rfp->tmplen)
+		{
+		}
+
+
+	}
+}
+*/
 size_w ImportBase64(FILE *fp, HWND hwndHexView, size_w offset, size_w length, IMPEXP_OPTIONS *ieopt)
 {
-	char   ach[200];
-	BYTE   buf[200];
+	char   ach[65];
+	BYTE   buf[64];
 	size_t len;
 	size_t alen;
 	size_t rem = 0;
 	size_w total = 0;
 
-	while(fgets(ach, 200, fp))//) > 0)
-	{
-		//alen += rem;		// remainder from last time
-		//rem = alen & 3;		// make sure it's a multiple of 4
-		alen = strlen(ach);
+	size_t rlen = 0;
+	size_t i = 0;
 
-		// check if the line was truncated
-		if(alen && ach[alen-1] != '\n')
-		{
-			//only break if
-			//break;
-		}
+	FILE_READER rfp;
+	init_reader(&rfp, fp, 64);
+
+	//while(fread(ach, 200, fp))//) > 0)
+	//while((rlen = fread(ach, 1, 200, fp) > 0)
+	
+	while(fgets_r(&rfp, ach, sizeof(ach)))
+	{
+		alen = strlen(ach);
 
 		// skip the --BEGIN at the top
 		// just check for a '-' because that's not a base64 character anyway
 		if(ach[0] == '-' || isspace(ach[0])) 
+		{
+			fgets_skip(&rfp);
 			continue;
+		}
 		
 		if((len = base64_decode(ach, alen - rem, buf)) != 0)
 		{
