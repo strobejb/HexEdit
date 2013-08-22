@@ -565,9 +565,11 @@ void HexView::IdentifySearchPatterns(BYTE *data, size_t len, seqchar_info *infob
 	if(m_nSearchLen == 0)
 		return;
 
-	while((ptr = (BYTE *)memchr(ptr, m_pSearchPat[0], len)) != 0)
+	while((ptr = (BYTE *)memchr(ptr, m_pSearchPat[0], len-(ptr-data))) != 0)
 	{
-		for(i = 1; i < m_nSearchLen; i++)
+		size_t slen = min(m_nSearchLen, len-(ptr-data));
+
+		for(i = 1; i < slen; i++)
 		{
 			if(ptr[i] != m_pSearchPat[i])
 				break;
@@ -582,7 +584,7 @@ void HexView::IdentifySearchPatterns(BYTE *data, size_t len, seqchar_info *infob
 		}
 		else
 		{
-			ptr++;
+			ptr += 1;
 		}
 	}
 }

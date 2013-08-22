@@ -44,6 +44,7 @@ BOOL HexView::OpenFile(LPCTSTR szFileName, UINT uOpenFlags)
 		else
 			m_nEditMode = HVMODE_OVERWRITE;
 
+		m_nSearchLen = 0;
 		return TRUE;
 	}
 
@@ -61,6 +62,8 @@ BOOL HexView::InitBuf(const BYTE *buffer, size_t len, bool copybuf, bool readonl
 		SetCaretPos((m_nAddressWidth + m_nHexPaddingLeft) * m_nFontHeight, 0);
 		UpdateMetrics();
 
+		m_nSearchLen = 0;
+
 		return TRUE;
 	}
 	else
@@ -73,6 +76,7 @@ BOOL HexView::CloseFile()
 {
 	ClipboardShutdown();
 	m_szFilePath[0]		= '\0';
+	m_nSearchLen = 0;
 	return TRUE;
 }
 
@@ -88,6 +92,7 @@ BOOL HexView::SaveFile(LPCTSTR szFileName, UINT uMethod)
 		}
 
 		UpdateMetrics();
+		m_nSearchLen = 0;
 
 		return TRUE;
 	}
@@ -110,7 +115,7 @@ BOOL HexView::ClearFile()
 	m_nSelectionStart	= 0;
 	m_nSelectionEnd		= 0;
 	m_nCursorOffset		= 0;
-
+	m_nSearchLen		= 0;
 	m_szFilePath[0]		= '\0';
 
 	UpdateMetrics();
@@ -124,6 +129,8 @@ BOOL HexView::RevertFile()
 	{
 		m_pDataSeq->clear();
 	}
+
+	m_nSearchLen = 0;
 
 	if(m_szFilePath[0])
 		return OpenFile(m_szFilePath, false);
