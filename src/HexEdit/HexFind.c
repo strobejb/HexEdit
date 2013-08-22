@@ -656,7 +656,7 @@ BOOL Find(HWND hwnd, HWND hwndHV)
 	return TRUE;
 }
 
-void Replace(HWND hwndDlg, HWND hwndHV)
+BOOL Replace(HWND hwndDlg, HWND hwndHV)
 {
 	int searchType;
 	size_w selsize;
@@ -672,11 +672,42 @@ void Replace(HWND hwndDlg, HWND hwndHV)
 	if(selsize != replaceLen && HexView_GetEditMode(hwndHV) != HVMODE_INSERT)
 	{
 		MessageBox(hwndDlg, TEXT("Replace data must be same length in Overwrite mode"), TEXT("error"), MB_OK|MB_ICONWARNING);
+		return FALSE;
 	}
 	else
 	{
 		HexView_SetDataCur(hwndHV, replaceData, replaceLen);
+		return FindNext();
 	}
+}
+
+void ReplaceAll(HWND hwndDlg, HWND hwndHV)
+{
+	HexView_SetRedraw(hwndHV, FALSE);
+	
+	for( ;; )
+	{
+		NMHVPROGRESS nmhvp;
+		size_w len, pos;
+		
+		if(!Replace(hwndDlg, hwndHV))
+			break;
+
+		HexView_GetCurPos(hwndHV, &pos);
+		HexView_GetFileSize(hwndHV, &len);
+
+		nmhvp.hdr.code     = HVN_PROGRESS;
+		nmhvp.hdr.hwndFrom = hwndHV;
+		nmhvp.hdr.idFrom   = GetWindowLongPtr(hwndHV, GWL_ID);
+	
+		nmhvp.len = len;
+		nmhvp.pos = pos;
+
+		if(SendMessage(GetParent(hwndHV), WM_NOTIFY, 0, (LPARAM)&nmhvp))
+			break;
+	}
+
+	HexView_SetRedraw(hwndHV, TRUE);
 }
 
 static DWORD GetClipboardDataBuf(UINT uFormat, PVOID pData, DWORD nLength)
@@ -833,6 +864,7 @@ INT_PTR CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 
 		case IDC_REPLACEALL:
+			ReplaceAll(hwnd, hwndHV);
 			return TRUE;
 
 		case IDOK:
@@ -1160,6 +1192,7 @@ INT_PTR CALLBACK SearchDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 
 		case IDC_REPLACEALL:
+			ReplaceAll(GetCurFindTab(hwnd), hwndHV);
 			return TRUE;
 
 		case IDOK:

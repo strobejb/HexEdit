@@ -974,6 +974,9 @@ ULONG WINAPI HexView_GetData(HWND hwnd, size_w offset, BYTE *buf, ULONG len);
  */
 ULONG WINAPI HexView_FillData(HWND hwnd, BYTE *buf, ULONG buflen, size_w len);
 
+#define HexView_SetRedraw(hwnd, fRedraw) \
+	(UINT)SNDMSG((hwnd), WM_SETREDRAW, (WPARAM)(BOOL)(fRedraw), 0)
+
 #ifdef __cplusplus
 }
 #endif

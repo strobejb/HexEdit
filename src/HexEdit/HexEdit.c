@@ -463,6 +463,9 @@ BOOL UpdateProgress(MAINWND *mainWnd, BOOL fVisible, size_w pos, size_w len)
 	static size_w oldpos;
 	static size_w startpos;
 
+	TRACEA("update progress: %x/%x\n", (DWORD)(pos), (DWORD)(len));
+
+
 	if(fVisible == FALSE)
 	{
 		DestroyWindow(hwndProgress);
