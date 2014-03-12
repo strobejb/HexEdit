@@ -1345,14 +1345,16 @@ LRESULT HexView::OnMouseWheel(int nDelta)
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
 
-	UINT uScrollLines;
+	int nScrollLines;
 
-	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &uScrollLines, 0);
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &nScrollLines, 0);
 
-	if(uScrollLines == -1 || uScrollLines <= 1)
-		uScrollLines = 3;
+	if(nScrollLines == -1 || nScrollLines <= 1)
+		nScrollLines = 3;
 
-	Scroll(0, (-nDelta/120) * uScrollLines);
+	int nScrollAmount = nDelta + m_nScrollMouseRemainder;
+	m_nScrollMouseRemainder = nScrollAmount % (120 / nScrollLines);
+	Scroll(0, -nScrollAmount * nScrollLines / 120);
 	RepositionCaret();
 	
 	return 0;
