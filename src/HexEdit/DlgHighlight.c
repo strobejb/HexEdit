@@ -618,7 +618,9 @@ LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam,
 					{
 						HWND hwndHexView = curItem.param;
 
+						GridView_DeleteItem(hwndGridView, hgCurSelItem);
 						HexView_DelBookmark(hwndHexView, hbm);
+						GridView_Update(hwndGridView);
 					}
 				}
 				else
