@@ -33,9 +33,7 @@ BOOL HexView::OpenFile(LPCTSTR szFileName, UINT uOpenFlags)
 
 		SetCaretPos((m_nAddressWidth + m_nHexPaddingLeft) * m_nFontHeight, 0);
 
-		//tupScrollbars();
 		UpdateMetrics();
-		//validateRect(m_hWnd, 0, 0);
 
 		SetLastError(e);
 

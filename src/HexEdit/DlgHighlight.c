@@ -495,6 +495,71 @@ BOOL SaveHighlights(HWND hwndHexView)
 	return TRUE;
 }
 
+void DeleteBookmarkFromConfig(LPCTSTR szFilename, LPCTSTR szBookmarkName)
+{
+	WIN32_FIND_DATA win32fd;
+	HANDLE hFind;
+	TCHAR szBookPath[MAX_PATH];
+	TCHAR szFilePath[MAX_PATH];
+	TCHAR szRefFilePath[MAX_PATH] = { 0 };
+
+	GetProgramDataPath(szBookPath, MAX_PATH);
+	lstrcat(szBookPath, TEXT("\\Bookmarks\\*"));
+
+	// enumerate all files in the bookmarks directory
+	if ((hFind = FindFirstFile(szBookPath, &win32fd)) != 0)
+	{
+		do
+		{
+			if ((win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			{
+				GetProgramDataPath(szBookPath, MAX_PATH);
+				wsprintf(szFilePath, TEXT("%s\\Bookmarks\\%s"), szBookPath, win32fd.cFileName);
+
+				HCONFIG configFile = OpenConfig(szFilePath);
+				if (configFile)
+				{
+					if (GetConfigStr(configFile, TEXT("hexFileData\\filePath"), szRefFilePath, MAX_PATH, 0) && _tcscmp(szRefFilePath, szFilename) == 0)
+					{
+						HCONFIG bookmarksSection = OpenConfigSection(configFile, TEXT("hexFileData\\bookmarks"));
+						DWORD idx = 0;
+						HCONFIG bookmark = 0;
+						DWORD countedBookmarks = 0;
+						while (bookmark = EnumConfigSection(bookmarksSection, TEXT("bookmark"), idx++))
+						{
+							TCHAR title[100];
+							BOOKMARK bm = { 0 };
+							bm.pszTitle = title;
+							bm.nMaxTitle = ARRAYSIZE(title);
+
+							if (GetConfigBookmark(bookmark, &bm) && _tcscmp(title, szBookmarkName) == 0)
+							{
+								DeleteConfigSection(bookmark);
+							}
+							else
+							{
+								countedBookmarks++;
+							}
+						}
+
+						SaveConfig(szFilePath, configFile);
+						CloseConfig(configFile);
+						if (countedBookmarks == 0)
+						{
+							DeleteFile(szFilePath);
+						}
+						break;
+					}
+					CloseConfig(configFile);
+				}
+			}
+
+		} while (FindNextFile(hFind, &win32fd));
+
+		FindClose(hFind);
+	}
+}
+
 LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	extern HWND g_hwndMain;
@@ -533,22 +598,40 @@ LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam,
 		}
 		case IDC_HIGHLIGHT_DELETE:
 		{
+			TCHAR itemText[100] = { 0 };
 			HWND hwndGridView = GetDlgItem(hwnd, IDC_HIGHLIGHT_GRIDVIEW);
 			ULONG curSelItem = GridView_GetCurSel(hwndGridView);
 			HGRIDITEM hgCurSelItem = GridView_GetItemHandle(hwndGridView, curSelItem);
-			GVITEM curItem = { GVIF_PARAM, curSelItem, 0 };
+			GVITEM curItem = { GVIF_PARAM | GVIF_TEXT, curSelItem, 0 };
+			curItem.pszText = itemText;
+			curItem.cchTextMax = ARRAYSIZE(itemText);
 
 			// Get the current item - param contains the HBOOKMARK for this item
-			if (GridView_GetItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+			if (GridView_GetItem(hwndGridView, hgCurSelItem, &curItem))
 			{
-				HBOOKMARK hbm = curItem.param;
-
-				// Get the parent item - param contains the HWND for the hexview
-				if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+				if (curItem.param)
 				{
-					HWND hwndHexView = curItem.param;
+					HBOOKMARK hbm = curItem.param;
 
-					HexView_DelBookmark(hwndHexView, hbm);
+					// Get the parent item - param contains the HWND for the hexview
+					if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+					{
+						HWND hwndHexView = curItem.param;
+
+						HexView_DelBookmark(hwndHexView, hbm);
+					}
+				}
+				else
+				{
+					// This wasn't a live bookmark - it exists in a config file
+					TCHAR parentText[100] = { 0 };
+					curItem.pszText = parentText;
+					if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem))
+					{
+						DeleteBookmarkFromConfig(parentText, itemText);
+						GridView_DeleteAll(hwndGridView);
+						UpdateHighlights(TRUE);
+					}
 				}
 			}
 
@@ -760,10 +843,6 @@ HGRIDITEM CreateBookmarkFileRoot(HGRIDITEM hRoot, LPCTSTR szFileName, HWND hwndG
 
 	MkRootGVITEM(&gvitem, szFileName, fBold, 0);	
 	hItem = GridView_InsertChild(hwndGridView, hRoot, &gvitem);
-	
-	
-	//EnumHighlights(sz
-	//Ooop(hItem, hwndHexView, hwndGridView);
 
 	return hItem;
 }
@@ -782,8 +861,6 @@ BOOL UpdateHighlightsFromConfig(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBoo
 	{
 		if(GetConfigStr(hConf, TEXT("hexFileData\\filePath"), szFilePath, MAX_PATH, 0))
 		{
-
-
 			hBookmarks = OpenConfigSection(hConf, TEXT("hexFileData\\bookmarks"));
 
 			for(i = 0; bookmark = EnumConfigSection(hBookmarks, TEXT("bookmark"), (int)i); i++)
