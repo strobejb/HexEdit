@@ -147,6 +147,9 @@ INT_PTR CALLBACK HighlightDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		SendDlgItemMessage(hwnd, IDC_NAME, EM_SETCUEBANNER, TRUE, (LPARAM)TEXT("Enter some descriptive text here"));
 		SendDlgItemMessage(hwnd, IDC_ANNOTATION, EM_SETCUEBANNER, 0, (LPARAM)TEXT("Enter some descriptive text here"));
 
+		//MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO1), fgcollist, fgtextlist, 16);
+		MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO4), bgcollist, bgtextlist, 16);
+
 		hbm = (HBOOKMARK)lParam;
 
 		if(hbm == 0)
@@ -169,16 +172,22 @@ INT_PTR CALLBACK HighlightDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			length = bm.length;
 			lstrcpy(title, bm.pszTitle);
 			lstrcpy(text, bm.pszText);
+
+			// Set the selected color
+			for (int i = 0; i < 16; i++)
+			{
+				if (bm.backcol == bgcollist[i])
+				{
+					SendMessage(GetDlgItem(hwnd, IDC_COMBO4), CB_SETCURSEL, i, 0);
+					break;
+				}
+			}
 		}
 
 		SetDlgItemBaseInt(hwnd, IDC_OFFSET, offset, 16, 1);
 		SetDlgItemBaseInt(hwnd, IDC_LENGTH, length, 16, 1);
 		SetDlgItemText(hwnd, IDC_NAME, title);
 		SetDlgItemText(hwnd, IDC_ANNOTATION, text);
-
-		
-		//MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO1), fgcollist, fgtextlist, 16);
-		MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO4), bgcollist, bgtextlist, 16);
 	
 	//ClientToScreen(hwndParent, &pt);
 		//GetCursorPos(&pt);
