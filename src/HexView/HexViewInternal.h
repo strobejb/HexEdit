@@ -369,6 +369,7 @@ private:
 	SELMODE		m_nSelectionMode;
 	UINT_PTR	m_nScrollTimer;
 	LONG		m_nScrollCounter;
+    LONG        m_nScrollMouseRemainder;
 	BOOL		m_fCursorAdjustment;
 	bool		m_fResizeBar;
 	bool		m_fResizeAddr;

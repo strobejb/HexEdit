@@ -156,6 +156,7 @@ private:
 	int			m_nHScrollMax;
 	UINT_PTR	m_nScrollTimer;
 	UINT		m_nScrollCounter;
+	LONG        m_nScrollMouseRemainder;
 	BOOL		m_fMouseDown;
 	HGRIDITEM   m_pTempInsertItem;
 	bool		m_fInNotify;

@@ -111,6 +111,7 @@ HexView::HexView(HWND hwnd)	:
 	m_fResizeAddr(false),
 	m_nScrollCounter(0),
 	m_nScrollTimer(0),
+	m_nScrollMouseRemainder(0),
 	m_fCursorAdjustment(FALSE),
 	
 	//m_fHighlighting(false),
