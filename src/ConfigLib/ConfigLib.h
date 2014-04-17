@@ -23,6 +23,7 @@ HCONFIG  OpenConfig(LPCTSTR pszConfigFile);
 BOOL     SaveConfig(LPCTSTR pszConfigFile, HCONFIG config);
 HCONFIG  CreateConfig();
 VOID	 CloseConfig(HCONFIG config);
+void	 DeleteConfigSection(HCONFIG config);
 
 //HCONFIG GetConfigSection(HCONFIG config,  LPCTSTR szSectionName);
 HCONFIG EnumConfigSection(HCONFIG config, LPCTSTR szSectionName, int idx);
