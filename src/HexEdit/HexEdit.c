@@ -897,8 +897,17 @@ LRESULT HexEdit_OnNotify(MAINWND *mainWnd, HWND hwnd, UINT idCtrl, NMHDR *hdr)
 
 	if (hdr->code == FCN_FILECHANGE)
 	{
-		InitTypeLibrary();
-		UpdateTypeView();
+		NMFILECHANGE *nmfc = (NMFILECHANGE *)hdr;
+		TCHAR szMessage[MAX_PATH + 100];
+		wsprintf(szMessage, TEXT("%s\r\n\r\nThis file has changed outside of the TypeView editor.\r\nDo you want to reload the changes?"), nmfc->pszFile);
+
+		UINT ret = MessageBox(hwnd, szMessage, TEXT("HexEdit"), MB_ICONQUESTION | MB_YESNO);
+
+		if (ret == IDYES)
+		{
+			InitTypeLibrary();
+			UpdateTypeView();
+		}
 		return 0;
 	}
 
