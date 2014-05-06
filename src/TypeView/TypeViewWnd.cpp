@@ -601,18 +601,6 @@ LRESULT CALLBACK TypeViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		NMGRIDVIEW *nmgv = (NMGRIDVIEW *)lParam;
 		NMFILECHANGE *nmfc = (NMFILECHANGE *)lParam;
 
-		if(nmfc->hdr.code == FCN_FILECHANGE)
-		{
-			TCHAR szMessage[MAX_PATH+100];
-			wsprintf(szMessage, TEXT("%s\r\n\r\nThis file has changed outside of the TypeView editor.\r\nDo you want to reload the changes?"), nmfc->pszFile);
-
-			UINT ret = MessageBox(hwnd, szMessage, TEXT("HexEdit"), MB_ICONQUESTION|MB_YESNO);
-
-			if(ret == IDYES)
-				UpdateTypeView();
-			return 0;
-		}
-
 		// 
 		if(nmgv->hdr.code == GVN_CANINSERT || nmgv->hdr.code == GVN_CANDELETE)
 		{
