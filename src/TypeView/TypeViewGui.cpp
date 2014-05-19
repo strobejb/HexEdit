@@ -181,22 +181,29 @@ void FormatDataItem(HWND hwndGV, HGRIDITEM hItem, Type *type, size_w dwOffset)
 	TCHAR buf[200] = TEXT("");
 
 	DWORD i, count = 20;
-	BYTE HexData[14];
+	BYTE HexData[MAX_STRING_LEN];
 
 	HWND hwndHV = GetActiveHexView(g_hwndMain);
 	DWORD numread;
 
+	Type *arrayType;
+	INUMTYPE charCount;
+
 	numread = HexView_GetData(hwndHV, dwOffset, (BYTE *)&HexData, sizeof(HexData));
 
-	if(type->link->ty == typeARRAY)
-		type = type->link->link;
-	else
+	if (type->link->ty != typeARRAY)
 		return;
+
+	arrayType = type->link;
+	type = arrayType->link;
 
 	switch(type->ty)
 	{
 	case typeCHAR:
-		_stprintf(buf, TEXT("\"%hs\""),  (char *)HexData);
+		Evaluate(GridView_GetParent(hwndGV, hItem), arrayType->elements, &charCount, dwOffset, hwndHV, hwndGV);
+		charCount = min(charCount & 0xffff, sizeof HexData - 1);
+		HexData[charCount] = 0;
+		_stprintf(buf, TEXT("\"%hs\""), (char *)HexData);
 		gvitem.state	= 0;
 		break;
 
