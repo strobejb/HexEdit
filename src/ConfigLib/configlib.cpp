@@ -88,6 +88,15 @@ void CloseConfig(HCONFIG config)
 	}
 }
 
+void DeleteConfigSection(HCONFIG config)
+{
+	TiXmlNode *parent = config->Parent();
+	if (parent)
+	{
+		parent->RemoveChild(config);
+	}
+}
+
 HCONFIG EnumConfigSection(HCONFIG config, LPCTSTR szSectionName, int idx)
 {
 	char path8[100], *tok, *next;

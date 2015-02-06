@@ -41,18 +41,18 @@ static HWND CreateGVToolTip(HWND hwndParent)
 	//	Create the tooltip for truncated item info-tips
 	//
 	HWND hwndTT = CreateWindowEx(WS_EX_TOPMOST,
-        TOOLTIPS_CLASS,
-        TEXT("WTF"),
-        WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_NOANIMATE ,		
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
+		TOOLTIPS_CLASS,
+		TEXT("WTF"),
+		WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_NOANIMATE ,		
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
 		hwndParent,
-        NULL,
-        GetModuleHandle(0),
-        NULL
-        );
+		NULL,
+		GetModuleHandle(0),
+		NULL
+		);
 
 	SetWindowPos(hwndTT, HWND_TOPMOST,0,0,0,0,
 				SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREDRAW|SWP_NOSIZE);
@@ -105,6 +105,7 @@ GridView::GridView(HWND hwnd)
 	m_nCurrentColumn = 0;
 	m_nCurrentLine	= 0;
 	m_nScrollTimer  = 0;
+	m_nScrollMouseRemainder = 0;
 	m_hwndEdit		= 0;
 	m_hwndComboLBox = 0;
 	m_pTempInsertItem = 0;

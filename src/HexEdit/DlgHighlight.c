@@ -28,6 +28,14 @@
 #include "HexFile.h"
 #include "trace.h"
 
+#define IDC_HIGHLIGHT_GRIDVIEW	5678
+
+#define IDC_HIGHLIGHT_ADD		1
+#define IDC_HIGHLIGHT_EDIT		2
+#define IDC_HIGHLIGHT_DELETE	3
+#define IDC_HIGHLIGHT_SHOWALL	4
+#define IDC_HIGHLIGHT_REPORT	5
+
 HWND CreateEmptyToolbar(HWND hwndParent, int nBitmapIdx, int nBitmapWidth, int nCtrlId, DWORD dwExtraStyle);
 void AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, TCHAR *szText);
 int  ResizeToolbar(HWND hwndTB);
@@ -122,7 +130,7 @@ INT_PTR CALLBACK HighlightDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 	static HWND	hwndHV;
 	size_w	offset, length;
-	BOOKMARK bm;
+	BOOKMARK bm = {0};
 
 	static TCHAR title[100];
 	static TCHAR text[200];
@@ -138,6 +146,9 @@ INT_PTR CALLBACK HighlightDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		SendDlgItemMessage(hwnd, IDC_NAME, EM_SETCUEBANNER, TRUE, (LPARAM)TEXT("Enter some descriptive text here"));
 		SendDlgItemMessage(hwnd, IDC_ANNOTATION, EM_SETCUEBANNER, 0, (LPARAM)TEXT("Enter some descriptive text here"));
+
+		//MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO1), fgcollist, fgtextlist, 16);
+		MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO4), bgcollist, bgtextlist, 16);
 
 		hbm = (HBOOKMARK)lParam;
 
@@ -161,16 +172,22 @@ INT_PTR CALLBACK HighlightDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			length = bm.length;
 			lstrcpy(title, bm.pszTitle);
 			lstrcpy(text, bm.pszText);
+
+			// Set the selected color
+			for (int i = 0; i < 16; i++)
+			{
+				if (bm.backcol == bgcollist[i])
+				{
+					SendMessage(GetDlgItem(hwnd, IDC_COMBO4), CB_SETCURSEL, i, 0);
+					break;
+				}
+			}
 		}
 
 		SetDlgItemBaseInt(hwnd, IDC_OFFSET, offset, 16, 1);
 		SetDlgItemBaseInt(hwnd, IDC_LENGTH, length, 16, 1);
 		SetDlgItemText(hwnd, IDC_NAME, title);
 		SetDlgItemText(hwnd, IDC_ANNOTATION, text);
-
-		
-		//MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO1), fgcollist, fgtextlist, 16);
-		MakeColourCombo(GetDlgItem(hwnd, IDC_COMBO4), bgcollist, bgtextlist, 16);
 	
 	//ClientToScreen(hwndParent, &pt);
 		//GetCursorPos(&pt);
@@ -478,14 +495,151 @@ BOOL SaveHighlights(HWND hwndHexView)
 	return TRUE;
 }
 
+void DeleteBookmarkFromConfig(LPCTSTR szFilename, LPCTSTR szBookmarkName)
+{
+	WIN32_FIND_DATA win32fd;
+	HANDLE hFind;
+	TCHAR szBookPath[MAX_PATH];
+	TCHAR szFilePath[MAX_PATH];
+	TCHAR szRefFilePath[MAX_PATH] = { 0 };
+
+	GetProgramDataPath(szBookPath, MAX_PATH);
+	lstrcat(szBookPath, TEXT("\\Bookmarks\\*"));
+
+	// enumerate all files in the bookmarks directory
+	if ((hFind = FindFirstFile(szBookPath, &win32fd)) != 0)
+	{
+		do
+		{
+			if ((win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			{
+				GetProgramDataPath(szBookPath, MAX_PATH);
+				wsprintf(szFilePath, TEXT("%s\\Bookmarks\\%s"), szBookPath, win32fd.cFileName);
+
+				HCONFIG configFile = OpenConfig(szFilePath);
+				if (configFile)
+				{
+					if (GetConfigStr(configFile, TEXT("hexFileData\\filePath"), szRefFilePath, MAX_PATH, 0) && _tcscmp(szRefFilePath, szFilename) == 0)
+					{
+						HCONFIG bookmarksSection = OpenConfigSection(configFile, TEXT("hexFileData\\bookmarks"));
+						DWORD idx = 0;
+						HCONFIG bookmark = 0;
+						DWORD countedBookmarks = 0;
+						while (bookmark = EnumConfigSection(bookmarksSection, TEXT("bookmark"), idx++))
+						{
+							TCHAR title[100];
+							BOOKMARK bm = { 0 };
+							bm.pszTitle = title;
+							bm.nMaxTitle = ARRAYSIZE(title);
+
+							if (GetConfigBookmark(bookmark, &bm) && _tcscmp(title, szBookmarkName) == 0)
+							{
+								DeleteConfigSection(bookmark);
+							}
+							else
+							{
+								countedBookmarks++;
+							}
+						}
+
+						SaveConfig(szFilePath, configFile);
+						CloseConfig(configFile);
+						if (countedBookmarks == 0)
+						{
+							DeleteFile(szFilePath);
+						}
+						break;
+					}
+					CloseConfig(configFile);
+				}
+			}
+
+		} while (FindNextFile(hFind, &win32fd));
+
+		FindClose(hFind);
+	}
+}
+
 LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	extern HWND g_hwndMain;
 
 	HWND hwndHV = GetActiveHexView(g_hwndMain);
 
-	if(msg == WM_COMMAND)
+	if (msg == WM_COMMAND)
 	{
+		switch (LOWORD(wParam))
+		{
+		case IDC_HIGHLIGHT_ADD:
+			HighlightDlg(NULL, NULL);
+			break;
+		case IDC_HIGHLIGHT_EDIT:
+		{
+			HWND hwndGridView = GetDlgItem(hwnd, IDC_HIGHLIGHT_GRIDVIEW);
+			ULONG curSelItem = GridView_GetCurSel(hwndGridView);
+			HGRIDITEM hgCurSelItem = GridView_GetItemHandle(hwndGridView, curSelItem);
+			GVITEM curItem = { GVIF_PARAM, curSelItem, 0 };
+
+			// Get the current item - param contains the HBOOKMARK for this item
+			if (GridView_GetItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+			{
+				HBOOKMARK hbm = curItem.param;
+
+				// Get the parent item - param contains the HWND for the hexview
+				if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+				{
+					HWND hwndHexView = curItem.param;
+
+					HighlightDlg(hwndHexView, hbm);
+				}
+			}
+
+			break;
+		}
+		case IDC_HIGHLIGHT_DELETE:
+		{
+			TCHAR itemText[100] = { 0 };
+			HWND hwndGridView = GetDlgItem(hwnd, IDC_HIGHLIGHT_GRIDVIEW);
+			ULONG curSelItem = GridView_GetCurSel(hwndGridView);
+			HGRIDITEM hgCurSelItem = GridView_GetItemHandle(hwndGridView, curSelItem);
+			GVITEM curItem = { GVIF_PARAM | GVIF_TEXT, curSelItem, 0 };
+			curItem.pszText = itemText;
+			curItem.cchTextMax = ARRAYSIZE(itemText);
+
+			// Get the current item - param contains the HBOOKMARK for this item
+			if (GridView_GetItem(hwndGridView, hgCurSelItem, &curItem))
+			{
+				if (curItem.param)
+				{
+					HBOOKMARK hbm = curItem.param;
+
+					// Get the parent item - param contains the HWND for the hexview
+					if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
+					{
+						HWND hwndHexView = curItem.param;
+
+						GridView_DeleteItem(hwndGridView, hgCurSelItem);
+						HexView_DelBookmark(hwndHexView, hbm);
+						GridView_Update(hwndGridView);
+					}
+				}
+				else
+				{
+					// This wasn't a live bookmark - it exists in a config file
+					TCHAR parentText[100] = { 0 };
+					curItem.pszText = parentText;
+					if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem))
+					{
+						DeleteBookmarkFromConfig(parentText, itemText);
+						GridView_DeleteAll(hwndGridView);
+						UpdateHighlights(TRUE);
+					}
+				}
+			}
+
+			break;
+		}
+		}
 		return 0;
 	}
 
@@ -593,12 +747,12 @@ HWND CreateHighlightView(HWND hwndParent)
 	SendMessage(hwndTB1, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
 
 	GetWindowWidth(hwndTB1);
-	AddButton(hwndTB1, -0, 0, TBSTYLE_BUTTON, _T("Add"));
-	AddButton(hwndTB1, -0, 3, TBSTYLE_BUTTON, _T("Edit"));
-	AddButton(hwndTB1, -0, 1, TBSTYLE_BUTTON, _T("Delete"));
+	AddButton(hwndTB1, IDC_HIGHLIGHT_ADD, 0, TBSTYLE_BUTTON, _T("Add"));
+	AddButton(hwndTB1, IDC_HIGHLIGHT_EDIT, 3, TBSTYLE_BUTTON, _T("Edit"));
+	AddButton(hwndTB1, IDC_HIGHLIGHT_DELETE, 1, TBSTYLE_BUTTON, _T("Delete"));
 	AddButton(hwndTB1, -0, 0, TBSTYLE_SEP, 0);
-	AddButton(hwndTB1, -0, 2, TBSTYLE_BUTTON|TBSTYLE_CHECK, _T("Show All"));
-	AddButton(hwndTB1, -0, 4, TBSTYLE_BUTTON, _T("Create Report"));
+	AddButton(hwndTB1, IDC_HIGHLIGHT_SHOWALL, 2, TBSTYLE_BUTTON|TBSTYLE_CHECK, _T("Show All"));
+	AddButton(hwndTB1, IDC_HIGHLIGHT_REPORT, 4, TBSTYLE_BUTTON, _T("Create Report"));
 	ResizeToolbar(hwndTB1);
 	ToolPanel_AddItem(hwndPanel, hwndTB1, 0);
 	ToolPanel_AddNewLine(hwndPanel, 4);
@@ -609,7 +763,7 @@ HWND CreateHighlightView(HWND hwndParent)
 	//
 	//	Create the gridview!!
 	//
-	hwndGridView = PrepGridView2(hwndPanel, 5678);	
+	hwndGridView = PrepGridView2(hwndPanel, IDC_HIGHLIGHT_GRIDVIEW);
 	
 	GridView_SetStyle(hwndGridView, -1, GVS_READONLY|GVS_FULLROWSELECT|GVS_VERTGRIDLINES//|GVS_TREELINES
 		//|GVS_SHOWFOCUS
@@ -636,7 +790,7 @@ HWND GetBookmarkWnd()
 		DockWnd_GetContents(g_hwndMain, DWID_HIGHLIGHT);
 			
 //				(HWND)-1,//hwndHV, 
-//				GetDlgItem(hwndBookMark, 5678));
+//				GetDlgItem(hwndBookMark, IDC_HIGHLIGHT_GRIDVIEW));
 	return hwndBookMark;
 
 }
@@ -644,7 +798,7 @@ HWND GetBookmarkWnd()
 //
 //	Add hexview's bookmarks to the gridview
 //
-void Ooop(HGRIDITEM hRoot, HWND hwndHexView, HWND hwndGridView, COLORREF col)
+void FillHexViewHighlights(HGRIDITEM hRoot, HWND hwndHexView, HWND hwndGridView, COLORREF col)
 {
 	BOOKMARK bm;
 	HBOOKMARK hbm;
@@ -670,7 +824,7 @@ void MkRootGVITEM(GVITEM *gvitem, LPCTSTR szText, BOOL fBold, PVOID param)
 //
 //	Add hexview's filename + bookmarks to the gridview
 //
-void Ooop2(HGRIDITEM hRoot, HWND hwndHexView, HWND hwndGridView, COLORREF col)
+void AddHexViewHighlights(HGRIDITEM hRoot, HWND hwndHexView, HWND hwndGridView, COLORREF col)
 {
 	GVITEM gvitem = { 0 };
 	HGRIDITEM hItem;
@@ -681,23 +835,21 @@ void Ooop2(HGRIDITEM hRoot, HWND hwndHexView, HWND hwndGridView, COLORREF col)
 	MkRootGVITEM(&gvitem, szFileName, TRUE, 0);	
 	hItem = GridView_InsertChild(hwndGridView, hRoot, &gvitem);
 	
-	Ooop(hItem, hwndHexView, hwndGridView, col);
+	FillHexViewHighlights(hItem, hwndHexView, hwndGridView, col);
 }
 
-HGRIDITEM Ooop3(HGRIDITEM hRoot, LPCTSTR szFileName, HWND hwndGridView, BOOL fBold)
+HGRIDITEM CreateBookmarkFileRoot(HGRIDITEM hRoot, LPCTSTR szFileName, HWND hwndGridView, BOOL fBold)
 {
 	GVITEM gvitem = { 0 };
 	HGRIDITEM hItem;
 
 	MkRootGVITEM(&gvitem, szFileName, fBold, 0);	
 	hItem = GridView_InsertChild(hwndGridView, hRoot, &gvitem);
+
 	return hItem;
-	
-	//EnumHighlights(sz
-	//Ooop(hItem, hwndHexView, hwndGridView);
 }
 
-BOOL Ooop4(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBookPath, COLORREF col)
+BOOL UpdateHighlightsFromConfig(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBookPath, COLORREF col)
 {
 	HCONFIG hConf, hBookmarks;
 	HBOOKMARK bookmark;
@@ -711,8 +863,6 @@ BOOL Ooop4(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBookPath, COLORREF col)
 	{
 		if(GetConfigStr(hConf, TEXT("hexFileData\\filePath"), szFilePath, MAX_PATH, 0))
 		{
-
-
 			hBookmarks = OpenConfigSection(hConf, TEXT("hexFileData\\bookmarks"));
 
 			for(i = 0; bookmark = EnumConfigSection(hBookmarks, TEXT("bookmark"), (int)i); i++)
@@ -723,8 +873,12 @@ BOOL Ooop4(HGRIDITEM hRoot, HWND hwndGridView, TCHAR *szBookPath, COLORREF col)
 				// do we need to add a root item?
 				if(hRoot == 0)
 				{
-					GVITEM gvitem = { 0 };
-					hRoot = Ooop3(GVI_ROOT, szFilePath, hwndGridView, FALSE);
+					GVITEM gvitem = { GVIF_TEXT };
+					gvitem.pszText = szFilePath;
+					hRoot = GridView_FindChild(hwndGridView, GVI_ROOT, &gvitem);
+
+					if (!hRoot)
+						hRoot = CreateBookmarkFileRoot(GVI_ROOT, szFilePath, hwndGridView, FALSE);
 
 					gvitem.mask  = GVIF_PARAM|GVIF_FONT;
 					gvitem.iFont = 0; // regular
@@ -767,7 +921,7 @@ BOOL UpdateHighlights2(HWND hwndHexView, HWND hwndGridView)
 	if(hwndHexView == 0)
 	{
 		// just add bookmarks for specified hexview
-		Ooop(GVI_ROOT, hwndHexView, hwndGridView, 0);
+		FillHexViewHighlights(GVI_ROOT, hwndHexView, hwndGridView, 0);
 	}
 	else if(hwndHexView != (HWND)-1)
 	{
@@ -776,7 +930,7 @@ BOOL UpdateHighlights2(HWND hwndHexView, HWND hwndGridView)
 		// add bookmarks for all open files
 		for(i = 0; (hwndHexView = EnumHexView(g_hwndMain, i)) != 0; i++)
 		{
-			Ooop2(GVI_ROOT, hwndHexView, hwndGridView, 0);
+			AddHexViewHighlights(GVI_ROOT, hwndHexView, hwndGridView, 0);
 		}
 	}
 	else 
@@ -810,11 +964,11 @@ BOOL UpdateHighlights2(HWND hwndHexView, HWND hwndGridView)
 
 					if((hwndHV = HexIsOpen(g_hwndMain, szFilePath, 0)) != 0)
 					{
-						Ooop2(GVI_ROOT, hwndHV, hwndGridView, 0);
+						AddHexViewHighlights(GVI_ROOT, hwndHV, hwndGridView, 0);
 					}
 					else
 					{
-						hItem = Ooop3(GVI_ROOT, szFilePath, hwndGridView, FALSE);
+						hItem = CreateBookmarkFileRoot(GVI_ROOT, szFilePath, hwndGridView, FALSE);
 					//EnumHighlights(szBookPath, addgv, hwndGridView);
 
 						hBookmarks = OpenConfigSection(hConf, TEXT("hexFileData\\bookmarks"));
@@ -871,7 +1025,7 @@ BOOL UpdateHighlight(LPCTSTR pszFilePath, TCHAR * pszBookPath, BOOL fAlways)
 	GVITEM    gvitem = { GVIF_TEXT };
 
 	// get the bookmark window's gridview
-	if((hwndGV = GetDlgItem(GetBookmarkWnd(), 5678)) == 0)
+	if ((hwndGV = GetDlgItem(GetBookmarkWnd(), IDC_HIGHLIGHT_GRIDVIEW)) == 0)
 		return FALSE;
 
 	// find the gridview item for specified filename
@@ -887,7 +1041,7 @@ BOOL UpdateHighlight(LPCTSTR pszFilePath, TCHAR * pszBookPath, BOOL fAlways)
 	{
 		// yes - update bookmarks from the hexview
 		if(hItem == 0)
-			hItem = Ooop3(GVI_ROOT, pszFilePath, hwndGV, TRUE);
+			hItem = CreateBookmarkFileRoot(GVI_ROOT, pszFilePath, hwndGV, TRUE);
 
 		gvitem.mask  = GVIF_PARAM|GVIF_FONT;
 		gvitem.iFont = 1; // bold
@@ -895,7 +1049,7 @@ BOOL UpdateHighlight(LPCTSTR pszFilePath, TCHAR * pszBookPath, BOOL fAlways)
 		GridView_SetItem(hwndGV, hItem, &gvitem);
 
 		GridView_DeleteChildren(hwndGV, hItem);
-		Ooop(hItem, hwndHV, hwndGV, RGB(0,0,0));
+		FillHexViewHighlights(hItem, hwndHV, hwndGV, RGB(0,0,0));
 		//		UpdateHighlights(
 	}
 	else if(fAlways)
@@ -910,9 +1064,9 @@ BOOL UpdateHighlight(LPCTSTR pszFilePath, TCHAR * pszBookPath, BOOL fAlways)
 		}
 
 		//if(hItem == 0 && pszFilePath)
-		//	hItem = Ooop3(GVI_ROOT, pszFilePath, hwndGV, FALSE);
+		//	hItem = CreateBookmarkFileRoot(GVI_ROOT, pszFilePath, hwndGV, FALSE);
 
-		Ooop4(hItem, hwndGV, pszBookPath, RGB(128, 128, 128));
+		UpdateHighlightsFromConfig(hItem, hwndGV, pszBookPath, RGB(128, 128, 128));
 
 		InvalidateRect(hwndGV, 0, 0);
 	}
@@ -931,7 +1085,7 @@ BOOL UpdateHighlights(BOOL fAlways)
 {
 	HWND hwndGridView;
 
-	if((hwndGridView = GetDlgItem(GetBookmarkWnd(), 5678)) == 0)
+	if ((hwndGridView = GetDlgItem(GetBookmarkWnd(), IDC_HIGHLIGHT_GRIDVIEW)) == 0)
 		return FALSE;
 
 	SendMessage(hwndGridView, WM_SETREDRAW, FALSE, 0);
@@ -964,7 +1118,7 @@ BOOL UpdateHighlights(BOOL fAlways)
 			FindClose(hFind);
 		}
 	}
-	else
+	//else
 	{
 		int i;
 		HWND hwndHexView;

@@ -356,7 +356,9 @@ LRESULT GridView::OnMouseWheel(int nDelta)
 		if(nScrollLines <= 1)
 			nScrollLines = 3;
 
-		Scroll(0, (-nDelta/120) * nScrollLines);
+		int nScrollAmount = nDelta + m_nScrollMouseRemainder;
+		m_nScrollMouseRemainder = nScrollAmount % (120 / nScrollLines);
+		Scroll(0, -nScrollAmount * nScrollLines / 120);
 		//RepositionCaret();
 	}
 	
