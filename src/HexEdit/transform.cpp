@@ -114,7 +114,6 @@ void transform( BYTE * buf, size_t len, int operation, BYTE * operand, int baset
 	case 4:	transform <INT8>	( (INT8   *)buf, len / sizeof(INT8),   operation, *((INT8   *)operand), swapendian); break;
 	case 5:	transform <INT16>	( (INT16  *)buf, len / sizeof(INT16),  operation, *((INT16  *)operand), swapendian); break;
 	case 6:	transform <INT32>	( (INT32  *)buf, len / sizeof(INT32),  operation, *((INT32  *)operand), swapendian); break;
-	case 7:	transform <INT64>	( (INT64  *)buf, len / sizeof(INT64),  operation, *((INT64  *)operand), swapendian); break;
 	case 8:	transform <float>	( (float  *)buf, len / sizeof(float),  operation, *((float  *)operand), swapendian); break;
 	case 9:	transform <double>	( (double *)buf, len / sizeof(double), operation, *((double *)operand), swapendian); break;
 	}

@@ -137,6 +137,7 @@ INT_PTR CALLBACK ModifyDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPara
 	static int  nLastOperation = 0;
 	static BOOL fBigEndian	   = FALSE;
 	int basetype;
+	int searchtype;
 
 	static const int SearchTypeFromBaseType[] = 
 	{
@@ -199,13 +200,13 @@ INT_PTR CALLBACK ModifyDlgProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPara
 		case IDOK:
 			
 			// get the basetype we are using
-			basetype = (int)SendDlgItemMessage(hwnd, IDC_INSERT_DATATYPE, CB_GETCURSEL, 0, 0);
-			basetype = SearchTypeFromBaseType[basetype];
+			basetype   = (int)SendDlgItemMessage(hwnd, IDC_INSERT_DATATYPE, CB_GETCURSEL, 0, 0);
+			searchtype = SearchTypeFromBaseType[basetype];
 
 			// get the operand in raw-byte format, ensure it is always little-endian
 			// as we must do these calculations using the native byte ordering format
 			operandLen = sizeof(operandData);
-			UpdateSearchData(GetDlgItem(hwnd, IDC_MODIFY_OPERAND), basetype, FALSE, operandData, &operandLen);
+			UpdateSearchData(GetDlgItem(hwnd, IDC_MODIFY_OPERAND), searchtype, FALSE, operandData, &operandLen);
 
 			HexView_GetSelSize(hwndHV, &len);
 			ModifyHexViewData(hwndHV, nLastOperation, operandData, len, basetype, fBigEndian);
