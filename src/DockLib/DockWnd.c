@@ -361,6 +361,9 @@ LRESULT DockPanel_OnNotify(DOCKPANEL *dpp, WPARAM wParam, NMHDR *hdr)
 static HHOOK g_hKeyboardHook;
 static LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam)
 {
+	if (g_hKeyboardHook == 0)
+		return 0;
+
 	if(code < 0)
 		return CallNextHookEx(g_hKeyboardHook, code, wParam, lParam);
 
