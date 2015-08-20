@@ -811,7 +811,7 @@ LRESULT DockPanel_OnMoving(DOCKPANEL *dppThis)
 			{
 				hwndAnimPanel = hwndTransPanel;
 				SetWindowLongPtr(hwndAnimPanel, GWLP_USERDATA, 255);
-				SetTimer(dppThis->hwndPanel, (UINT)hwndAnimPanel, 10, 0);
+				SetTimer(dppThis->hwndPanel, (UINT_PTR)hwndAnimPanel, 10, 0);
 				hwndTransPanel = 0;
 			}
 		}

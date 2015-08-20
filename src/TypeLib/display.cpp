@@ -76,9 +76,9 @@ int DisplayWhitespace(FILE *fp, FILEREF *fileRef, char *newcomment)
 	char *s, *cs, *ce, *e;
 	if(LocateComment(fileRef, &s, &cs, &ce, &e))
 	{
-		fprintf(fp, "%.*s", cs-s, s);
+		fprintf(fp, "%.*s", (int)(cs-s), s);
 		fprintf(fp, newcomment);
-		fprintf(fp, "%.*s", e-ce, ce);
+		fprintf(fp, "%.*s", (int)(e-ce), ce);
 	}
 
 /*	if(fileRef->wspEnd > fileRef->wspStart)
@@ -126,7 +126,7 @@ int DisplayWhitespace(FILE *fp, FILEREF *fileRef)
 		//while(s2 > s1 && isspace(*(s2-1)))
 		//	s2--;
 
-		return fprintf(fp, "%.*s", s2-s1, s1);
+		return fprintf(fp, "%.*s", (int)(s2-s1), s1);
 	}
 
 	return 0;
@@ -172,11 +172,11 @@ void PrintType(Type *type)
 		switch(type->ty)
 		{
 		case typePOINTER:	printf(" POINTER(*) -> "); break;
-		case typeARRAY:		printf(" ARRAY[%d] -> ", Evaluate(type->elements)); break;
+		case typeARRAY:		printf(" ARRAY[%d] -> ", (int)Evaluate(type->elements)); break;
 		case typeTYPEDEF:	printf(" TYPEDEF(%s) -> ", type->sym->name); break;
 		case typeSTRUCT:	printf(" STRUCT(%s) ", type->sptr->symbol->name);	break;
 		case typeENUM:		printf(" ENUM(%s) ", type->eptr->symbol->name);		break;
-		case typeFUNCTION:	printf(" FUNC-returning ", type->fptr->symbol->name);		break;	
+		case typeFUNCTION:	printf(" FUNC-returning(%s)", type->fptr->symbol->name);		break;	
 
 		case typeCHAR:		case typeWCHAR: 
 		case typeBYTE:		case typeWORD:
@@ -279,7 +279,7 @@ size_t RecurseDisplayType(FILE *fp, TypeDecl *typeDecl, Type *type, int indent, 
 					else
 						len += print_indent(fp, indent+1);
 
-					len += fprintf(fp, "%s", eptr->fieldList[i]->name);
+					len += fprintf(fp, "%s", (char *)eptr->fieldList[i]->name);
 					
 					if(eptr->fieldList[i]->expr)
 					{

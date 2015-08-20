@@ -296,7 +296,7 @@ INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			switch(LOWORD(wParam))
 			{
 			case IDC_ITEMLIST:
-				idx = SendDlgItemMessage(hwnd, IDC_ITEMLIST, LB_GETCURSEL, 0, 0);
+				idx = (int)SendDlgItemMessage(hwnd, IDC_ITEMLIST, LB_GETCURSEL, 0, 0);
 				g_crPreviewFG = HexView_RealiseColour(g_colorItem[idx].fgColor);
 				g_crPreviewBG = HexView_RealiseColour(g_colorItem[idx].bgColor);
 				InvalidateRect(GetDlgItem(hwnd, IDC_PREVIEW), 0, 0);

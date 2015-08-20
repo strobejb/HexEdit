@@ -492,7 +492,7 @@ LONG OnGridViewDropDown(HWND hwnd, UINT msg, NMGRIDVIEW *nmgv)
 //
 LRESULT CALLBACK TypeViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	INITCOMMONCONTROLSEX ice = { sizeof(ice), -1 };
+	INITCOMMONCONTROLSEX ice = { sizeof(ice), (DWORD)-1 };
 	TCHAR szTextBuf[200];
 
 	HWND hwndGridView = GetDlgItem(hwnd, IDC_TYPEVIEW_GRIDVIEW);

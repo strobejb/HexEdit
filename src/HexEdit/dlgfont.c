@@ -63,7 +63,7 @@ typedef struct
 
 static PVOID RoundUp(PVOID ptr, DWORD align)
 {
-	DWORD p = (DWORD)ptr;
+	DWORD_PTR p = (DWORD_PTR)ptr;
 	
 	if(p % align != 0)
 	{
@@ -139,13 +139,13 @@ static PVOID CopyDialogItem(DLGITEMTEMPLATEEX *destDlg, PVOID source, BOOL fExte
 	else				while(*sptr++);		// title-string
 	if(*sptr == 0x0000) sptr += 1;			// creation data
 	else				//sptr += RoundUp(sptr, 
-						sptr = (WCHAR *)((DWORD)sptr + (DWORD)(*sptr));// creation data
+						sptr = (WCHAR *)((DWORD_PTR)sptr + (DWORD_PTR)(*sptr));// creation data
 
 	sptr = RoundUp(sptr, sizeof(DWORD));
 
 	if(destDlg)
 	{
-		memcpy(destDlg+1, sptr2, (DWORD)sptr - (DWORD)sptr2);
+		memcpy(destDlg+1, sptr2, (DWORD_PTR)sptr - (DWORD_PTR)sptr2);
 	}
 
 	//while((DWORD_PTR)sptr & 3)
@@ -222,8 +222,8 @@ static PVOID CopyDialog(DLGTEMPLATEEX *destDlg, PVOID source, BOOL fExtended, WC
 	if(destDlg)
 	{
 		destDlg++;
-		memcpy(destDlg, sptr2, (DWORD)sptr - (DWORD)sptr2);
-		destDlg = (DLGTEMPLATEEX *)((DWORD)destDlg + (DWORD)sptr - (DWORD)sptr2); 
+		memcpy(destDlg, sptr2, (DWORD_PTR)sptr - (DWORD_PTR)sptr2);
+		destDlg = (DLGTEMPLATEEX *)((DWORD_PTR)destDlg + (DWORD_PTR)sptr - (DWORD_PTR)sptr2); 
 	}
 
 	if(fIncludeFont)
@@ -337,7 +337,7 @@ HGLOBAL DialogExFromTemplate(HINSTANCE hInst, HANDLE hTemplate, LPCTSTR szFontNa
 	//
 	// allocate room for the resulting dialogex template
 	//
-	if((destDlg = GlobalAlloc(GPTR, (DWORD)srcItem - (DWORD)srcDlg + (lstrlenW(wszFontName) + 1) * sizeof(WCHAR))) == 0)
+	if((destDlg = GlobalAlloc(GPTR, (DWORD_PTR)srcItem - (DWORD_PTR)srcDlg + (lstrlenW(wszFontName) + 1) * sizeof(WCHAR))) == 0)
 	{
 		GlobalUnlock(hTemplate);
 		return NULL;

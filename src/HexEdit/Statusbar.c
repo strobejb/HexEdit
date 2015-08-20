@@ -376,7 +376,7 @@ HWND CreateToolbarPart(HWND hwndStatusBar, int nCtrlId, int nBitmapResId, int nB
 		WS_VISIBLE|WS_CHILD|TBSTYLE_FLAT|TBSTYLE_LIST|
 		TBSTYLE_TRANSPARENT |CCS_NORESIZE|CCS_NODIVIDER,
 		0,0,0,0,
-		hwndStatusBar,(HMENU)nCtrlId,
+		hwndStatusBar,(HMENU)(UINT_PTR)nCtrlId,
 		0,0
 		);
 

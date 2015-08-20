@@ -42,6 +42,7 @@ int  ResizeToolbar(HWND hwndTB);
 HWND HexIsOpen(HWND hwndMain, LPCTSTR szFileName, int *idx);
 BOOL HexSetCurFileName(HWND hwndMain, LPCTSTR szFileName);
 BOOL HexSetCurFileHwnd(HWND hwndMain, HWND);
+BOOL UpdateHighlights(BOOL fAlways);
 
 COLORREF bgcollist[] = 
 {
@@ -303,7 +304,7 @@ void FillGridView2(HWND hwndGV, HGRIDITEM hGridItem, HBOOKMARK hbm, BOOKMARK *bm
 	HGRIDITEM hItem;
 
 	TCHAR szOffset[32];
-	_stprintf(szOffset, TEXT("%08I64X  (%d bytes)"), bm->offset, bm->length);
+	_stprintf(szOffset, TEXT("%08I64X  (%d bytes)"), bm->offset, (int)bm->length);
 
 	gvitem.pszText	= bm->pszTitle;
 	gvitem.iSubItem = 0;
@@ -583,12 +584,12 @@ LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam,
 			// Get the current item - param contains the HBOOKMARK for this item
 			if (GridView_GetItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
 			{
-				HBOOKMARK hbm = curItem.param;
+				HBOOKMARK hbm = (HBOOKMARK)curItem.param;
 
 				// Get the parent item - param contains the HWND for the hexview
 				if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
 				{
-					HWND hwndHexView = curItem.param;
+					HWND hwndHexView = (HWND)curItem.param;
 
 					HighlightDlg(hwndHexView, hbm);
 				}
@@ -611,12 +612,12 @@ LRESULT CALLBACK HighlightViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam,
 			{
 				if (curItem.param)
 				{
-					HBOOKMARK hbm = curItem.param;
+					HBOOKMARK hbm = (HBOOKMARK)curItem.param;
 
 					// Get the parent item - param contains the HWND for the hexview
 					if (GridView_GetParentItem(hwndGridView, hgCurSelItem, &curItem) && curItem.param)
 					{
-						HWND hwndHexView = curItem.param;
+						HWND hwndHexView = (HWND)curItem.param;
 
 						GridView_DeleteItem(hwndGridView, hgCurSelItem);
 						HexView_DelBookmark(hwndHexView, hbm);

@@ -14,7 +14,7 @@
 #include "trace.h"
 
 HRESULT GetDataObjBuf(IDataObject *pDataObject, LPCTSTR szFormat, PVOID pData, DWORD nLength);
-HRESULT GetDataObjDword(IDataObject *pDataObject, LPCTSTR szFormat, DWORD *pdwValue);
+HRESULT GetDataObjDword(IDataObject *pDataObject, LPCTSTR szFormat, DWORD_PTR *pdwValue);
 
 /*DWORD GetClipboardDataPtr(TCHAR *szFormatName, PVOID pData, DWORD nLength)
 {
@@ -362,7 +362,7 @@ VOID HexView::ClipboardShutdown()
 	// is our dataobject still on the clipboard?
 	if(S_OK == OleIsCurrentClipboard(m_pLastDataObject))
 	{
-		DWORD len;
+		DWORD_PTR len;
 
 		// see how much data we put there
 		if(GetDataObjDword(m_pLastDataObject, CFSTR_HEX_DATALEN, &len) == S_OK)

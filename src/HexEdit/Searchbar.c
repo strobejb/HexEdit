@@ -149,7 +149,7 @@ HWND CreateChild(DWORD dwStyleEx, DWORD dwStyle, TCHAR *szClass, HWND hwndParent
 	//GetStockObject(DEFAULT_GUI_FONT)
 	HWND hwnd;
 	
-	hwnd = CreateWindowEx(dwStyleEx, szClass, 0, dwStyle, 0, 0, 0,0, hwndParent, (HMENU)nCommandId, 0, 0);
+	hwnd = CreateWindowEx(dwStyleEx, szClass, 0, dwStyle, 0, 0, 0,0, hwndParent, (HMENU)(UINT_PTR)nCommandId, 0, 0);
 
 	if(hFont == 0)
 		hFont = CreateFont(-16,0,0,0,FW_BOLD,0,0,0,0,0,0,0,0, TEXT("Segoe UI"));
@@ -173,8 +173,8 @@ typedef PVOID (__fastcall * VALIDATEHWND)(HWND hwnd);
 
 PVOID ValidateHwnd(HWND hwnd)
 {
-    DWORD ptr  =  (DWORD  )memchr(GetWindowRect, 0xE8, 100);
-    DWORD addr = *(DWORD *)(ptr+1) + ptr + 5;
+    DWORD_PTR ptr  =  (DWORD_PTR  )memchr(GetWindowRect, 0xE8, 100);
+    DWORD_PTR addr = *(DWORD_PTR *)(ptr+1) + ptr + 5;
 
     VALIDATEHWND _ValidateHwnd = (VALIDATEHWND)addr;
 	//PVOID (__fastcall * _ValidateHwnd)(HWND hwnd) = ((PVOID)(__fastcall *)(HWND))addr;

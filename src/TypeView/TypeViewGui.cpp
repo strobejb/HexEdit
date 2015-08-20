@@ -255,7 +255,7 @@ void FormatWhitespace(FILEREF *fileRef, TCHAR *buf)
 	char *s, *cs, *ce, *e;
 	if(LocateComment(fileRef, &s, &cs, &ce, &e))
 	{
-		_stprintf(buf, TEXT("%.*hs"), ce-cs, cs);
+		_stprintf(buf, TEXT("%.*hs"), (int)(ce-cs), cs);
 	}
 	else
 	{
@@ -516,7 +516,7 @@ size_w FmtData(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOffset, TypeDe
 		{
 			if(Evaluate(eptr->fieldList[i]->expr) == *wptr)
 			{
-				_stprintf(buf, TEXT("%hs"), eptr->fieldList[i]->name);
+				_stprintf(buf, TEXT("%hs"), eptr->fieldList[i]->name->name);
 				break;
 			}
 		}
@@ -615,7 +615,7 @@ size_w FmtData(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOffset, TypeDe
 				{
 					if(Evaluate(eptr->fieldList[i]->expr) == *wptr)
 					{
-						_stprintf(buf, TEXT("%hs"), eptr->fieldList[i]->name);
+						_stprintf(buf, TEXT("%hs"), eptr->fieldList[i]->name->name);
 						break;
 					}
 				}
@@ -912,7 +912,7 @@ size_w RecurseType(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOffset, Ty
 			HGRIDITEM hItem;
 			TCHAR buf[164];
 
-			int len = _stprintf(buf, TEXT("[%d]  "), i);
+			int len = _stprintf(buf, TEXT("[%d]  "), (int)i);
 
 			if(sym)
 			{
@@ -954,7 +954,7 @@ size_w RecurseType(HWND hwndGV, HGRIDITEM hRoot, Type *type, size_w dwOffset, Ty
 	// add the 'offset' column to all items
 	if(hRoot)
 	{
-		_stprintf(buf, TEXT("%08x"), dwOffset);
+		_stprintf(buf, TEXT("%08x"), (DWORD)dwOffset);
 		gvitem.pszText		= buf;
 		gvitem.iSubItem		= COLIDX_OFFSET;
 		gvitem.state		= 0;

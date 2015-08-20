@@ -242,7 +242,7 @@ HWND CreateToolTip(HWND hwndTarget)
     ti.uFlags = TTF_SUBCLASS|TTF_IDISHWND;
     ti.hwnd = hwndTarget;
     ti.hinst = g_hInstance;
-    ti.uId = (UINT)hwndTarget;
+    ti.uId = (UINT_PTR)hwndTarget;
     ti.lpszText = TEXT("Ballooooon");
         // ToolTip control will cover the whole window
     ti.rect.left = rect.left;    
@@ -903,24 +903,24 @@ LRESULT HexEdit_OnNotify(MAINWND *mainWnd, HWND hwnd, UINT idCtrl, NMHDR *hdr)
 		{
 		case DWID_TOOLBAR:
 			mainWnd->hwndToolbar = InitToolbar(hdr->hwndFrom);
-			return (LONG)mainWnd->hwndToolbar;
+			return (LONG_PTR)mainWnd->hwndToolbar;
 
 		case DWID_SEARCHBAR:
-			return (LONG)CreateSearchBar(hdr->hwndFrom);
+			return (LONG_PTR)CreateSearchBar(hdr->hwndFrom);
 
 		case DWID_ALLTYPES:
 			//SendMessage(hwndTB, TB_SETSTATE, IDM_TOOLS_TYPEVIEW, DockWnd_IsOpen(g_hwndMain, DWID_TYPEVIEW) ? TBSTATE_CHECKED|TBSTATE_ENABLED : TBSTATE_ENABLED);
-			return (LONG)CreateTypeView(hdr->hwndFrom, nmdw->hKey, TRUE);//TEXT("struct ALL"));
+			return (LONG_PTR)CreateTypeView(hdr->hwndFrom, nmdw->hKey, TRUE);//TEXT("struct ALL"));
 
 		case DWID_TYPEVIEW:
 			//SendMessage(hwndTB, TB_SETSTATE, IDM_TOOLS_TYPEVIEW, DockWnd_IsOpen(g_hwndMain, DWID_TYPEVIEW) ? TBSTATE_CHECKED|TBSTATE_ENABLED : TBSTATE_ENABLED);
-			return (LONG)CreateTypeView(hdr->hwndFrom, nmdw->hKey, 0);
+			return (LONG_PTR)CreateTypeView(hdr->hwndFrom, nmdw->hKey, 0);
 
 		case DWID_HIGHLIGHT:
-			return (LONG)CreateHighlightView(hdr->hwndFrom);
+			return (LONG_PTR)CreateHighlightView(hdr->hwndFrom);
 
 		case DWID_STRINGS:
-			return (LONG)CreateStringsView(hdr->hwndFrom);
+			return (LONG_PTR)CreateStringsView(hdr->hwndFrom);
 		}
 	}
 	else if(hdr->code == DWN_DOCKCHANGE)
@@ -948,7 +948,7 @@ LRESULT HexEdit_OnNotify(MAINWND *mainWnd, HWND hwnd, UINT idCtrl, NMHDR *hdr)
 		return 0;
 	}
 	
-	return DefWindowProc(hwnd, WM_NOTIFY, idCtrl, (LONG)hdr);
+	return DefWindowProc(hwnd, WM_NOTIFY, idCtrl, (LPARAM)hdr);
 }
 
 

@@ -19,7 +19,7 @@ bool IsKeyPressed(UINT);
 //
 LRESULT GridView::OnChar(UINT nChar)
 {
-	TCHAR ch[] = { nChar, '\0' };
+	TCHAR ch[] = { (TCHAR)nChar, '\0' };
 
 	if(nChar < 32)		return 0;
 

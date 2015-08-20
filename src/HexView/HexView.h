@@ -416,7 +416,7 @@ typedef struct _NMHVBOOKMARK
  *
  */
 #define HexView_SetStyle(hwnd, uMask, uStyle) \
-	(UINT)SNDMSG((hwnd), HVM_SETSTYLE, (WPARAM)(UINT)(uMask), (LPARAM)(UINT)(uStyle))
+	(UINT)SNDMSG((hwnd), HVM_SETSTYLE, (WPARAM)(UINT_PTR)(uMask), (LPARAM)(UINT_PTR)(uStyle))
 
 /**
  * Specify the byte-grouping arrangement in the hex-pane. This allows
@@ -425,7 +425,7 @@ typedef struct _NMHVBOOKMARK
  * @param UINT nBytes - the number of bytes in each column grouping
  */
 #define HexView_SetGrouping(hwnd, nBytes) \
-	(UINT)SNDMSG((hwnd), HVM_SETGROUPING, (WPARAM)(UINT)(nBytes), 0)
+	(UINT)SNDMSG((hwnd), HVM_SETGROUPING, (WPARAM)(UINT_PTR)(nBytes), 0)
 
 /**
  * Return the current styles selected into the hexview control
@@ -434,7 +434,7 @@ typedef struct _NMHVBOOKMARK
  * @param
  */
 #define HexView_GetStyle(hwnd) \
-	(UINT)SNDMSG((hwnd), HVM_GETSTYLE, (WPARAM)(UINT)(-1), 0)
+	(UINT)SNDMSG((hwnd), HVM_GETSTYLE, (WPARAM)(UINT_PTR)(-1), 0)
 
 /**
  * Return the style value(s) specified by the mask. The uMask
@@ -468,7 +468,7 @@ typedef struct _NMHVBOOKMARK
  * @param
  */
 #define HexView_SetSearchPattern(hwnd, pData, nLength) \
-	(UINT)SNDMSG((hwnd), HVM_SETSEARCHPAT, (WPARAM)(ULONG)(nLength), (LPARAM)(PBYTE)(pData))
+	(UINT)SNDMSG((hwnd), HVM_SETSEARCHPAT, (WPARAM)(ULONG_PTR)(nLength), (LPARAM)(PBYTE)(pData))
 
 /**
  * Return the current position of the cursor, as an offset
@@ -621,7 +621,7 @@ typedef struct _NMHVBOOKMARK
 //!					HVOF_READONLY, HVOF_QUICKLOAD, HVOF_QUICKSAVE
 //!
 #define HexView_OpenFile(hwnd, szFileName, uMethod) \
-	(UINT)SNDMSG((hwnd), HVM_OPENFILE, (WPARAM)(UINT)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
+	(UINT)SNDMSG((hwnd), HVM_OPENFILE, (WPARAM)(UINT_PTR)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
 
 //!
 //!	HexView_SaveFile
@@ -631,7 +631,7 @@ typedef struct _NMHVBOOKMARK
 //!					HVOF_READONLY, HVOF_QUICKLOAD, HVOF_QUICKSAVE
 //!
 #define HexView_SaveFile(hwnd, szFileName, uMethod) \
-	(UINT)SNDMSG((hwnd), HVM_SAVEFILE, (WPARAM)(UINT)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
+	(UINT)SNDMSG((hwnd), HVM_SAVEFILE, (WPARAM)(UINT_PTR)(uMethod), (LPARAM)(LPCTSTR)(szFileName))
 
 #define HexView_InitBuf(hwnd, pBuffer, nLength) \
 	(UINT)SNDMSG((hwnd), HVM_INITBUF, (WPARAM)(const PBYTE)(pBuffer), (LPARAM)(UINT_PTR)(nLength))
@@ -885,7 +885,7 @@ typedef struct _NMHVBOOKMARK
  * @param COLORREF color - a RGB value, or a HEX_SYSCOLOR value
  */
 #define HexView_SetColor(hwnd, index, color) \
-	(UINT)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT)(index), (LPARAM)(COLORREF)(color))
+	(UINT)SNDMSG((hwnd), HVM_SETCOLOR, (WPARAM)(UINT_PTR)(index), (LPARAM)(COLORREF)(color))
 
 /**
  * Get the color-value for the specified HexView display element

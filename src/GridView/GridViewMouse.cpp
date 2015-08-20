@@ -43,7 +43,7 @@ LRESULT GridView::NotifyParent(UINT nCode, HGRIDITEM hItem)
 	LRESULT    res;
 	NMGRIDVIEW nmgv =
 	{
-		{ m_hWnd, GetWindowLongPtr(m_hWnd, GWL_ID), nCode },
+		{ m_hWnd, (UINT_PTR)GetWindowLongPtr(m_hWnd, GWL_ID), nCode },
 		0,
 		hItem,
 		{0,0},

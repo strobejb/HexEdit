@@ -389,7 +389,7 @@ void sequence::debug1 ()
 		//printf("%.*s", sptr->length, buffer + sptr->offset);
 
 		char *buffer = (char *)getptr(sptr);
-		printf("%.*s", sptr->length, buffer);
+		printf("%.*s", (int)sptr->length, buffer);
 	}
 
 	printf("\n");
@@ -405,9 +405,11 @@ void sequence::debug2 ()
 		//char *buffer = (char *)buffer_list[sptr->buffer]->buffer;
 		char *buffer = (char *)getptr(sptr);
 		
-		printf("[%d] [%4d %4d] %.*s\n", sptr->id, 
-			sptr->offset, sptr->length,
-			sptr->length, buffer);
+		printf("[%d] [%4d %4d] %.*s\n", 
+			(int)sptr->id,
+			(int)sptr->offset, 
+			(int)sptr->length,
+			(int)sptr->length, buffer);
 	}
 
 	printf("-------------------------\n");
@@ -417,9 +419,12 @@ void sequence::debug2 ()
 		//char *buffer = (char *)buffer_list[sptr->buffer]->buffer;
 		char *buffer = (char *)getptr(sptr);
 		
-		printf("[%d] [%4d %4d] %.*s\n", sptr->id, 
-			sptr->offset, sptr->length,
-			sptr->length, buffer + sptr->offset);
+		printf("[%d] [%4d %4d] %.*s\n", 
+			(int)sptr->id,
+			(int)sptr->offset, 
+			(int)sptr->length,
+			(int)sptr->length, 
+			buffer + sptr->offset);
 	}
 
 	printf("**********************\n");
@@ -428,10 +433,10 @@ void sequence::debug2 ()
 	{
 		//char *buffer = (char *)buffer_list[sptr->buffer]->buffer;
 		char *buffer = (char *)getptr(sptr);
-		printf("%.*s", sptr->length, buffer + sptr->offset);
+		printf("%.*s", (int)sptr->length, buffer + sptr->offset);
 	}
 
-	printf("\nsequence length = %d chars\n", sequence_length);
+	printf("\nsequence length = %d chars\n", (int)sequence_length);
 	printf("\n\n");
 }
 /*

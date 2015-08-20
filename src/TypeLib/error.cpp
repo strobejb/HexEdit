@@ -49,7 +49,7 @@ const char * Parser::inenglish(TOKEN t, bool use_t_state)
 	}
 	else if(t == TOK_INUMBER)
 	{
-		sprintf(buf, "'%d'", tnum);
+		sprintf(buf, "'%d'", (int)tnum);
 		return buf;
 	}
 	else if(t == TOK_FNUMBER)
@@ -205,7 +205,7 @@ void Parser::Error(ERROR err, ...)
 	char *e = errstr;
 
 	if(curFile->filePath && curFile->filePath[0])
-		e += sprintf(e, "%s(%d) : ", curFile->filePath, curFile->curLine);
+		e += sprintf(e, "%s(%d) : ", curFile->filePath, (int)curFile->curLine);
 
 	e += sprintf(e, "error E%d : ", err);
 	

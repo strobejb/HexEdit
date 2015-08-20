@@ -17,7 +17,7 @@
 #include "HexViewInternal.h"
 #include "trace.h"
 
-HRESULT GetDataObjDword(IDataObject *pDataObject, LPCTSTR szFormat, DWORD *pdwValue);
+HRESULT GetDataObjDword(IDataObject *pDataObject, LPCTSTR szFormat, DWORD_PTR *pdwValue);
 HRESULT GetDataObjBuf(IDataObject *pDataObject, LPCTSTR szFormat, PVOID pData, DWORD nLength);
 
 static WORD g_cfFileDesc = RegisterClipboardFormat(CFSTR_FILEDESCRIPTORW);
@@ -144,7 +144,7 @@ HRESULT WINAPI HexView::Drop(IDataObject * pDataObject, DWORD grfKeyState, POINT
 
 		// detect the source HWND of the drag-drop
 		HWND hwndSource;
-		GetDataObjDword(pDataObject, CFSTR_HEX_HWND, (DWORD *)&hwndSource);
+		GetDataObjDword(pDataObject, CFSTR_HEX_HWND, (DWORD_PTR *)&hwndSource);
 
 		*pdwEffect = DropEffect(grfKeyState, pt, dwAllowed);
 
@@ -235,7 +235,7 @@ DWORD HexView::DropEffect(DWORD grfKeyState, POINTL pt, DWORD dwAllowed)
 
 bool GetStgMedium(IDataObject *pDataObject, UINT cfFormat, UINT tymed, STGMEDIUM *stgmed)
 {
-	FORMATETC fmtetc = { cfFormat, 0, DVASPECT_CONTENT, -1, tymed };
+	FORMATETC fmtetc = { (CLIPFORMAT)cfFormat, 0, DVASPECT_CONTENT, -1, tymed };
 
 	return pDataObject->GetData(&fmtetc, stgmed) == S_OK ? true : false;
 }
@@ -255,7 +255,7 @@ bool HexView::DropData(IDataObject *pDataObject, bool fReplaceSelection, bool fS
 	{
 		HWND hwndSource = 0;
 
-		GetDataObjDword(pDataObject, CFSTR_HEX_HWND, (DWORD *)&hwndSource);
+		GetDataObjDword(pDataObject, CFSTR_HEX_HWND, (DWORD_PTR *)&hwndSource);
 
 		// make sure that the source of the snapshot is *this* HexView!!!
 		if(hwndSource == m_hWnd)
@@ -274,7 +274,7 @@ bool HexView::DropData(IDataObject *pDataObject, bool fReplaceSelection, bool fS
 	if(GetStgMedium(pDataObject, CF_TEXT, TYMED_HGLOBAL, &stgmed))
 	{
 		PVOID  data;
-		DWORD  len;
+		DWORD_PTR  len;
 
 		if((data = GlobalLock(stgmed.hGlobal)) != 0)
 		{

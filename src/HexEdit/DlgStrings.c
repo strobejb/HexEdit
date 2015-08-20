@@ -208,7 +208,7 @@ BOOL FindStrings(HWND hwndHV, HWND hwndGV, size_w offset, size_w length, int min
 					size_t l = min(len-i,90);
 					if(endmatch != -1)
 						l = (size_t)min(90,endmatch-startmatch);
-					_stprintf_s(samp, 100, TEXT("%.*hs"), l, buf+i+(startmatch-offset));
+					_stprintf_s(samp, 100, TEXT("%.*hs"), (int)l, buf+i+(startmatch-offset));
 				}
 				
 				// did we find the end of the string?

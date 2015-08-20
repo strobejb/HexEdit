@@ -38,7 +38,7 @@ static int numlz(size_w num)
 //	
 BOOL SetScrollInfo64(HWND hwnd, int nBar, int fMask, size_w nMax, size_w nPos, int nPage, BOOL fRedraw)
 {
-	SCROLLINFO si = { sizeof(si), fMask };
+	SCROLLINFO si = { sizeof(si), (UINT)fMask };
 
 	// normal scroll range requires no adjustment
 	if(nMax <= WIN32_SCROLLBAR_MAX)
@@ -68,7 +68,7 @@ BOOL SetScrollInfo64(HWND hwnd, int nBar, int fMask, size_w nMax, size_w nPos, i
 //
 size_w GetScrollPos64(HWND hwnd, int nBar, int fMask, size_w nMax)
 {
-	SCROLLINFO si = { sizeof(si), fMask | SIF_PAGE};
+	SCROLLINFO si = { sizeof(si), (UINT)fMask | SIF_PAGE};
 	size_w     nPos;
 
 	if(!GetScrollInfo(hwnd, nBar, &si))

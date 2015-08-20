@@ -89,7 +89,7 @@ void InitSizeList(HWND hwndCombo, TCHAR *szFontName)
 	SendMessage(hwndCombo, CB_RESETCONTENT, 0, 0);
 
 	// enumerate font sizes
-	EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontSizes, (LONG)hwndCombo, 0);
+	EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontSizes, (LPARAM)hwndCombo, 0);
 
 	count = (int)SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
 	
