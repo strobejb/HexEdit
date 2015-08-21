@@ -178,25 +178,32 @@ int Parse(char *file)
 void FormatDataItem(HWND hwndGV, HGRIDITEM hItem, Type *type, size_w dwOffset)
 {
 	GVITEM gvitem = { 0 };
-	TCHAR buf[200] = TEXT("");
+	TCHAR buf[MAX_STRING_LEN] = TEXT("");
 
 	DWORD i, count = 20;
-	BYTE HexData[14];
+	BYTE HexData[MAX_STRING_LEN];
 
 	HWND hwndHV = GetActiveHexView(g_hwndMain);
 	DWORD numread;
 
+	Type *arrayType;
+	INUMTYPE charCount;
+
 	numread = HexView_GetData(hwndHV, dwOffset, (BYTE *)&HexData, sizeof(HexData));
 
-	if(type->link->ty == typeARRAY)
-		type = type->link->link;
-	else
+	if (type->link->ty != typeARRAY)
 		return;
+
+	arrayType = type->link;
+	type = arrayType->link;
 
 	switch(type->ty)
 	{
 	case typeCHAR:
-		_stprintf(buf, TEXT("\"%hs\""),  (char *)HexData);
+		Evaluate(GridView_GetParent(hwndGV, hItem), arrayType->elements, &charCount, dwOffset, hwndHV, hwndGV);
+		charCount = min(charCount & 0xffff, sizeof HexData - 1);
+		HexData[charCount] = 0;
+		_sntprintf_s(buf, MAX_STRING_LEN, _TRUNCATE, TEXT("\"%hs\""), (char *)HexData);
 		gvitem.state	= 0;
 		break;
 
@@ -204,15 +211,16 @@ void FormatDataItem(HWND hwndGV, HGRIDITEM hItem, Type *type, size_w dwOffset)
 		{
 			DWORD *dwptr = (DWORD *)&HexData[0];
 			TCHAR *sptr = buf;
+			TCHAR *end = buf + MAX_STRING_LEN;
 
-			sptr += _stprintf(sptr, TEXT("{ "));
+			sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("{ "));
 			
 			for(i = 0; i < count; i++)
 			{
-				sptr += _stprintf(sptr, TEXT("%d, "), dwptr[i]);
+				sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("%d, "), dwptr[i]);
 			}
 
-			sptr += _stprintf(sptr, TEXT("}"));
+			sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("}"));
 			gvitem.state	= GVIS_READONLY;
 		}
 
@@ -220,15 +228,16 @@ void FormatDataItem(HWND hwndGV, HGRIDITEM hItem, Type *type, size_w dwOffset)
 		{
 			WORD *dwptr = (WORD *)&HexData[0];
 			TCHAR *sptr = buf;
+			TCHAR *end = buf + MAX_STRING_LEN;
 
-			sptr += _stprintf(sptr, TEXT("{ "));
+			sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("{ "));
 			
 			for(i = 0; i < count; i++)
 			{
-				sptr += _stprintf(sptr, TEXT("%d, "), dwptr[i]);
+				sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("%d, "), dwptr[i]);
 			}
 
-			sptr += _stprintf(sptr, TEXT("}"));
+			sptr += _sntprintf_s(sptr, end - sptr, _TRUNCATE, TEXT("}"));
 			gvitem.state	= GVIS_READONLY;
 
 		}
