@@ -601,18 +601,6 @@ LRESULT CALLBACK TypeViewCommandHandler(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		NMGRIDVIEW *nmgv = (NMGRIDVIEW *)lParam;
 		NMFILECHANGE *nmfc = (NMFILECHANGE *)lParam;
 
-		if(nmfc->hdr.code == FCN_FILECHANGE)
-		{
-			TCHAR szMessage[MAX_PATH+100];
-			wsprintf(szMessage, TEXT("%s\r\n\r\nThis file has changed outside of the TypeView editor.\r\nDo you want to reload the changes?"), nmfc->pszFile);
-
-			UINT ret = MessageBox(hwnd, szMessage, TEXT("HexEdit"), MB_ICONQUESTION|MB_YESNO);
-
-			if(ret == IDYES)
-				UpdateTypeView();
-			return 0;
-		}
-
 		// 
 		if(nmgv->hdr.code == GVN_CANINSERT || nmgv->hdr.code == GVN_CANDELETE)
 		{
@@ -679,17 +667,35 @@ void SaveTypeView(HWND hwndPanel, HKEY hKey)
 
 void FillTypeList(HWND hwndCombo)
 {
+	// Preserve the current selection if possible.
+	char selectedName[MAX_STRING_LEN] = "";
+	int idx;
+
+	idx = SendMessage(hwndCombo, CB_GETCURSEL, 0, 0);
+	if (idx != CB_ERR)
+	{
+		SendMessageA(hwndCombo, CB_GETLBTEXT, idx, (LPARAM)selectedName);
+	}
+
+	SendMessage(hwndCombo, CB_RESETCONTENT, 0, 0);
+	idx = 0;
+
 	for(size_t i = 0; i < globalTagSymbolList.size(); i++)
 	{
 		Symbol *sym = globalTagSymbolList[i];
 
 		if(IsExportedStruct(sym->type) && sym->anonymous == false)
 		{
+			if (selectedName[0] && strcmp(sym->name, selectedName) == 0)
+			{
+				idx = SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
+				selectedName[0] = 0;
+			}
 			SendMessageA(hwndCombo, CB_ADDSTRING, 0, (LPARAM)sym->name);
 		}
 	}
 
-	SendMessageA(hwndCombo, CB_SETCURSEL, 0, 0);
+	SendMessage(hwndCombo, CB_SETCURSEL, idx, 0);
 }
  
 void SetDefaultType(HWND hwndTypeView)
@@ -926,6 +932,7 @@ void UpdateTypeView()
 		id = l[i];
 		HWND hwndTypeView  = DockWnd_GetContents(g_hwndMain, id);
 		HWND hwndGridView  = GetDlgItem(hwndTypeView, IDC_TYPEVIEW_GRIDVIEW);
+		HWND hwndTypeList = GetDlgItem(hwndTypeView, IDC_TYPEVIEW_TYPECOMBO);
 
 		SetDlgItemBaseInt(hwndTypeView, IDC_TYPEVIEW_ADDRESS, offset, 16, TRUE);
 
@@ -939,6 +946,8 @@ void UpdateTypeView()
 			GetDlgItemTextA(hwndTypeView, IDC_TYPEVIEW_TYPECOMBO, typeName, 100);
 			UpdateTypeGridView(hwndGridView, offset, typeName);
 		}
+
+		FillTypeList(hwndTypeList);
 	}
 
 /**	LARGE_INTEGER freq;
