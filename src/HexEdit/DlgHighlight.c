@@ -461,7 +461,8 @@ BOOL SaveHighlights(HWND hwndHexView)
 	HBOOKMARK hbm;
 	HCONFIG config, filedata, bookmarks;
 
-	GetBookmarkFileName(hwndHexView, NULL, szBookPath);
+	if (!GetBookmarkFileName(hwndHexView, NULL, szBookPath))
+		return FALSE;
 
 	config	  = CreateConfig();
 	filedata  = CreateConfigSection(config, TEXT("hexFileData"));
