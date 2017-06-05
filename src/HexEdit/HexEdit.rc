@@ -12,7 +12,18 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+// [SnakE] Replace this include with windows.h, see below
+//#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// [SnakE] Use windows.h instead of afxres.h to avoid dependency on MFC.
+//
+#include "windows.h"
+
+#if !defined(IDC_STATIC)
+#define IDC_STATIC -1
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
