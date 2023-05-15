@@ -42,7 +42,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//	Set the version from the version resource
 		//
 		GetModuleFileName(0, szCurExe, MAX_PATH);
-		GetVersionString(szCurExe, TEXT("FileVersion"), szVersion+8, 80);
+		GetVersionString(szCurExe, TEXT("ProductVersion"), szVersion+8, 80);
 		SetDlgItemText(hwnd, IDC_ABOUT_APPNAME, szVersion);
 
 		//

@@ -671,7 +671,7 @@ void FillTypeList(HWND hwndCombo)
 	char selectedName[MAX_STRING_LEN] = "";
 	int idx;
 
-	idx = SendMessage(hwndCombo, CB_GETCURSEL, 0, 0);
+	idx = (int)SendMessage(hwndCombo, CB_GETCURSEL, 0, 0);
 	if (idx != CB_ERR)
 	{
 		SendMessageA(hwndCombo, CB_GETLBTEXT, idx, (LPARAM)selectedName);
@@ -688,7 +688,7 @@ void FillTypeList(HWND hwndCombo)
 		{
 			if (selectedName[0] && strcmp(sym->name, selectedName) == 0)
 			{
-				idx = SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
+				idx = (int)SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
 				selectedName[0] = 0;
 			}
 			SendMessageA(hwndCombo, CB_ADDSTRING, 0, (LPARAM)sym->name);

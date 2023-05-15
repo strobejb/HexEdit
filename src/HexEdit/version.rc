@@ -1,0 +1,51 @@
+#ifndef APSTUDIO_INVOKED
+
+#include "version.h"
+#define STRINGIZE_(s) #s
+#define Q(s) STRINGIZE_(s)
+        
+#undef FILE_VERSION_STRING 
+#undef PRODUCT_VERSION_STRING
+#define FILE_VERSION_STRING Q(VERSION_MAJOR) "." Q(VERSION_MINOR) "." Q(VERSION_BUILD) "." Q(VERSION_BUILD_COUNT)                              
+#define PRODUCT_VERSION_STRING Q(VERSION_MAJOR) "." Q(VERSION_MINOR) "." Q(VERSION_BUILD)                               
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_BUILD_COUNT
+ PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x3L
+#else
+ FILEFLAGS 0x2L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904b0"
+        BEGIN
+            VALUE "Comments", "Hexadecimal File Editor for Windows"
+            VALUE "CompanyName", "Catch22 Productions"
+            VALUE "FileDescription", "HexEdit"
+            VALUE "FileVersion", FILE_VERSION_STRING "\0"
+            VALUE "InternalName", "HexEdit"
+            VALUE "LegalCopyright", L"Copyright \xa9 1999 - 2023 by Catch22 Productions."
+            VALUE "OriginalFilename", "HexEdit.exe"
+            VALUE "ProductName", "HexEdit"
+            VALUE "ProductVersion", PRODUCT_VERSION_STRING "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 1200
+    END
+END
+
+#endif

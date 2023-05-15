@@ -204,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HexEdit.rc" />
+    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConfigLib\ConfigLib.vcxproj">
