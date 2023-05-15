@@ -51,7 +51,7 @@ jobs:
         path = os.path.abspath("${{env.VERSION_H}}")
         with open(path, "w") as f:
           print("#define VERSION_MAJOR", r.group(1), file=f)
-          print("#define VERSION_MIN", r.group(2), file=f)
+          print("#define VERSION_MINOR", r.group(2), file=f)
           print("#define VERSION_BUILD", r.group(3), file=f)
           print("#define VERSION_BUILD_COUNT", ${{github.run_number}}, file=f)        
           print("Writing: ", path)
