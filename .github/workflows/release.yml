@@ -65,7 +65,7 @@ jobs:
     - name: Package
       run: 
         $compress = @{
-          Path = "${{env.TARGET_PATH}}", "LICENCE.TXT", "README.md";
+          Path = "${{env.TARGET_PATH}}", "LICENCE.TXT", "README.md", "bin\typelib";
           CompressionLevel = "Optimal";
           DestinationPath = "${{env.PACKAGE_NAME}}"
         };
