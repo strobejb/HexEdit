@@ -1041,7 +1041,7 @@ void GetModuleDirectory(HMODULE hModule, TCHAR *szPath, DWORD nSize)
 }
 
 
-void InitTypeLibrary()
+extern "C" void InitTypeLibrary()
 {
 	TCHAR szPath[MAX_PATH];
 	char path[MAX_PATH];
