@@ -3,7 +3,7 @@ Catch22 HexEdit
 
 Visit the Catch22 homepage at
 
-  www.catch22.net/software
+  www.catch22.net
 
 HexEdit program and sourcecode is released under the MIT open source licence.
 Please refer to LICENCE.TXT for licencing terms and conditions.
