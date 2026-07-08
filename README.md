@@ -1,5 +1,8 @@
-Catch22 HexEdit
----------------
+Catch22 HexEdit (Legacy)
+------------------------
+
+### Notice of EOL
+HexEdit has been superceded by [Q22](https://github.com/strobejb/q22). Q22 is a more modern alternative to HexEdit, and is being actively maintained. Recently released under GPL3, Q22 is built upon the original C++ HexView engine, but the entire UX is now written in Qt6 and will support many more platforms, not just Win32. 
 
 Visit the Catch22 homepage at
 
